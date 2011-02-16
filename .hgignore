@@ -1,0 +1,9 @@
+syntax: glob
+
+.DS_Store
+*.pyc
+~*
+*.old
+env
+env26
+_build
