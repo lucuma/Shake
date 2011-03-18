@@ -1,9 +1,11 @@
 syntax: glob
-
 .DS_Store
 *.pyc
 ~*
 *.old
 env
+env25
 env26
+extra
 _build
+shake-*

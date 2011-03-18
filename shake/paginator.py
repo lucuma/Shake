@@ -13,7 +13,7 @@ from math import ceil
 DEFAULT_PER_PAGE = 10
 
 
-def _sanitize_page_number(page):
+def sanitize_page_number(page):
     if page == 'last':
         return page
     is_positive_integer = isinstance(page, int) and (page > 0)
@@ -22,9 +22,9 @@ def _sanitize_page_number(page):
     return int(page)
 
 
-def get_page(request):
-    page = request.values.get('page', 1)
-    return _sanitize_page_number(page)
+def get_page(request, page_field='page'):
+    page = request.values.get(page_field, 1)
+    return sanitize_page_number(page)
 
 
 class Paginator(object):
@@ -51,7 +51,7 @@ class Paginator(object):
         self.total = total
 
         # The current page number (1 indexed)
-        page = _sanitize_page_number(page)
+        page = sanitize_page_number(page)
         if page == 'last':
             page = self.num_pages
         self.page = page

@@ -9,6 +9,7 @@
     :license: BSD. See LICENSE for more details.
 
 """
+from datetime import datetime
 import hashlib
 import os
 
@@ -94,6 +95,7 @@ class Render(object):
 
     default_globals = {
         'ellipsis': Ellipsis,
+        'now': LocalProxy(datetime.utcnow),
         'media': media,
         'get_messages': get_messages,
         'messages': LocalProxy(get_messages),

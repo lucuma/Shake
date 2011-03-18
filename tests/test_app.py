@@ -285,7 +285,7 @@ class TestRequest(TestCase):
         
         resp = c.post('/', content_type='application/json', 
             data=json.dumps(data))
-        self.assertEqual(resp.data, str(data))
+        self.assertEqual(eval(resp.data), data)
         
         resp = c.post('/', data=json.dumps(data))
         assert resp.data == 'None'
