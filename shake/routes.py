@@ -507,12 +507,16 @@ class Rule(RuleFactory):
             self.methods = set([x.upper() for x in methods])
             if 'HEAD' not in self.methods and 'GET' in self.methods:
                 self.methods.add('HEAD')
+        self.greediness = 0
+        self.redirect_to = redirect_to
+
         if (endpoint is not None
           and not (isinstance(endpoint, basestring) or callable(endpoint))):
             raise ValueError('Endpoint must be None, a string or a callable')
         self.endpoint = endpoint
-        self.greediness = 0
-        self.redirect_to = redirect_to
+
+        if not name and isinstance(endpoint, basestring):
+            name = endpoint
         self.name = name
 
         if defaults is not None:

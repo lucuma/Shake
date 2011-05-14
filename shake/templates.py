@@ -71,6 +71,10 @@ class CSRFToken(object):
     def input(self):
         return '<input type="hidden" name="%s" value="%s">' \
             % (self.name, self.value)
+    
+    @property
+    def query(self):
+        return '%s=%s' % (self.name, self.value)
 
     def __repr__(self):
         return '<CSRFToken %s = "%s">' % (self.name, self.value)
@@ -134,23 +138,26 @@ class Render(object):
         env.tests.update(tests)
 
         self.env = env
+        self._loader = None
 
-    def get_template(self, template, alt_loader=None):
-        try:
-            return self.env.get_template(template)
-        except TemplateNotFound:
-            if not alt_loader:
-                raise
-        return alt_loader.load(self.env, template, globals=self.env.globals)
-
-    def add_loader(self, loader):
-        self.env.loader.loaders.insert(-1, loader)
+    def load_alt_loader(self, alt_loader):
+        if alt_loader:
+            self._loader = loader = self.env.loader
+            self.env.loader = jinja2.ChoiceLoader([loader, alt_loader])
+    
+    def unload_alt_loader(self):
+        if self._loader:
+            self.env.loader = self._loader
+            self._loader = None
 
     def to_string(self, template, dcontext=None, alt_loader=None, **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
-        tmpl = self.get_template(template, alt_loader)
-        return tmpl.render(context)
+        self.load_alt_loader(alt_loader)
+        tmpl = self.env.get_template(template)
+        result = tmpl.render(context)
+        self.unload_alt_loader()
+        return result
 
     def from_string(self, source, dcontext=None, **context):
         if not context and isinstance(dcontext, dict):
@@ -161,16 +168,22 @@ class Render(object):
     def to_stream(self, template, dcontext=None, alt_loader=None, **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
-        tmpl = self.get_template(template, alt_loader)
-        return tmpl.stream(context)
+        self.load_alt_loader(alt_loader)
+        tmpl = self.env.get_template(template)
+        result = tmpl.stream(context)
+        self.unload_alt_loader()
+        return result
 
     def __call__(self, template, dcontext=None, alt_loader=None, **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
         mimetype = context.pop('mimetype', self.default)
         response_class = local.app.response_class
-        tmpl = self.get_template(template, alt_loader)
-        return response_class(tmpl.render(context), mimetype=mimetype)
+        self.load_alt_loader(alt_loader)
+        tmpl = self.env.get_template(template)
+        result = tmpl.render(context)
+        self.unload_alt_loader()
+        return response_class(result, mimetype=mimetype)
 
     def get_global(self, name):
         return self.env.globals[name]
