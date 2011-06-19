@@ -67,6 +67,8 @@ class Shake(object):
         self.before_request_funcs = []
         # Functions to run before each response
         self.before_response_funcs = []
+        # Functions to run if an exception occurs
+        self.on_exception_funcs = []
 
         # Registered database objects
         self.databases = []
@@ -86,8 +88,8 @@ class Shake(object):
         self.url_map = url_map
 
         self.error_handlers = {
-            401: settings.PAGE_FORBIDDEN,
-            403: settings.PAGE_FORBIDDEN,
+            401: settings.PAGE_NOT_ALLOWED,
+            403: settings.PAGE_NOT_ALLOWED,
             404: settings.PAGE_NOT_FOUND,
             500: settings.PAGE_ERROR,
             }
@@ -132,6 +134,13 @@ class Shake(object):
         Can be used as a decorator."""
         if function not in self.before_response_funcs:
             self.before_response_funcs.append(function)
+        return function
+
+    def on_exception(self, function):
+        """Register a function to be run if an exception
+        occurs."""
+        if function not in self.on_exception_funcs:
+            self.on_exception_funcs.append(function)
         return function
 
     def preprocess_request(self, request):
@@ -197,18 +206,25 @@ class Shake(object):
 
         except (HTTPException), error:
             code = error.code
-            # In production catch all the errors without handlers
-            if not self.settings.DEBUG and code >= 400 and \
-                    not code in self.error_handlers:
-                code = 500
+            # If less than 400 is not an error
+            if code < 400:
+                return error(environ, start_response)
 
+            for handler in self.on_exception_funcs:
+                handler(error)
+
+            endpoint = None
             if code == 404 and not self.url_map._rules:
-                endpoint = views.welcome_page
+                # No URL rules? Forget about the 404 and show a welcome page
                 code = 200
+                endpoint = views.welcome_page
             else:
                 endpoint = self.error_handlers.get(code)
                 if endpoint is None:
-                    return error(environ, start_response)
+                    if self.settings.DEBUG:
+                        return error(environ, start_response)
+                    # In production try to use the default error handler
+                    endpoint = self.error_handlers.get(500)
 
             if isinstance(endpoint, basestring):
                 endpoint = import_string(endpoint)
@@ -217,6 +233,8 @@ class Shake(object):
             response.status_code = code
 
         except (Exception), error:
+            for handler in self.on_exception_funcs:
+                handler(error)
             endpoint = self.error_handlers.get(500)
             if endpoint is None or self.settings.DEBUG:
                 raise

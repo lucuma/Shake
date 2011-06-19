@@ -42,10 +42,10 @@ def error_page(request, error):
     return default_render('error.html')
 
 
-def forbidden_page(request, error):
+def not_allowed_page(request, error):
     """A default "access denied" page.
     """
-    return default_render('forbidden.html')
+    return default_render('not_allowed.html')
 
 
 def welcome_page(request, error):

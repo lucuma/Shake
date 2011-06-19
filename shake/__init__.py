@@ -40,8 +40,9 @@ except ImportError:
 from jinja2 import escape, Markup
 from werkzeug.exceptions import (abort, HTTPException, Forbidden,
     MethodNotAllowed, NotFound)
+NotAllowed = Forbidden
 from werkzeug.urls import url_quote, url_unquote
-from werkzeug.utils import cached_property, redirect
+from werkzeug.utils import cached_property, import_string, redirect
 
 from .app import Shake
 from .datastructures import ObjDict
@@ -54,7 +55,7 @@ from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .templates import (Render, TemplateNotFound, flash, get_messages,
     get_csrf_secret, new_csrf_secret)
-from .views import (not_found_page, error_page, forbidden_page, show_template,
+from .views import (not_found_page, error_page, not_allowed_page, show_template,
     send_file, from_dir)
 from .wrappers import Request, Response, SecureCookie
 

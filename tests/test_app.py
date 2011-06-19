@@ -32,8 +32,8 @@ def not_found(request, error):
 def error(request, error):
     return 'error'
 
-# Custom access denied view
-def denied(request, error):
+# Custom access "not allowed" view
+def not_allowed(request, error):
     return 'access denied'
 
 # View designed to fail
@@ -105,11 +105,11 @@ class TestApplication(TestCase):
         assert resp.status_code == 500
         assert resp.data == 'error'
     
-    def test_custom_denied(self):
+    def test_custom_not_allowed(self):
         urls = [
             Rule('/', no_pass),
             ]
-        settings = {'PAGE_FORBIDDEN': denied}
+        settings = {'PAGE_NOT_ALLOWED': not_allowed}
         app = Shake(urls, settings)
         
         c = app.test_client()
@@ -137,7 +137,7 @@ class TestApplication(TestCase):
         c = app.test_client()
         self.assertRaises(AssertionError, c.get, '/')
     
-    def test_default_denied(self):
+    def test_default_not_allowed(self):
         urls = [
             Rule('/', no_pass),
             ]

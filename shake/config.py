@@ -32,7 +32,7 @@ DEFAULT_SETTINGS = {
 
     'PAGE_NOT_FOUND': 'shake.views.not_found_page',
     'PAGE_ERROR': 'shake.views.error_page',
-    'PAGE_FORBIDDEN': 'shake.views.forbidden_page',
+    'PAGE_NOT_ALLOWED': 'shake.views.not_allowed_page',
 }
 
 

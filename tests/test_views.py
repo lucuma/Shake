@@ -7,7 +7,7 @@ import os
 import unittest
 
 from shake import Shake, abort, Rule, Render
-from shake.views import not_found_page, error_page, forbidden_page
+from shake.views import not_found_page, error_page, not_allowed_page
 from shake.views import show_template, send_file, send_file
 
 
@@ -58,7 +58,7 @@ class TestDefaultViews(unittest.TestCase):
             Rule('/', no_pass),
             ]
         settings = {
-            'PAGE_FORBIDDEN': forbidden_page
+            'PAGE_NOT_ALLOWED': not_allowed_page
             }
         app = Shake(urls, settings)
         c = app.test_client()

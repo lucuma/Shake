@@ -20,17 +20,20 @@
 <ol>
 {% for r in rules %}
     {% if not r.build_only %}
-        <li>{{ r.rule|e }}
+        <li>
+        {%- if r.subdomain %}{{ r.subdomain|e }}. {% endif -%}
+        {{ r.rule|e }}
         {%- if r.methods %} <small>[{{ r.methods|join(', ') }}]</small>{% endif -%}
         </li>
     {% endif %}
 {% endfor %}
 </ol>
-<p>The current URL, &ldquo;{{ request.path|e }}&rdquo;, didn’t match any of these.</p>
+<p>The current URL, &ldquo;{{ request.url|e }}&rdquo;, didn’t match any of these.</p>
 </div>
 <!-- WARNING:
 If this custom 404 page is smaller than 512 bytes, then Internet Explorer and 
-Chrome|Chromium will display their own built-in 404 page.
+Chrome|Chromium will display their own built-in 404 page and the robots
+will take over the world.
 -->
 </body>
 </html>

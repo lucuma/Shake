@@ -108,13 +108,19 @@ class Paginator(object):
         """0-based index of the last element in the current page."""
         end = self.start_index + self.per_page - 1
         return min(end, self.total - 1)
+    
+    @property
+    def items(self):
+        return self.query.slice(
+            (self.page - 1) * self.per_page, self.per_page
+            )
 
     def iter_pages(self, left_edge=2, left_current=2, right_current=5,
             right_edge=2):
         """Iterates over the page numbers in the pagination.  The four
         parameters control the thresholds how many numbers should be produced
         from the sides.  Skipped page numbers are represented as `None`.
-        This is how you could render such a pagination in the templates:
+        This is one way how you could render such a pagination in the templates:
 
         .. sourcecode:: html+jinja
 
