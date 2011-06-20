@@ -18,6 +18,23 @@ def index(request, name=None):
         msg = 'foo bar'
     return msg
 
+# class PaginationTestCase(TestCase):
+# 
+#     def test_basic_pagination(self):
+#         p = Paginator(None, 1, 20, 500)
+#         self.assertEqual(p.page, 1)
+#         self.assertFalse(p.has_prev)
+#         self.assert_(p.has_next)
+#         self.assertEqual(p.total, 500)
+#         self.assertEqual(p.num_pages, 25)
+#         self.assertEqual(p.next_num, 2)
+#         self.assertEqual(list(p.iter_pages()),
+#             [1, 2, 3, 4, 5, None, 24, 25])
+#         p.page = 10
+#         self.assertEqual(list(p.iter_pages()),
+#             [1, 2, None, 8, 9, 10, 11, 12, 13, 14, None, 24, 25])
+# 
+
 
 class TestUrlFor(unittest.TestCase):
 
