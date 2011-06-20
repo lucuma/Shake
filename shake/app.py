@@ -18,8 +18,8 @@ from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
 from werkzeug.wsgi import SharedDataMiddleware
 
-from . import views
 from .config import Settings
+from .controllers import welcome_page
 from .routes import Map, Rule
 from .helpers import local, json
 from .wrappers import Request, Response
@@ -216,7 +216,7 @@ class Shake(object):
             if code == 404 and not self.url_map._rules:
                 # No URL rules? Forget about the 404 and show a welcome page
                 code = 200
-                endpoint = views.welcome_page
+                endpoint = welcome_page
             else:
                 endpoint = self.error_handlers.get(code)
                 if endpoint is None:

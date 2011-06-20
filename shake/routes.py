@@ -3,9 +3,9 @@
     shake.routes
     ----------------------------------------------
 
-    When it comes to combining multiple controller or view functions (however
-    you want to call them) you need a dispatcher. A simple way would be
-    applying regular expression tests on the ``PATH_INFO`` and calling
+    When it comes to combining multiple "controller" or "view" functions
+    (however you want to call them) you need a dispatcher. A simple way would
+    be applying regular expression tests on the ``PATH_INFO`` and calling
     registered callback functions that return the value then.
 
     This module implements a much more powerful system than simple regular
@@ -97,7 +97,6 @@
     BSD license.
 
     * Added support for named rules.
-    * Preservation of the rule creation order.
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
@@ -513,10 +512,6 @@ class Rule(RuleFactory):
           and not (isinstance(endpoint, basestring) or callable(endpoint))):
             raise ValueError('Endpoint must be None, a string or a callable')
         self.endpoint = endpoint
-
-        # Auto-name
-        if not name and isinstance(endpoint, basestring):
-            name = endpoint
         self.name = name
 
         if defaults is not None:
@@ -671,10 +666,9 @@ class Rule(RuleFactory):
 
         :internal:
         """
-        return (not self.build_only and self.defaults is not None and
-            self.endpoint == rule.endpoint and self != rule and
+        return not self.build_only and self.defaults is not None and \
+            self.endpoint == rule.endpoint and self != rule and \
             self.arguments == rule.arguments
-            )
 
     def suitable_for(self, values, method=None):
         """Check if the dict of values has enough data for url generation.
@@ -890,8 +884,7 @@ class NumberConverter(BaseConverter):
             raise ValidationError()
         value = self.num_convert(value)
         if ((self.min is not None and value < self.min) or
-            (self.max is not None and value > self.max)
-            ):
+            (self.max is not None and value > self.max)):
             raise ValidationError()
         return value
 
@@ -1142,7 +1135,8 @@ class Map(object):
         in the correct order after things changed.
         """
         if self._remap:
-            #self._rules.sort(lambda a, b: a.match_compare(b))
+            ####
+            self._rules.sort(lambda a, b: a.match_compare(b))
             for rules in self._rules_by_endpoint.itervalues():
                 rules.sort(lambda a, b: a.build_compare(b))
             for rules in self._rules_by_name.itervalues():
@@ -1172,11 +1166,11 @@ class MapAdapter(object):
         self.default_method = default_method
         self.query_args = query_args
 
-    def dispatch(self, view_func, path_info=None, method=None,
+    def dispatch(self, control_func, path_info=None, method=None,
       catch_http_exceptions=False):
-        """Does the complete dispatching process. `view_func` is called with
-        the endpoint and a dict with the values for the view. It should
-        look up the view function, call it, and return a response object
+        """Does the complete dispatching process. `control_func` is called with
+        the endpoint and a dict with the values for the controller. It should
+        look up the controller function, call it, and return a response object
         or WSGI application. http exceptions are not caught by default
         so that applications can display nicer error messages by just
         catching them by hand. If you want to stick with the default
@@ -1193,21 +1187,21 @@ class MapAdapter(object):
                 return Response('Hello from the index')
 
             url_map = Map([Rule('/', 'index')])
-            views = {'index': on_index}
+            controllers = {'index': on_index}
 
             @responder
             def application(environ, start_response):
                 request = Request(environ)
                 urls = url_map.bind_to_environ(environ)
-                return urls.dispatch(lambda e, v: views[e](request, **v),
+                return urls.dispatch(lambda e, c: controllers[e](request, **c),
                                      catch_http_exceptions=True)
 
         Keep in mind that this method might return exception objects, too, so
         use :class:`Response.force_type` to get a response object.
 
-        :param view_func: a function that is called with the endpoint as
+        :param control_func: a function that is called with the endpoint as
             first argument and the value dict as second. Has to dispatch
-            to the actual view function with this information (see above).
+            to the actual controller with this information (see above).
 
         :param path_info: the path info to use for matching. Overrides the
             path info specified on binding.
@@ -1223,7 +1217,7 @@ class MapAdapter(object):
                 endpoint, args = self.match(path_info, method)
             except RequestRedirect, e:
                 return e
-            return view_func(endpoint, args)
+            return control_func(endpoint, args)
         except HTTPException, e:
             if catch_http_exceptions:
                 return e
@@ -1480,11 +1474,10 @@ class MapAdapter(object):
         self.map.update()
         if values:
             if isinstance(values, MultiDict):
-                values = dict((k, v) for k, v in values.iteritems(multi=True)
-                    if v is not None)
+                valueiter = values.iteritems(multi=True)
             else:
-                values = dict((k, v) for k, v in values.iteritems()
-                    if v is not None)
+                valueiter = values.iteritems()
+            values = dict((k, v) for k, v in valueiter if v is not None)
         else:
             values = {}
 

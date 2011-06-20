@@ -45,7 +45,9 @@ from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
 
 from .app import Shake
-from .datastructures import ObjDict
+from .controllers import (not_found_page, error_page, not_allowed_page, render_view,
+    send_file, from_dir)
+from .datastructures import StorageDict
 from .helpers import (local, json, url_for, execute, to64, from64,
     to36, from36)
 from .manager import (Manager, manager, prompt, prompt_pass, prompt_bool,
@@ -53,10 +55,9 @@ from .manager import (Manager, manager, prompt, prompt_pass, prompt_bool,
 from .paginator import get_page, sanitize_page_number, Paginator
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
-from .templates import (Render, TemplateNotFound, flash, get_messages,
+from .views import (Render, TemplateNotFound, flash, get_messages,
     get_csrf_secret, new_csrf_secret)
-from .views import (not_found_page, error_page, not_allowed_page, show_template,
-    send_file, from_dir)
+ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 

@@ -1,107 +1,52 @@
 # -*- coding: utf-8 -*-
 """
+    Test view templates
+    
     :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
     :license: BSD. See LICENSE for more details.
 """
+import jinja2
 import os
-import unittest
+import pytest
 
-from shake import Shake, abort, Rule, Render
-from shake.views import not_found_page, error_page, not_allowed_page
-from shake.views import show_template, send_file, send_file
+from shake import Shake, Rule, Render, TemplateNotFound
 
 
-def index(request):
-    return 'hello'
+views_dir = os.path.join(os.path.dirname(__file__), 'views')
+loader = jinja2.FileSystemLoader(views_dir)
 
-
-def fail(request):
-    """View designed to fail. """
-    assert False
-
-
-def no_pass(request):
-    abort(401)
-
-
-class TestDefaultViews(unittest.TestCase):
     
-    def test_default_not_found(self):
-        urls = [
-            Rule('/', index),
-            ]
-        settings = {
-            'PAGE_NOT_FOUND': not_found_page
-            }
-        app = Shake(urls, settings)
-        c = app.test_client()
-        resp = c.get('/bla')
-        self.assertEqual(resp.status_code, 404)
-        assert '<title>Page not found</title>' in resp.data
+def test_render_view():
+    render = Render(__file__, globals={'who': 'E.T.'})
     
-    def test_default_error(self):
-        urls = [
-            Rule('/', fail),
-            ]
-        settings = {
-            'DEBUG': False,
-            'PAGE_ERROR': error_page
-            }
-        app = Shake(urls, settings)
-        c = app.test_client()
-        resp = c.get('/')
-        self.assertEqual(resp.status_code, 500)
-        assert '<title>Error</title>' in resp.data
-    
-    def test_default_denied(self):
-        urls = [
-            Rule('/', no_pass),
-            ]
-        settings = {
-            'PAGE_NOT_ALLOWED': not_allowed_page
-            }
-        app = Shake(urls, settings)
-        c = app.test_client()
-        resp = c.get('/')
-        self.assertEqual(resp.status_code, 401)
-        assert '<title>Access Denied</title>' in resp.data
-
-
-class TestShowTemplate(unittest.TestCase):
-    
-    def test_render(self):
-        render = Render(__file__)
-        urls = [
-            Rule('/', show_template, 
-                defaults={'render': render, 'template': 'template.html'}),
-            ]
-        app = Shake(urls)
+    def _home(request):
+        return render('view.txt', mimetype='text/plain', action='phone')
         
-        c = app.test_client()
-        resp = c.get('/')
-        self.assertEqual(resp.data, '<h1>Hello World</h1>')
-        self.assertEqual(resp.mimetype, 'text/html')
+    urls = [
+        Rule('/home', _home),
+        ]
+    app = Shake(urls)
+    render.app = app
     
-    def test_args(self):
-        render = Render(__file__)
-        urls = [
-            Rule('/', show_template, 
-                defaults={
-                    'render': render,
-                    'template': 'template.txt',
-                    'mimetype': 'text/plain',
-                    'who': 'You',
-                    'action': 'are here:',
-                }),
-            ]
-        app = Shake(urls)
-        
-        c = app.test_client()
-        resp = c.get('/')
-        self.assertEqual(resp.data, 'You are here: /')
-        self.assertEqual(resp.mimetype, 'text/plain')
+    c = app.test_client()
+    resp = c.get('/home')
+    assert resp.status == '200 OK'
+    assert resp.data == 'E.T. phone /home'
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_template_not_found():
+    render = Render(__file__)
+    
+    def _no_template(request):
+        return render('x.html')
+    
+    urls = [
+        Rule('/', _no_template),
+        ]
+    app = Shake(urls)
+    render.app = app
+    
+    c = app.test_client()
+    with pytest.raises(TemplateNotFound):
+        c.get('/')
 

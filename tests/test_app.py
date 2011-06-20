@@ -10,8 +10,8 @@ from werkzeug.exceptions import (BadRequest, Unauthorized, Forbidden,
     LengthRequired, PreconditionFailed, RequestEntityTooLarge,
     RequestURITooLarge, UnsupportedMediaType, InternalServerError,
     NotImplemented, BadGateway, ServiceUnavailable)
-from shake import (Shake, abort, redirect, Response, Rule, json, url_for,
-    NotAllowed)
+
+from shake import (Shake, abort, redirect, Response, Rule, json, NotAllowed)
 
 
 HTTP_OK = 200
@@ -30,17 +30,17 @@ def no_pass(request):
     raise NotAllowed
 
 
-# Custom "not found" view
+# Custom "not found" controller
 def not_found(request, error):
     return 'not found'
 
 
-# Custom error view
+# Custom error controller
 def error(request, error):
     return 'error'
 
 
-# Custom access "not allowed" view
+# Custom access "not allowed" controller
 def not_allowed(request, error):
     return 'access denied'
 
@@ -505,7 +505,7 @@ def test_processors_order():
     r = []
 
     def index(request):
-        r.append('view')
+        r.append('controller')
 
     def rq1(request):
         r.append('rq1')
@@ -538,18 +538,18 @@ def test_processors_order():
     c = app.test_client()
     c.get('/')
 
-    assert r == ['rq1', 'rq2', 'view', 'rs1', 'rs2']
+    assert r == ['rq1', 'rq2', 'controller', 'rs1', 'rs2']
 
 
 def test_processors_order_exception():
     r = []
 
     def index(request):
-        r.append('view')
+        r.append('controller')
         assert False
     
-    def eview(request, error):
-        r.append('eview')
+    def econtroller(request, error):
+        r.append('econtroller')
 
     def rq1(request):
         r.append('rq1')
@@ -571,7 +571,7 @@ def test_processors_order_exception():
     urls = [
         Rule('/', index),
         ]
-    settings = {'PAGE_ERROR': eview, 'DEBUG': False}
+    settings = {'PAGE_ERROR': econtroller, 'DEBUG': False}
     app = Shake(urls, settings)
 
     app.before_request(rq1)
@@ -583,14 +583,14 @@ def test_processors_order_exception():
     c = app.test_client()
     c.get('/')
 
-    assert r == ['rq1', 'rq2', 'view', 'error', 'eview']
+    assert r == ['rq1', 'rq2', 'controller', 'error', 'econtroller']
 
 
 def test_repeated_processors():
     r = []
     
     def index(request):
-        r.append('view')
+        r.append('controller')
     
     def rq1(request):
         r.append('rq1')
@@ -619,18 +619,18 @@ def test_repeated_processors():
     c = app.test_client()
     
     c.get('/')
-    assert r == ['rq1', 'view', 'rs1']
+    assert r == ['rq1', 'controller', 'rs1']
 
 
 def test_repeated_processors_exception():
     r = []
     
     def index(request):
-        r.append('view')
+        r.append('controller')
         assert False
 
-    def eview(request, error):
-        r.append('eview')
+    def econtroller(request, error):
+        r.append('econtroller')
     
     def rq1(request):
         r.append('rq1')
@@ -645,7 +645,7 @@ def test_repeated_processors_exception():
     urls = [
         Rule('/', index),
         ]
-    settings = {'PAGE_ERROR': eview, 'DEBUG': False}
+    settings = {'PAGE_ERROR': econtroller, 'DEBUG': False}
     app = Shake(urls, settings)
     
     app.before_request(rq1)
@@ -660,7 +660,7 @@ def test_repeated_processors_exception():
     c = app.test_client()
 
     c.get('/')
-    assert r == ['rq1', 'view', 'error', 'eview']
+    assert r == ['rq1', 'controller', 'error', 'econtroller']
 
 
 def test_before_response_return():

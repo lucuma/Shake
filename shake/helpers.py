@@ -14,7 +14,6 @@ except ImportError:
     import json
 
 import os
-
 from werkzeug.local import Local
 
 from .routes import BuildError
@@ -34,7 +33,7 @@ def url_for(endpoint, method=None, external=False, **values):
         urls = local.urls
     except AttributeError:
         raise RuntimeError("You must call this function only from"
-            " inside a view or a template")
+            " inside a controller or a view")
     try:
         url = urls.build(endpoint, values, method=method,
             force_external=external)
@@ -73,7 +72,9 @@ def url_join(path, *args):
 
 
 ALPHABET36 = '0123456789abcdefghijklmnopqrstuvwxyz'
+
 ALPHABET64 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ=_'
+
 ALPHABET64_REVERSE = {
     '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8,
     '9': 9, 'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15, 'g': 16,
@@ -160,3 +161,4 @@ def from36(snum, alphabet=None):
     except KeyError:
         raise ValueError('The string is not a valid base 36 encoded integer')
     return num
+

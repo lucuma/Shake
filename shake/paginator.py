@@ -120,7 +120,7 @@ class Paginator(object):
         """Iterates over the page numbers in the pagination.  The four
         parameters control the thresholds how many numbers should be produced
         from the sides.  Skipped page numbers are represented as `None`.
-        This is one way how you could render such a pagination in the templates:
+        This is one way how you could render such a pagination in the views:
 
         .. sourcecode:: html+jinja
 

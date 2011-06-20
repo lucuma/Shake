@@ -7,7 +7,7 @@
     :license: BSD. See LICENSE for more details.
 
 """
-from .datastructures import ObjDict
+from .datastructures import StorageDict
 
 
 DEFAULT_SETTINGS = {
@@ -30,9 +30,9 @@ DEFAULT_SETTINGS = {
     'TIMEZONE': 'utc',
     'LOCALE': 'en_US',
 
-    'PAGE_NOT_FOUND': 'shake.views.not_found_page',
-    'PAGE_ERROR': 'shake.views.error_page',
-    'PAGE_NOT_ALLOWED': 'shake.views.not_allowed_page',
+    'PAGE_NOT_FOUND': 'shake.controllers.not_found_page',
+    'PAGE_ERROR': 'shake.controllers.error_page',
+    'PAGE_NOT_ALLOWED': 'shake.controllers.not_allowed_page',
 }
 
 
@@ -40,7 +40,7 @@ class Settings(object):
 
     def __init__(self, custom):
         if isinstance(custom, dict):
-            custom = ObjDict(custom)
+            custom = StorageDict(custom)
         self.__dict__['custom'] = custom
 
     def __contains__(self, key):
