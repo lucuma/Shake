@@ -306,8 +306,11 @@ def test_is_get():
 
     resp = c.get('/')
     assert resp.data == 'True'
-
     resp = c.post('/')
+    assert resp.data == 'False'
+    resp = c.put('/')
+    assert resp.data == 'False'
+    resp = c.delete('/')
     assert resp.data == 'False'
 
 
@@ -323,8 +326,51 @@ def test_is_post():
 
     resp = c.get('/')
     assert resp.data == 'False'
-
     resp = c.post('/')
+    assert resp.data == 'True'
+    resp = c.put('/')
+    assert resp.data == 'False'
+    resp = c.delete('/')
+    assert resp.data == 'False'
+
+
+def test_is_put():
+    def index(request):
+        return str(request.is_put)
+
+    urls = [
+        Rule('/', index),
+        ]
+    app = Shake(urls)
+    c = app.test_client()
+
+    resp = c.get('/')
+    assert resp.data == 'False'
+    resp = c.post('/')
+    assert resp.data == 'False'
+    resp = c.put('/')
+    assert resp.data == 'True'
+    resp = c.delete('/')
+    assert resp.data == 'False'
+
+
+def test_is_delete():
+    def index(request):
+        return str(request.is_delete)
+
+    urls = [
+        Rule('/', index),
+        ]
+    app = Shake(urls)
+    c = app.test_client()
+
+    resp = c.get('/')
+    assert resp.data == 'False'
+    resp = c.post('/')
+    assert resp.data == 'False'
+    resp = c.put('/')
+    assert resp.data == 'False'
+    resp = c.delete('/')
     assert resp.data == 'True'
 
 
