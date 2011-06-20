@@ -5,10 +5,20 @@
 """
 import os
 import pytest
-
+from werkzeug.exceptions import (BadRequest, Unauthorized, Forbidden,
+    NotFound, MethodNotAllowed, NotAcceptable, RequestTimeout, Gone,
+    LengthRequired, PreconditionFailed, RequestEntityTooLarge,
+    RequestURITooLarge, UnsupportedMediaType, InternalServerError,
+    NotImplemented, BadGateway, ServiceUnavailable)
 from shake import (Shake, abort, redirect, Response, Rule, json, url_for,
-    Paginator)
+    NotAllowed)
 
+
+HTTP_OK = 200
+HTTP_FOUND = 302
+HTTP_FORBIDDEN = 403
+HTTP_NOT_FOUND = 404
+HTTP_ERROR = 500
 
 #### Views
 
@@ -17,7 +27,7 @@ def index(request):
 
 
 def no_pass(request):
-    abort(401)
+    raise NotAllowed
 
 
 # Custom "not found" view
@@ -42,6 +52,45 @@ def fail(request):
 
 ##### Tests
 
+def test_add_url():
+    def number(request, num):
+        return str(num)
+
+    app = Shake()
+    app.add_url('/', index)
+    app.add_url('/<int:num>/', number)
+    c = app.test_client()
+    
+    resp = c.get('/')
+    assert resp.status_code == HTTP_OK
+    assert resp.data == 'hello'
+
+    resp = c.get('/3/')
+    assert resp.status_code == HTTP_OK
+    assert resp.data == '3'
+
+
+def test_add_urls():
+    def number(request, num):
+        return str(num)
+    
+    urls = [
+        Rule('/', index),
+        Rule('/<int:num>/', number),
+        ]
+    app = Shake()
+    app.add_urls(urls)
+    c = app.test_client()
+    
+    resp = c.get('/')
+    assert resp.status_code == HTTP_OK
+    assert resp.data == 'hello'
+
+    resp = c.get('/3/')
+    assert resp.status_code == HTTP_OK
+    assert resp.data == '3'
+
+
 def test_callable_endpoint():
     urls = [
         Rule('/', index),
@@ -50,7 +99,7 @@ def test_callable_endpoint():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 200
+    assert resp.status_code == HTTP_OK
     assert resp.data == 'hello'
 
 
@@ -62,7 +111,7 @@ def test_string_endpoint():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 200
+    assert resp.status_code == HTTP_OK
     assert resp.data == 'hello'
 
 
@@ -77,7 +126,7 @@ def test_default_response():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 200
+    assert resp.status_code == HTTP_OK
     assert resp.data == ''
 
 
@@ -89,7 +138,7 @@ def test_default_not_found():
 
     c = app.test_client()
     resp = c.get('/bla')
-    assert resp.status_code == 404
+    assert resp.status_code == HTTP_NOT_FOUND
     assert '<title>Page not found</title>' in resp.data
 
 
@@ -112,7 +161,7 @@ def test_default_not_allowed():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 401
+    assert resp.status_code == HTTP_FORBIDDEN
     assert '<title>Access Denied</title>' in resp.data
 
 
@@ -127,7 +176,7 @@ def test_redirect():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 302
+    assert resp.status_code == HTTP_FOUND
 
 
 def test_custom_not_found():
@@ -139,7 +188,7 @@ def test_custom_not_found():
 
     c = app.test_client()
     resp = c.get('/bla')
-    assert resp.status_code == 404
+    assert resp.status_code == HTTP_NOT_FOUND
     assert resp.data == 'not found'
 
 
@@ -152,7 +201,7 @@ def test_custom_error():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 500
+    assert resp.status_code == HTTP_ERROR
     assert resp.data == 'error'
 
 
@@ -165,74 +214,84 @@ def test_custom_not_allowed():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 401
+    assert resp.status_code == HTTP_FORBIDDEN
     assert resp.data == 'access denied'
 
 
-def test_response_response():
-    def index(request):
-        return Response('hello world')
+def test_error_codes():
+    errors = {
+        400: BadRequest,
+        401: Unauthorized,
+        403: Forbidden,
+        404: NotFound,
+        405: MethodNotAllowed,
+        406: NotAcceptable,
+        408: RequestTimeout,
+        410: Gone,
+        411: LengthRequired,
+        412: PreconditionFailed,
+        413: RequestEntityTooLarge,
+        414: RequestURITooLarge,
+        415: UnsupportedMediaType,
+        500: InternalServerError,
+        501: NotImplemented,
+        502: BadGateway,
+        503: ServiceUnavailable,
+        }
+    settings = {'DEBUG': True}
+    
+    def index(request, code):
+        print code
+        raise errors[code]
 
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-
+    urls = [Rule('/<int:code>/', index),]
+    app = Shake(urls, settings)
     c = app.test_client()
-    resp = c.get('/')
-    assert resp.status_code == 200
-    assert resp.mimetype == 'text/plain'
-    assert resp.data == 'hello world'
+
+    for code in errors:
+        if code in app.error_handlers:
+            continue
+        resp = c.get('/%i/' % code)
+        assert resp.status_code == code
+        assert resp.data != 'error'
 
 
-def test_response_string():
-    def index(request):
-        return 'hello world'
+def test_fallback_error_code():
+    errors = {
+        400: BadRequest,
+        401: Unauthorized,
+        403: Forbidden,
+        404: NotFound,
+        405: MethodNotAllowed,
+        406: NotAcceptable,
+        408: RequestTimeout,
+        410: Gone,
+        411: LengthRequired,
+        412: PreconditionFailed,
+        413: RequestEntityTooLarge,
+        414: RequestURITooLarge,
+        415: UnsupportedMediaType,
+        500: InternalServerError,
+        501: NotImplemented,
+        502: BadGateway,
+        503: ServiceUnavailable,
+        }
+    settings = {'PAGE_ERROR': error, 'DEBUG': False}
+    
+    def index(request, code):
+        print code
+        raise errors[code]
 
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-
+    urls = [Rule('/<int:code>/', index),]
+    app = Shake(urls, settings)
     c = app.test_client()
-    resp = c.get('/')
-    assert resp.status_code == 200
-    assert resp.mimetype == 'text/plain'
-    assert resp.data == 'hello world'
 
-
-def test_response_none():
-    def index(request):
-        return None
-
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-
-    c = app.test_client()
-    resp = c.get('/')
-    assert resp.status_code == 200
-    assert resp.mimetype == 'text/plain'
-    assert resp.data == ''
-
-
-def test_response_json():
-    data = {'foo': 'bar', 'num': 3}
-
-    def index(request):
-        return data
-
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-
-    c = app.test_client()
-    resp = c.get('/')
-    assert resp.status_code == 200
-    assert resp.mimetype == 'application/json'
-    assert eval(resp.data) == data
+    for code in errors:
+        if code in app.error_handlers:
+            continue
+        resp = c.get('/%i/' % code)
+        assert resp.status_code == code
+        assert resp.data == 'error'
 
 
 def test_is_get():
@@ -289,6 +348,97 @@ def test_is_json():
     assert resp.data == 'None'
 
 
+def test_response_response():
+    def index(request):
+        return Response('hello world')
+
+    urls = [
+        Rule('/', index),
+        ]
+    app = Shake(urls)
+
+    c = app.test_client()
+    resp = c.get('/')
+    assert resp.status_code == HTTP_OK
+    assert resp.mimetype == 'text/plain'
+    assert resp.data == 'hello world'
+
+
+def test_response_string():
+    def index(request):
+        return 'hello world'
+
+    urls = [
+        Rule('/', index),
+        ]
+    app = Shake(urls)
+
+    c = app.test_client()
+    resp = c.get('/')
+    assert resp.status_code == HTTP_OK
+    assert resp.mimetype == 'text/plain'
+    assert resp.data == 'hello world'
+
+
+def test_response_none():
+    def index(request):
+        return None
+
+    urls = [
+        Rule('/', index),
+        ]
+    app = Shake(urls)
+
+    c = app.test_client()
+    resp = c.get('/')
+    assert resp.status_code == HTTP_OK
+    assert resp.mimetype == 'text/plain'
+    assert resp.data == ''
+
+
+def test_response_json():
+    data = {'foo': 'bar', 'num': 3}
+
+    def index(request):
+        return data
+
+    urls = [
+        Rule('/', index),
+        ]
+    app = Shake(urls)
+
+    c = app.test_client()
+    resp = c.get('/')
+    assert resp.status_code == HTTP_OK
+    assert resp.mimetype == 'application/json'
+    assert eval(resp.data) == data
+
+
+def test_response_invalid():
+    class A:
+        pass
+    
+    invalid_responses = [
+        42,
+        [], (),
+        [1, 2, 3],
+        ('a', 'b', 'c'),
+        lambda x: 2 * x,
+        os.path,
+        Ellipsis,
+        A,
+        A(),
+        ]
+
+    for r in invalid_responses:
+        urls = [Rule('/', lambda request: r)]
+        app = Shake(urls)
+    
+        c = app.test_client()
+        with pytest.raises(Exception):
+            c.get('/')
+
+
 def test_response_mimetype():
     def index(request):
         return Response('hello world', mimetype='foo/bar')
@@ -300,7 +450,7 @@ def test_response_mimetype():
 
     c = app.test_client()
     resp = c.get('/')
-    assert resp.status_code == 200
+    assert resp.status_code == HTTP_OK
     assert resp.mimetype == 'foo/bar'
     assert resp.data == 'hello world'
 
@@ -500,7 +650,7 @@ def test_session():
 
     resp = c.get('/p1/')
     resp = c.get('/p2/')
-    assert resp.status_code == 200
+    assert resp.status_code == HTTP_OK
 
 
 def test_session_nosecret():

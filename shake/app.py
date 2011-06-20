@@ -88,7 +88,6 @@ class Shake(object):
         self.url_map = url_map
 
         self.error_handlers = {
-            401: settings.PAGE_NOT_ALLOWED,
             403: settings.PAGE_NOT_ALLOWED,
             404: settings.PAGE_NOT_FOUND,
             500: settings.PAGE_ERROR,
