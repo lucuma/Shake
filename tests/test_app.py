@@ -4,7 +4,7 @@
     :license: BSD. See LICENSE for more details.
 """
 import os
-from unittest import TestCase
+import pytest
 
 from shake import (Shake, abort, redirect, Response, Rule, json, url_for,
     Paginator)
