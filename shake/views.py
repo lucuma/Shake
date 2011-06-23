@@ -21,7 +21,6 @@ from .helpers import local, url_for, to64
 from . import media
 
 
-VIEWS_DIR = 'views'
 LOCAL_FLASHES = '_fm'
 
 
@@ -113,17 +112,17 @@ class Render(object):
         # Test for the mysterious Ellipsis object :P
         'ellipsis': (lambda obj: obj == Ellipsis),
         }
+    
+    default_filters = {}
 
-    def __init__(self, root_path=None, loader=None, default='text/html',
+    def __init__(self, views_path=None, loader=None, default='text/html',
       **kwargs):
         filters = kwargs.pop('filters', {})
         tests = kwargs.pop('tests', {})
         tglobals = kwargs.pop('globals', {})
         self.default = default
 
-        if root_path and not loader:
-            root_path = os.path.dirname(root_path)
-            views_path = os.path.join(root_path, VIEWS_DIR)
+        if views_path and not loader:
             loader = jinja2.FileSystemLoader(views_path)
 
         kwargs.setdefault('autoescape', False)
@@ -132,6 +131,8 @@ class Render(object):
 
         env.globals.update(self.default_globals)
         env.globals.update(tglobals)
+        
+        env.globals.update(self.default_filters)
         env.filters.update(filters)
 
         env.tests.update(self.default_tests)
@@ -175,14 +176,14 @@ class Render(object):
         return result
 
     def __call__(self, view_template, dcontext=None, alt_loader=None, **context):
-        if not context and isinstance(dcontext, dict):
-            context = dcontext
-        mimetype = context.pop('mimetype', self.default)
-        response_class = local.app.response_class
         self.load_alt_loader(alt_loader)
         tmpl = self.env.get_template(view_template)
+        if not context and isinstance(dcontext, dict):
+            context = dcontext
         result = tmpl.render(context)
         self.unload_alt_loader()
+        mimetype = context.pop('mimetype', self.default)        
+        response_class = local.app.response_class
         return response_class(result, mimetype=mimetype)
 
     def get_global(self, name):

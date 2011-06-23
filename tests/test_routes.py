@@ -56,6 +56,17 @@ def test_basic_routing():
         assert False
 
 
+def test_priority():
+    map = Map([
+        Rule('/foo/<name>/', 'cdefault'),
+        Rule('/foo/bar/', 'cfoo'),
+        ])
+    adapter = map.bind('example.com', '/')
+
+    assert adapter.match('/foo/bar/') == ('cfoo', {})
+    assert adapter.match('/foo/blargh/') == ('cdefault', {'name': 'blargh'})
+
+
 def test_named_routes():
     map = Map([
         Rule('/foo', 'cfoo', name='foo'),

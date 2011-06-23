@@ -1,1 +1,0 @@
-{{ who }} {{ action }} {{ request.path }}

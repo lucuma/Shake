@@ -18,6 +18,10 @@ HTTP_NOT_FOUND = 404
 HTTP_ERROR = 500
 
 
+views_dir = os.path.join(os.path.dirname(__file__), 'res')
+render = Render(views_dir)
+
+
 def index(request):
     return 'hello'
 
@@ -77,7 +81,6 @@ def test_default_not_allowed():
 
 
 def test_render_view_controller():
-    render = Render(__file__)
     urls = [
         Rule('/', render_view, 
             defaults={'render': render, 'view': 'view.html'}),
@@ -91,21 +94,21 @@ def test_render_view_controller():
 
 
 def test_render_view_controller_args():
-    render = Render(__file__)
     urls = [
         Rule('/', render_view, 
             defaults={
                 'render': render,
                 'view': 'view.txt',
-                'mimetype': 'text/plain',
+                'mimetype': 'foo/bar',
                 'who': 'You',
-                'action': 'are here:',
+                'action': 'are',
+                'where': 'here'
             }),
         ]
     app = Shake(urls)
     
     c = app.test_client()
     resp = c.get('/')
-    assert resp.data == 'You are here: /'
-    assert resp.mimetype == 'text/plain'
+    assert resp.data == 'You are here'
+    assert resp.mimetype == 'foo/bar'
 
