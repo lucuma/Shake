@@ -1,0 +1,9 @@
+~*
+.DS_Store
+*.pyc
+.hg*
+env
+env25
+env26
+_build
+shake-*
