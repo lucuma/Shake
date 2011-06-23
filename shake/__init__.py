@@ -61,4 +61,4 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = 2.2
+__version__ = 2.0
