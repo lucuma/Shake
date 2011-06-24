@@ -5,11 +5,13 @@
     :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
     :license: BSD. See LICENSE for more details.
 """
+from datetime import datetime, timedelta
 import jinja2
 import os
 import pytest
 
-from shake import Shake, Rule, Render, ViewNotFound
+from shake import (Shake, Rule, Render, ViewNotFound, flash, get_messages,
+    get_csrf_secret, new_csrf_secret, local)
 
 
 views_dir = os.path.join(os.path.dirname(__file__), 'res')
@@ -40,46 +42,289 @@ def test_from_to_string():
     assert resp == 'Testing, 1 2 3...'
 
 
-def test_default_globals():
-    g = {'who':'E.T.', 'action':'phone', 'where':'home'}
-    render = Render(views_dir, globals=g)
+def test_mimetype():
+    render1 = Render(views_dir)
+    render2 = Render(views_dir, default='foo/bar')
 
-    resp = render.to_string('view.html')
-    assert resp == '<h1>Hello World</h1>'
-    resp = render.to_string('view.txt')
-    assert resp == 'E.T. phone home'
-    
+    def t1(request):
+        resp = render1('view.html')
+        assert isinstance(resp, local.app.response_class)
+        assert resp.mimetype == 'text/html'
 
-#TODO
-def test_default_tests():
-    pass
+    def t2(request):
+        resp = render2('view.html')
+        assert isinstance(resp, local.app.response_class)
+        assert resp.mimetype == 'foo/bar'
+
+    urls = [
+        Rule('/t1', t1),
+        Rule('/t2', t2),
+        ]
+    app = Shake(urls)
+    local.app = app
+    c = app.test_client()
+    c.get('/t1')
+    c.get('/t2')
 
 
 def test_globals():
-    pass
+    gg = {'who':'E.T.', 'action':'phone', 'where':'home'}
+    render = Render(globals=gg)
+    tmpl = '{{ who }} {{ action }} {{ where }}'
+    resp = render.from_string(tmpl)
+    assert resp == 'E.T. phone home'
 
 
-#TODO
 def test_filters():
-    pass
+    def double(val):
+        return val * 2
+
+    def cut(text):
+        return text[:3]
+
+    ff = {'double': double, 'cut': cut}
+    render = Render(filters=ff)
+    tmpl = '{{ 45|double }} {{ "abcytfugj"|cut }}'
+    resp = render.from_string(tmpl)
+    assert resp == '90 abc'
 
 
-#TODO
 def test_tests():
-    pass
+    def gt_3(val):
+        return val > 3
+
+    tt = {'gt_3': gt_3}
+    render = Render(tests=tt)
+    tmpl = '{% if 6 is gt_3 %}ok{% endif %}{% if 1 is gt_3 %} FAIL{% endif %}'
+    resp = render.from_string(tmpl)
+    assert resp == 'ok'
 
 
-#TODO
+def test_set_get_globals():
+    gg = {'who':'E.T.', 'action':'phone', 'where':'home'}
+    render = Render()
+    render.set_global('who', 'E.T.')
+    render.set_global('action', 'phone')
+    render.set_global('where', 'home')
+
+    tmpl = '{{ who }} {{ action }} {{ where }}'
+    resp = render.from_string(tmpl)
+    assert resp == 'E.T. phone home'
+
+    assert render.get_global('who') == 'E.T.'
+    assert render.get_global('action') == 'phone'
+    assert render.get_global('where') == 'home'
+
+
+def test_set_get_filters():
+    def double(val):
+        return val * 2
+
+    def cut(text):
+        return text[:3]
+
+    render = Render()
+    render.set_filter('double', double)
+    render.set_filter('cut', cut)
+
+    tmpl = '{{ 45|double }} {{ "abcytfugj"|cut }}'
+    resp = render.from_string(tmpl)
+    assert resp == '90 abc'
+
+    assert render.get_filter('double') == double
+    assert render.get_filter('cut') == cut
+
+
+def test_set_get_tests():
+    def gt_3(val):
+        return val > 3
+
+    render = Render()
+    render.set_test('gt_3', gt_3)
+
+    tmpl = '{% if 6 is gt_3 %}ok{% endif %}{% if 1 is gt_3 %} FAIL{% endif %}'
+    resp = render.from_string(tmpl)
+    assert resp == 'ok'
+
+    assert render.get_test('gt_3') == gt_3
+
+
+def test_default_tests():
+    render = Render()
+    tmpl = '{% if value is ellipsis %}ok{% endif %}'
+    resp = render.from_string(tmpl, value=Ellipsis)
+    assert resp == 'ok'
+
+
+def test_default_globals():
+    render = Render()
+
+    def foo(request):
+        tmpl = '{{ media }}{{ request }}{{ settings }}'
+        render.from_string(tmpl)
+
+    urls = [
+        Rule('/', foo),
+        ]
+    app = Shake(urls)
+    c = app.test_client()
+    c.get('/')
+
+
+def test_default_globals_now():
+    render = Render()
+    tmpl = '{{ now }}'
+    snow = str(datetime.utcnow())[:-10]
+    assert render.from_string(tmpl).startswith(snow)
+
+
+def test_default_globals_flash_messages():
+    render = Render()
+
+    def foo(request):
+        flash(request, 'foo')
+        tmpl = '{% for fm in flash_messages %}{{ fm.msg }}{% endfor %}'
+        assert render.from_string(tmpl) == 'foo'
+
+    urls = [
+        Rule('/', foo),
+        ]
+    settings = {'SECRET_KEY': 'abc'*20}
+    app = Shake(urls, settings)
+    c = app.test_client()
+    c.get('/')
+
+
+def test_default_globals_url_for():
+    render = Render()
+
+    def foo(request):
+        tmpl = "{{ url_for('foo') }}"
+        assert render.from_string(tmpl) == '/'
+
+    urls = [
+        Rule('/', foo, name='foo'),
+        ]
+    app = Shake(urls)
+    c = app.test_client()
+    c.get('/')
+
+
 def test_alt_loader():
+    render = Render(views_dir)
     alt_loader = jinja2.FileSystemLoader(static_dir)
-    pass
+
+    def foo(request):
+        resp = render.to_string('view.html', alt_loader=alt_loader)
+        assert resp == '<h1>Hello World</h1>'
+        resp = render.to_string('robots.txt', alt_loader=alt_loader)
+        assert resp == '# Domo arigato Mr. Roboto!'
+
+    urls = [
+        Rule('/', foo),
+        ]
+    app = Shake(urls)
+    c = app.test_client()
+    c.get('/')
 
 
-#TODO
-def test_csrf_token():
-    pass
-
-#TODO
 def test_flash_messagesech():
-    pass
+    def t1(request):
+        msgs = get_messages()
+        assert msgs == []
+
+    def t2(request):
+        flash(request, 'foo')
+        flash(request, 'bar', 'error', extra='blub')
+        msgs = get_messages()
+        assert len(msgs) == 2
+        assert (msgs[0]['msg'], msgs[0]['cat'], msgs[0]['extra']) == \
+            ('foo', 'info', None)
+        assert (msgs[1]['msg'], msgs[1]['cat'], msgs[1]['extra']) == \
+            ('bar', 'error', 'blub')
+        msgs2 = get_messages()
+        assert msgs2 == msgs
+
+    urls = [
+        Rule('/t1', t1),
+        Rule('/t2', t2),
+        ]
+    settings = {'SECRET_KEY': 'abc'*20}
+    app = Shake(urls, settings)
+    c = app.test_client()
+    c.get('/t1')
+    c.get('/t2')
+
+
+def test_csrf_token():
+    render = Render()
+
+    def t(request):
+        csrf1 = get_csrf_secret(request).value
+        csrf2 = new_csrf_secret(request).value
+        csrf2_ = get_csrf_secret(request).value
+        assert csrf2 != csrf1
+        assert csrf2_ == csrf2
+
+    urls = [
+        Rule('/', t),
+        ]
+    settings = {'SECRET_KEY': 'abc'*20}
+    app = Shake(urls, settings)
+    c = app.test_client()
+    c.get('/')
+
+
+def test_csrf_token_global():
+    render = Render()
+
+    def t(request):
+        csrf = get_csrf_secret(request)
+        tmpl = '{{ csrf_secret.name }} {{ csrf_secret.value }}'
+        assert render.from_string(tmpl) == '%s %s' % (csrf.name, csrf.value)
+
+    urls = [
+        Rule('/', t),
+        ]
+    settings = {'SECRET_KEY': 'abc'*20}
+    app = Shake(urls, settings)
+    c = app.test_client()
+    c.get('/')
+
+
+def test_csrf_token_input():
+    render = Render()
+
+    def t(request):
+        csrf = get_csrf_secret(request)
+        tmpl = '{{ csrf_secret.input }}'
+        expected = '<input type="hidden" name="%s" value="%s">' \
+            % (csrf.name, csrf.value)
+        assert render.from_string(tmpl) == expected
+
+    urls = [
+        Rule('/', t),
+        ]
+    settings = {'SECRET_KEY': 'abc'*20}
+    app = Shake(urls, settings)
+    c = app.test_client()
+    c.get('/t')
+
+
+def test_csrf_token_query():
+    render = Render()
+
+    def t(request):
+        csrf = get_csrf_secret(request)
+        tmpl = '{{ csrf_secret.query }}'
+        expected = '%s=%s' % (csrf.name, csrf.value)
+        assert render.from_string(tmpl) == expected
+
+    urls = [
+        Rule('/', t),
+        ]
+    settings = {'SECRET_KEY': 'abc'*20}
+    app = Shake(urls, settings)
+    c = app.test_client()
+    c.get('/t')
 
