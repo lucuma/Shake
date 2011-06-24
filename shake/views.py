@@ -33,9 +33,7 @@ def flash(request, message, category='info', extra=None):
     :param category: optional classification of the message.
     """
     session = request.session
-    msg = {'msg': message, 'cat': category}
-    if extra:
-        msg['extra'] = extra
+    msg = {'msg': message, 'cat': category, 'extra': extra}
     session.setdefault(LOCAL_FLASHES, []).append(msg)
 
 
@@ -101,7 +99,7 @@ class Render(object):
         'now': LocalProxy(datetime.utcnow),
         'media': media,
         'get_messages': get_messages,
-        'messages': LocalProxy(get_messages),
+        'flash_messages': LocalProxy(get_messages),
         'request': local('request'),
         'settings': LocalProxy(lambda: local.app.settings),
         'url_for': url_for,
@@ -116,7 +114,7 @@ class Render(object):
     default_filters = {}
 
     def __init__(self, views_path=None, loader=None, default='text/html',
-      **kwargs):
+            **kwargs):
         filters = kwargs.pop('filters', {})
         tests = kwargs.pop('tests', {})
         tglobals = kwargs.pop('globals', {})
