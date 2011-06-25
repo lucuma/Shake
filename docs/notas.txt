@@ -1,0 +1,21 @@
+
+I have a different opinion. The Django docs are good, but not great. Here's how 
+
+I see them right now:
+    - Combination of overview, how-to, and API reference.
+
+Instead, I'd like to see it split up like so:
+    - Overview section.
+    - How-To section.
+    - API reference.
+
+The overview section should cover general concepts. "This is what a View is, how it relates to URLConf, etc...".
+
+The how-to section should show you how to do certain things. "Here's example code of how you can configure settings.py, how to handle an HTTPRequest in a view function, etc...".
+
+The API reference, just a list of Django objects (showing inheritance), their attributes, functions, and parameters. Excellent example:http://api.rubyonrails.org/ . Currently some of this is documented, but some of it is only visible in source code.
+
+Right now, everything in the Django docs is semi-bunched together. This made it really hard for me to initially learn the API; I'd imagine others' have similar issues. Since then I've gotten use to the docs, but it's still frustrating at times.
+
+I do like Django very very much, but this is one of its pain points for me. It goes away with experience, but for new users it likely poses a bit of a challege
+

@@ -202,6 +202,9 @@ class Render(object):
     def set_test(self, name, value):
         self.env.tests[name] = value
 
+    def add_extension(self, ext):
+        self.env.add_extension(ext)
+
 
 default_loader = jinja2.PackageLoader('shake', 'default_views')
 default_render = Render(loader=default_loader)

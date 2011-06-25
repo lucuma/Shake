@@ -1,30 +1,13 @@
 .. contents:: Table of Contents
 
-.. _Bottle: http://bottle.paws.org
-.. _Python: http://www.python.org
-.. _SQLite: http://www.sqlite.org
-.. _Windows: http://www.sqlite.org/download.html
-.. _PySQLite: http://pypi.python.org/pypi/pysqlite/
-.. _`decorator statement`: http://docs.python.org/glossary.html#term-decorator
-.. _`Python DB API`: http://www.python.org/dev/peps/pep-0249/
-.. _`WSGI reference Server`: http://docs.python.org/library/wsgiref.html#module-wsgiref.simple_server
-.. _Cherrypy: http://www.cherrypy.org/
-.. _Fapws3: http://github.com/william-os4y/fapws3
-.. _Flup: http://trac.saddi.com/flup
-.. _Paste: http://pythonpaste.org/
-.. _Apache: http://www.apache.org
-.. _`Bottle documentation`: http://github.com/defnull/bottle/blob/master/docs/docs.md
-.. _`mod_wsgi`: http://code.google.com/p/modwsgi/
-.. _`json`: http://www.json.org
 
 Tutorial
 =========
 
-This tutorial should give a brief introduction into the Bottle_ WSGI Framework. The main goal is to be able, after reading through this tutorial, to create a project using Bottle. Within this document, not all abilities will be shown, but at least the main and important ones like routing, utilizing the Bottle template abilities to format output and handling GET / POST parameters.
+Este tutorial debería darte una breve introducción al framework web Shake. Al terminarlo tendrás una idea general de como es desarrollar con Shake y podrás crear tus primeros proyectos. En este documento no se muestra todo lo que puede hacer Shake, pero si las fundamentales, como definir las URL, obtener los datos GET / POST que envía el navegador, y armar una respuesta en HTML.
 
-To understand the content here, it is not necessary to have a basic knowledge of WSGI, as Bottle tries to keep WSGI away from the user anyway. You should have a fair understanding of the Python_ programming language. Furthermore, the example used in the tutorial retrieves and stores data in a SQL databse, so a basic idea about SQL helps, but is not a must to understand the concepts of Bottle. Right here, SQLite_ is used. The output of Bottle send to the browser is formated in some examples by the help of HTML. Thus, a basic idea about the common HTML tags does help as well.
+Para entender el contenido aqui, es necesario tener conocimientos de Python, aunque no necesariamente relacionados con web. Además, deberías tener una idea general de como funciona la web y un conocimiento básico de HTML también será de ayuda.
 
-For the sake of introducing Bottle, the Python code "in between" is kept short, in order to keep the focus. Also all code within the tutorial is working fine, but you may not necessarily use it "in the wild", e.g. on a public web server. In order to do so, you may add e.g. more error handling, protect the database with a password, test and escape the input etc.
 
 Goals
 ------
