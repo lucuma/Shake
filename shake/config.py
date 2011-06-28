@@ -76,3 +76,15 @@ class Settings(object):
         custom = self.custom
         for key, value in dict_.items():
             setattr(custom, key, value)
+
+
+QUOTES = [
+    'Shaken, not stirred',
+    'Chocolate milkshake',
+    'Protein shake',
+    'Apple Martini',
+    'Shake it, baby!',
+    'Shake your Ruby',
+    'Shake on rails'
+    ]
+

@@ -18,12 +18,14 @@
 """
 import mimetypes
 import os
+from random import choice
 from time import time
 from werkzeug.datastructures import Headers
 from werkzeug.wsgi import wrap_file
 from werkzeug.exceptions import NotFound
 from zlib import adler32
 
+from .config import QUOTES
 from .helpers import local
 from .views import default_render
 
@@ -50,7 +52,8 @@ def not_allowed_page(request, error):
 def welcome_page(request, error):
     """A default "welcome to shake" page.
     """
-    return default_render('welcome.html')
+    quote = choice(QUOTES)
+    return default_render('welcome.html', quote=quote)
 
 
 def render_view(request, render, view, **kwargs):
@@ -247,3 +250,4 @@ def check_if_exist(request, model, column_name):
     if data is None:
         return ''
     return '1'
+

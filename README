@@ -1,13 +1,15 @@
-Shake v2.0 (beta)
+Shake v0.4 beta
 =================
 
-Un framework ligero para el desarrollo web en python, mezcla de los mejores ingredientes.
+Un framework ligero para el desarrollo web en python, mezcla de los mejores
+ingredientes.
 
-Shake requiere Python 2.5, 2.6 o 2.7 y depende de las bibliotecas externas Werkzeug y Jinja2.
+Shake requiere Python 2.5, 2.6 o 2.7 y depende de las bibliotecas externas
+Werkzeug y Jinja2.
 
-Todavía no hay documentación, pero es nuestra prioridad.
 
-
----
+---------------------------------------------------------------
 Copyright © 2011 por Lúcuma labs <http://lucumalabs.com>
 Licencia BSD. Mira LICENSE para más detalles.
+---------------------------------------------------------------
+
