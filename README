@@ -7,6 +7,10 @@ ingredientes.
 Shake requiere Python 2.5, 2.6 o 2.7 y depende de las bibliotecas externas
 Werkzeug y Jinja2.
 
+Para correr los tests instala pytest (http://pytest.org)
+y usa:
+$ py.test tests/
+
 
 ---------------------------------------------------------------
 Copyright © 2011 por Lúcuma labs <http://lucumalabs.com>
