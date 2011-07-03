@@ -28,6 +28,7 @@ from .wrappers import Request, Response
 local_manager = LocalManager([local])
 SECRET_KEY_MINLEN = 20
 STATIC_DIR = 'static'
+WELCOME_MESSAGE = "Welcome aboard. You're now using Shake!"
 
 
 class Shake(object):
@@ -315,9 +316,22 @@ class Shake(object):
         if resp_value is None:
             return self.response_class('')
         return self.response_class.force_type(resp_value, environ)
+    
+    def _welcome_msg(self):
+        """Prints a welcome message, if you run an application
+        without any URL."""
+        if os.environ.get('WERKZEUG_RUN_MAIN') != 'true' \
+                and not self.url_map._rules:
+            wml = len(WELCOME_MESSAGE) + 2
+            print '\n '.join(['',
+                '-' * wml, 
+                ' %s ' % WELCOME_MESSAGE,
+                '-' * wml,
+                ''])
 
     def run(self, host=None, port=None, use_reloader=None, use_debugger=None,
-          reloader_interval=1, threaded=False, processes=1, ssl_context=None):
+          reloader_interval=1, threaded=False, processes=1, ssl_context=None,
+          **kwargs):
         """Runs the application on a local development server.
 
         The development server is not intended to be used on production
@@ -360,13 +374,17 @@ class Shake(object):
         use_debugger = (use_debugger if (use_debugger is not None) else
             self.settings.DEBUG)
 
+        self._welcome_msg()
+
         return run_simple(host, port, self,
             use_reloader=use_reloader,
             use_debugger=use_debugger,
             reloader_interval=reloader_interval,
             threaded=threaded,
             processes=processes,
-            ssl_context=ssl_context
+            ssl_context=ssl_context,
+            static_files=self.static_dirs,
+            **kwargs
             )
 
     def test_client(self):
@@ -379,9 +397,5 @@ class Shake(object):
 
     def __call__(self, environ, start_response):
         local.app = self
-        if self.static_dirs:
-            self.wsgi_app = SharedDataMiddleware(
-                self.wsgi_app,
-                self.static_dirs
-                )
         return self.wsgi_app(environ, start_response)
+

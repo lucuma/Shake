@@ -1,0 +1,11 @@
+include *.txt
+include runtests.py
+recursive-include shake *
+recursive-include tests *
+recursive-include docs *
+recursive-exclude shake *.pyc
+recursive-exclude shake *.pyo
+recursive-exclude tests *.pyc
+recursive-exclude tests *.pyo
+prune docs/_build
+prune docs/_themes/.git

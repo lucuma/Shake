@@ -1,4 +1,7 @@
 ~*
 .DS_Store
 *.pyc
-_build
+build
+dist
+Shake.egg*
+MANIFEST

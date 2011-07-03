@@ -8,7 +8,7 @@ import pytest
 import random
 import time
 
-from shake import Shake, Rule, url_for, Paginator
+from shake import Shake, Rule, url_for
 from shake.helpers import url_join, execute, to64, from64, to36, from36 
 
 
@@ -17,23 +17,6 @@ def endpoint(request, name=None):
     if name:
         msg = 'hello ' + name
     return msg
-
- 
-def test_paginator():
-    p = Paginator(query=None, page=1, per_page=20, total=500)
-
-    assert p.page == 1
-    assert not p.has_prev
-    assert p.has_next
-    assert p.total == 500
-    assert p.num_pages == 25
-    assert p.next_num == 2
-
-    assert list(p.iter_pages()) == \
-        [1, 2, 3, 4, 5, None, 24, 25]
-    p.page = 10
-    assert list(p.iter_pages()) == \
-        [1, 2, None, 8, 9, 10, 11, 12, 13, 14, None, 24, 25]
 
 
 def test_url_for():

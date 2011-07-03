@@ -52,7 +52,6 @@ from .helpers import (local, json, url_for, execute, to64, from64,
     to36, from36)
 from .manager import (Manager, manager, prompt, prompt_pass, prompt_bool,
     prompt_choices)
-from .paginator import get_page, sanitize_page_number, Paginator
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (Render, TemplateNotFound, flash, get_messages,
