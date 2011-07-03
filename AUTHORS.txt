@@ -1,4 +1,4 @@
-Shake is written and maintained by the Lúcuma labs team:
+Shake is written and maintained by the LÃºcuma labs team:
 
 Project Leader / Developer:
 
@@ -12,16 +12,16 @@ Portions of the code (and inspiration) were taken from
 Flask <http://flask.pocoo.org>.
 The original code is BSD licensed with the following copyright:
 
-    Copyright © 2010 Armin Ronacher.
+    Copyright Â© 2010 Armin Ronacher.
 
 The `routes` module was adapted from the routing package of 
 Werkzeug <http://werkzeug.pocoo.org>.
 The original code is BSD licensed.
 
-    Copyright © 2010 the Werkzeug Team.
+    Copyright Â© 2010 the Werkzeug Team.
 
 The `run_fastcgi` method was adapted from the 
 Django Framework <http://djangoproject.com>
 The original code is BSD licensed.
 
-    Copyright © 2005 Django Software Foundation and individual contributors.
+    Copyright Â© 2005 Django Software Foundation and individual contributors.
