@@ -4,7 +4,7 @@ from setuptools import setup
 
 def run_tests():
     import sys, subprocess
-    errno = subprocess.call([sys.executable, 'runtests.py'])
+    errno = subprocess.call([sys.executable, 'run_tests.py'])
     raise SystemExit(errno)
 
 
