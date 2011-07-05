@@ -119,9 +119,6 @@ class Shake(object):
         path = os.path.join(os.path.dirname(path), STATIC_DIR)
         self.static_dirs[url] = path
 
-    def set_cookie(self, name, value):
-        pass
-
     def before_request(self, function):
         """Register a function to run before each request.
         Can be used as a decorator."""
