@@ -26,7 +26,7 @@ def test_storagedict_basic():
 
 def test_storagedict_get():
     st = StorageDict(a=1, b=2, c='3')
-
+    
     assert st.get('b') == 2
     del st.b
     assert st.get('b') == None
@@ -39,12 +39,12 @@ def test_storagedict_get():
 
 def test_storagedict_update():
     st = StorageDict(a=1, b=2, c='3')
-
+    
     st.d = 4
     assert st.d == 4
     assert st['d'] == 4
     assert st.get('d') == 4
-
+    
     st.update({'a': 10, 'c': 12})
     assert st.a == 10
     assert st['a'] == 10
@@ -52,4 +52,3 @@ def test_storagedict_update():
     assert st.c == 12
     assert st['c'] == 12
     assert st.get('c') == 12
-

@@ -9,7 +9,7 @@ import random
 import time
 
 from shake import Shake, Rule, url_for
-from shake.helpers import url_join, execute, to64, from64, to36, from36 
+from shake.helpers import url_join, execute, to64, from64, to36, from36
 
 
 def endpoint(request, name=None):
@@ -20,9 +20,10 @@ def endpoint(request, name=None):
 
 
 def test_url_for():
+    
     def index(request):
         return url_for(endpoint, name='world')
-
+    
     urls = [
         Rule('/', index),
         Rule('/home/', endpoint),
@@ -30,16 +31,17 @@ def test_url_for():
         ]
     app = Shake(urls)
     c = app.test_client()
-
+    
     resp = c.get('/')
     assert resp.data == '/hello/world/'
 
 
 def test_named_url_for():
+    
     def test(request):
         result = [url_for('a'), url_for('b'), url_for('c')]
         return ' '.join(result)
-
+    
     urls = [
         Rule('/', test),
         Rule('/home1/', endpoint, name='a'),
@@ -48,16 +50,17 @@ def test_named_url_for():
         ]
     app = Shake(urls)
     c = app.test_client()
-
+    
     resp = c.get('/')
     assert resp.status_code == 200
     assert resp.data == '/home1/ /home2/ /home3/'
 
 
 def test_named_url_for_dup():
+    
     def test(request):
         return url_for('a')
-
+    
     urls = [
         Rule('/', test),
         Rule('/home1/', endpoint, name='a'),
@@ -66,12 +69,12 @@ def test_named_url_for_dup():
         ]
     app = Shake(urls)
     c = app.test_client()
-
+    
     resp = c.get('/')
     assert resp.status_code == 200
     assert resp.data == '/home3/'
-
  
+
 def test_url_join():
     expected = '/path/dir'
     assert url_join('/path', 'dir') == expected
@@ -85,7 +88,7 @@ def test_url_join():
 def test_execute():
     with pytest.raises(OSError):
         execute('qwerty99933654321x')
-
+    
     result1 = execute('stat', [__file__])
     result2 = execute('stat', __file__)
     assert result1 == result2
@@ -122,15 +125,15 @@ def test_custom_alphabet64():
     assert to64(555, CUSTOM) == 'i$'
     assert from64('AA', CUSTOM) == 3640
     
-    RANDOM = [c for c in 
+    RANDOM = [c for c in
         '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ=_']
     random.shuffle(RANDOM)
-    RANDOM = ''.join(RANDOM)   
+    RANDOM = ''.join(RANDOM)
     
     RCUSTOM = [c for c in CUSTOM]
     random.shuffle(RCUSTOM)
     RCUSTOM = ''.join(RCUSTOM)
-
+    
     rnum = random.randint(0, 5555)
     
     assert from64(to64(rnum, CUSTOM), CUSTOM) == rnum
@@ -185,12 +188,12 @@ def test_custom_alphabet36():
     
     RANDOM = [c for c in '0123456789abcdefghijklmnopqrstuvwxyz']
     random.shuffle(RANDOM)
-    RANDOM = ''.join(RANDOM)   
+    RANDOM = ''.join(RANDOM)
     
     RCUSTOM = [c for c in CUSTOM]
     random.shuffle(RCUSTOM)
     RCUSTOM = ''.join(RCUSTOM)
-
+    
     rnum = random.randint(0, 5555)
     
     assert from36(to36(rnum, CUSTOM), CUSTOM) == rnum
@@ -200,7 +203,7 @@ def test_custom_alphabet36():
 
 def test_custom_alphabet36_invalid():
     CUSTOM = '9876543210ZYXWVUTSRQPONMLKJIHGFEDCBA'
-
+    
     # bad custom alphabet
     with pytest.raises(AssertionError):
         to36(1, 'bad')
@@ -212,4 +215,3 @@ def test_custom_alphabet36_invalid():
         from36('ab', CUSTOM)
     with pytest.raises(ValueError):
         from36('!', CUSTOM)
-

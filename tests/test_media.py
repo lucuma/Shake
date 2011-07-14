@@ -8,7 +8,7 @@ import pytest
 from shake import media
 from shake import Shake, local, StorageDict
 
-    
+
 def set_up():
     local.media = {}
     local.app = StorageDict()
@@ -39,7 +39,8 @@ def test_add_js():
 
 def test_add_link():
     set_up()
-    media.add_link('/feed.rss', title='test feed', rel='alternate', mtype='rss+xml')
+    media.add_link('/feed.rss', title='test feed', rel='alternate',
+        mtype='rss+xml')
     media.add_link('/page/2', title='next page', rel='next')
     media.add_link('/page/2', title='next page', rel='next')
     media.add_link('/xmlrpc', rel='pingback')
@@ -69,15 +70,15 @@ def test_render_css():
     
     expected = (
         '<link href="/static/t1.css" media="all" rel="stylesheet">\n'
-        '<link href="/static/t2.css" media="screen" rel="alternate stylesheet" title="t2">\n'
+        '<link href="/static/t2.css" media="screen" rel="alternate stylesheet"'
+        ' title="t2">\n'
         '<!--[if lte IE6]>\n'
         '<link href="/static/ie6.css" media="all" rel="stylesheet">\n'
         '<link href="/static/print_ie6.css" media="print" rel="stylesheet">\n'
         '<![endif]-->\n'
         '<!--[if IE7]>\n'
         '<link href="/static/ie7.css" media="all" rel="stylesheet">\n'
-        '<![endif]-->'
-        )
+        '<![endif]-->')
     result = media.render_css()
     assert expected == result
 
@@ -99,8 +100,7 @@ def test_render_js():
         '<!--[if IE]>\n'
         '<script src="/static/html5.js"></script>\n'
         '<script src="/static/ie.js"></script>\n'
-        '<![endif]-->'
-        )
+        '<![endif]-->')
     result = media.render_js()
     print result
     assert expected == result
@@ -108,16 +108,17 @@ def test_render_js():
 
 def test_render_links():
     set_up()
-    media.add_link('/feed.rss', title='test feed', rel='alternate', mtype='rss+xml')
+    media.add_link('/feed.rss', title='test feed', rel='alternate',
+        mtype='rss+xml')
     media.add_link('page/2', title='next page', rel='next')
     media.add_link('/xmlrpc', rel='pingback')
     media.add_link('/favicon.ico', rel='shortcut icon', mtype='image/x-icon')
     expected = (
-        '<link href="/feed.rss" rel="alternate" title="test feed" type="rss+xml">\n'
+        '<link href="/feed.rss" rel="alternate" title="test feed"'
+        ' type="rss+xml">\n'
         '<link href="page/2" rel="next" title="next page">\n'
         '<link href="/xmlrpc" rel="pingback">\n'
-        '<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">'
-        )
+        '<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon">')
     result = media.render_links()
     assert expected == result
 
@@ -128,8 +129,6 @@ def test_render_metas():
     media.add_meta('description', 'this is a test')
     expected = (
         '<meta name="author" content="shake">\n'
-        '<meta name="description" content="this is a test">'
-        )
+        '<meta name="description" content="this is a test">')
     result = media.render_metas()
     assert expected == result
-

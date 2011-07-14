@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
+import os
 from setuptools import setup
+
+
+ROOTDIR = os.path.dirname(__file__)
+README = os.path.join(ROOTDIR, 'README.txt')
 
 
 def run_tests():
@@ -14,11 +19,11 @@ setup(
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
-
+    zip_safe=False,
     url='http://github.com/lucuma/Shake',
     license='BSD',
     description='A web framework mixed from the best ingredients',
-    long_description=open('README.txt').read(),
+    long_description=open(README).read(),
     include_package_data=True,
     install_requires=[
         'Werkzeug>=0.6.1',
@@ -34,5 +39,9 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    test_suite='__main__.run_tests'
+    test_suite='__main__.run_tests',
+    entry_points="""
+    [console_scripts]
+    shake = shake.shake_vudu:main
+    """
 )

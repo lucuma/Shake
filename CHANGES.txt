@@ -9,13 +9,20 @@ v0.5 (`Milkshake`)
 Publicada el XX de Julio, 2011
 
 - Proper python packaging.
+
 - Las carpetas de archivos estáticos se definen en la aplicación solo para
   que las use el servidor de desarrollo. En producción, de todas formas,
   ya había que definirlos en el archivo de configuración del servidor
   (Apache, Lighttpd, Ngnix, etc.).
-- Mensaje de bienvenida en la consola (si no se definieron URL).
-- El paginador ya no es parte del core sino una extensión externa
+
+- Mensaje de bienvenida en la consola (si no se definieron URLs).
+
+- El paginador ya no es parte del core sino una extensión externa.
+
+- Comando `shake` para crear rápidamente un esqueleto de aplicación.
+
 - Documentación básica: Overview y API.
+
 
 
 ================
@@ -24,11 +31,13 @@ Roadmap
 
 v0.6
 -------------------
-Extensiones, extensiones, extensiones.
-Hay que desarrollar un esquema estándar para que otros puedan 
-contribuir extensiones fácilmente integrables.
-Hay una serie de extensiones ya desarrolladas que necesitan documentación
+Extensiones, extensiones, extensiones:
+- Hay una serie de extensiones ya desarrolladas que necesitan documentación
 y tests. La prioridad número uno de esas es la de SQLAlchemy.
+
+- Hay que desarrollar un esquema estándar para que otros puedan 
+contribuir extensiones fácilmente integrables.
+
 
 v0.7
 -------------------

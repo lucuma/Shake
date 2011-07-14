@@ -16,21 +16,21 @@ from shake import (Shake, Rule, Render, ViewNotFound, flash, get_messages,
 
 views_dir = os.path.join(os.path.dirname(__file__), 'res')
 static_dir = os.path.join(os.path.dirname(__file__), 'static')
-
     
+
 def test_render():
     render = Render(views_dir)
-
+    
     resp = render.to_string('view.html')
     assert resp == '<h1>Hello World</h1>'
-    resp = render.to_string('view.txt', 
+    resp = render.to_string('view.txt',
         who='E.T.', action='phone', where='home')
     assert resp == 'E.T. phone home'
 
 
 def test_view_not_found():
     render = Render(views_dir)
-
+    
     with pytest.raises(ViewNotFound):
         render('x_x')
 
@@ -45,17 +45,17 @@ def test_from_to_string():
 def test_mimetype():
     render1 = Render(views_dir)
     render2 = Render(views_dir, default='foo/bar')
-
+    
     def t1(request):
         resp = render1('view.html')
         assert isinstance(resp, local.app.response_class)
         assert resp.mimetype == 'text/html'
-
+    
     def t2(request):
         resp = render2('view.html')
         assert isinstance(resp, local.app.response_class)
         assert resp.mimetype == 'foo/bar'
-
+    
     urls = [
         Rule('/t1', t1),
         Rule('/t2', t2),
@@ -68,7 +68,7 @@ def test_mimetype():
 
 
 def test_globals():
-    gg = {'who':'E.T.', 'action':'phone', 'where':'home'}
+    gg = {'who': 'E.T.', 'action': 'phone', 'where': 'home'}
     render = Render(globals=gg)
     tmpl = '{{ who }} {{ action }} {{ where }}'
     resp = render.from_string(tmpl)
@@ -76,12 +76,13 @@ def test_globals():
 
 
 def test_filters():
+    
     def double(val):
         return val * 2
-
+    
     def cut(text):
         return text[:3]
-
+    
     ff = {'double': double, 'cut': cut}
     render = Render(filters=ff)
     tmpl = '{{ 45|double }} {{ "abcytfugj"|cut }}'
@@ -90,9 +91,10 @@ def test_filters():
 
 
 def test_tests():
+    
     def gt_3(val):
         return val > 3
-
+    
     tt = {'gt_3': gt_3}
     render = Render(tests=tt)
     tmpl = '{% if 6 is gt_3 %}ok{% endif %}{% if 1 is gt_3 %} FAIL{% endif %}'
@@ -101,51 +103,53 @@ def test_tests():
 
 
 def test_set_get_globals():
-    gg = {'who':'E.T.', 'action':'phone', 'where':'home'}
+    gg = {'who': 'E.T.', 'action': 'phone', 'where': 'home'}
     render = Render()
     render.set_global('who', 'E.T.')
     render.set_global('action', 'phone')
     render.set_global('where', 'home')
-
+    
     tmpl = '{{ who }} {{ action }} {{ where }}'
     resp = render.from_string(tmpl)
     assert resp == 'E.T. phone home'
-
+    
     assert render.get_global('who') == 'E.T.'
     assert render.get_global('action') == 'phone'
     assert render.get_global('where') == 'home'
 
 
 def test_set_get_filters():
+    
     def double(val):
         return val * 2
-
+    
     def cut(text):
         return text[:3]
-
+    
     render = Render()
     render.set_filter('double', double)
     render.set_filter('cut', cut)
-
+    
     tmpl = '{{ 45|double }} {{ "abcytfugj"|cut }}'
     resp = render.from_string(tmpl)
     assert resp == '90 abc'
-
+    
     assert render.get_filter('double') == double
     assert render.get_filter('cut') == cut
 
 
 def test_set_get_tests():
+    
     def gt_3(val):
         return val > 3
-
+    
     render = Render()
     render.set_test('gt_3', gt_3)
-
+    
     tmpl = '{% if 6 is gt_3 %}ok{% endif %}{% if 1 is gt_3 %} FAIL{% endif %}'
     resp = render.from_string(tmpl)
     assert resp == 'ok'
-
+    
     assert render.get_test('gt_3') == gt_3
 
 
@@ -158,11 +162,11 @@ def test_default_tests():
 
 def test_default_globals():
     render = Render()
-
+    
     def foo(request):
         tmpl = '{{ media }}{{ request }}{{ settings }}'
         render.from_string(tmpl)
-
+    
     urls = [
         Rule('/', foo),
         ]
@@ -180,12 +184,12 @@ def test_default_globals_now():
 
 def test_default_globals_flash_messages():
     render = Render()
-
+    
     def foo(request):
         flash(request, 'foo')
         tmpl = '{% for fm in flash_messages %}{{ fm.msg }}{% endfor %}'
         assert render.from_string(tmpl) == 'foo'
-
+    
     urls = [
         Rule('/', foo),
         ]
@@ -197,11 +201,11 @@ def test_default_globals_flash_messages():
 
 def test_default_globals_url_for():
     render = Render()
-
+    
     def foo(request):
         tmpl = "{{ url_for('foo') }}"
         assert render.from_string(tmpl) == '/'
-
+    
     urls = [
         Rule('/', foo, name='foo'),
         ]
@@ -213,13 +217,13 @@ def test_default_globals_url_for():
 def test_alt_loader():
     render = Render(views_dir)
     alt_loader = jinja2.FileSystemLoader(static_dir)
-
+    
     def foo(request):
         resp = render.to_string('view.html', alt_loader=alt_loader)
         assert resp == '<h1>Hello World</h1>'
         resp = render.to_string('robots.txt', alt_loader=alt_loader)
         assert resp == '# Domo arigato Mr. Roboto!'
-
+    
     urls = [
         Rule('/', foo),
         ]
@@ -229,10 +233,11 @@ def test_alt_loader():
 
 
 def test_flash_messagesech():
+    
     def t1(request):
         msgs = get_messages()
         assert msgs == []
-
+    
     def t2(request):
         flash(request, 'foo')
         flash(request, 'bar', 'error', extra='blub')
@@ -244,7 +249,7 @@ def test_flash_messagesech():
             ('bar', 'error', 'blub')
         msgs2 = get_messages()
         assert msgs2 == msgs
-
+    
     urls = [
         Rule('/t1', t1),
         Rule('/t2', t2),
@@ -258,14 +263,14 @@ def test_flash_messagesech():
 
 def test_csrf_token():
     render = Render()
-
+    
     def t(request):
         csrf1 = get_csrf_secret(request).value
         csrf2 = new_csrf_secret(request).value
         csrf2_ = get_csrf_secret(request).value
         assert csrf2 != csrf1
         assert csrf2_ == csrf2
-
+    
     urls = [
         Rule('/', t),
         ]
@@ -277,12 +282,12 @@ def test_csrf_token():
 
 def test_csrf_token_global():
     render = Render()
-
+    
     def t(request):
         csrf = get_csrf_secret(request)
         tmpl = '{{ csrf_secret.name }} {{ csrf_secret.value }}'
         assert render.from_string(tmpl) == '%s %s' % (csrf.name, csrf.value)
-
+    
     urls = [
         Rule('/', t),
         ]
@@ -294,14 +299,14 @@ def test_csrf_token_global():
 
 def test_csrf_token_input():
     render = Render()
-
+    
     def t(request):
         csrf = get_csrf_secret(request)
         tmpl = '{{ csrf_secret.input }}'
         expected = '<input type="hidden" name="%s" value="%s">' \
             % (csrf.name, csrf.value)
         assert render.from_string(tmpl) == expected
-
+    
     urls = [
         Rule('/', t),
         ]
@@ -313,13 +318,13 @@ def test_csrf_token_input():
 
 def test_csrf_token_query():
     render = Render()
-
+    
     def t(request):
         csrf = get_csrf_secret(request)
         tmpl = '{{ csrf_secret.query }}'
         expected = '%s=%s' % (csrf.name, csrf.value)
         assert render.from_string(tmpl) == expected
-
+    
     urls = [
         Rule('/', t),
         ]
@@ -327,4 +332,3 @@ def test_csrf_token_query():
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/t')
-

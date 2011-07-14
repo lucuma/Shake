@@ -2,18 +2,18 @@
 """
     Shake
     ======
-
+    
     A web framework mixed from the best ingredients.
-
+    
     Coded with love by Juan-Pablo Scaletti.
-
+    
     Portions of code and/or inspiration taken from:
     - Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
     - Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
     - Django <djangoproject.com> Copyright 2005, Django Software Foundation.
-
+    
     See AUTHORS for more details
-
+    
     :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
     :license: BSD. See LICENSE for more details.
 
@@ -45,8 +45,8 @@ from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
 
 from .app import Shake
-from .controllers import (not_found_page, error_page, not_allowed_page, render_view,
-    send_file, from_dir)
+from .controllers import (not_found_page, error_page, not_allowed_page,
+    render_view, send_file, from_dir)
 from .datastructures import StorageDict
 from .helpers import (local, json, url_for, execute, to64, from64,
     to36, from36)

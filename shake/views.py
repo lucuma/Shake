@@ -2,9 +2,9 @@
 """
     shake.views
     ----------------------------------------------
-
+    
     Implements the bridge to Jinja2.
-
+    
     :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
     :license: BSD. See LICENSE for more details.
 
@@ -28,7 +28,7 @@ def flash(request, message, category='info', extra=None):
     """Flashes a message to the next request.  In order to remove the
     flashed message from the session and to display it to the user,
     the view has to call :func:`get_flashed_messages`.
-
+    
     :param message: the message to be flashed.
     :param category: optional classification of the message.
     """
@@ -57,13 +57,13 @@ CSRF_SESSION_NAME = '_c'
 
 
 class CSRFToken(object):
-
+    
     name = CSRF_FORM_NAME
-
+    
     def __init__(self):
         value = hashlib.md5(os.urandom(32)).hexdigest()[:16]
         self.value = to64(int(value, 16))
-
+    
     @property
     def input(self):
         return '<input type="hidden" name="%s" value="%s">' \
@@ -72,7 +72,7 @@ class CSRFToken(object):
     @property
     def query(self):
         return '%s=%s' % (self.name, self.value)
-
+    
     def __repr__(self):
         return '<CSRFToken %s = "%s">' % (self.name, self.value)
 
@@ -87,13 +87,13 @@ def get_csrf_secret(request):
 
 def new_csrf_secret(request):
     csrf_secret = CSRFToken()
-
+    
     request.session[CSRF_SESSION_NAME] = csrf_secret
     return csrf_secret
 
 
 class Render(object):
-
+    
     default_globals = {
         'ellipsis': Ellipsis,
         'now': LocalProxy(datetime.utcnow),
@@ -105,40 +105,40 @@ class Render(object):
         'url_for': url_for,
         'csrf_secret': LocalProxy(lambda: get_csrf_secret(local.request)),
         }
-
+    
     default_tests = {
         # Test for the mysterious Ellipsis object :P
         'ellipsis': (lambda obj: obj == Ellipsis),
         }
     
     default_filters = {}
-
+    
     def __init__(self, views_path=None, loader=None, default='text/html',
             **kwargs):
         filters = kwargs.pop('filters', {})
         tests = kwargs.pop('tests', {})
         tglobals = kwargs.pop('globals', {})
         self.default = default
-
+        
         if views_path and not loader:
             loader = jinja2.FileSystemLoader(views_path)
-
+        
         kwargs.setdefault('autoescape', False)
-
+        
         env = jinja2.Environment(loader=loader, **kwargs)
-
+        
         env.globals.update(self.default_globals)
         env.globals.update(tglobals)
         
         env.globals.update(self.default_filters)
         env.filters.update(filters)
-
+        
         env.tests.update(self.default_tests)
         env.tests.update(tests)
-
+        
         self.env = env
         self._loader = None
-
+    
     def load_alt_loader(self, alt_loader):
         if alt_loader:
             self._loader = loader = self.env.loader
@@ -148,8 +148,9 @@ class Render(object):
         if self._loader:
             self.env.loader = self._loader
             self._loader = None
-
-    def to_string(self, view_template, dcontext=None, alt_loader=None, **context):
+    
+    def to_string(self, view_template, dcontext=None, alt_loader=None,
+            **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
         self.load_alt_loader(alt_loader)
@@ -157,14 +158,15 @@ class Render(object):
         result = tmpl.render(context)
         self.unload_alt_loader()
         return result
-
+    
     def from_string(self, source, dcontext=None, **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
         tmpl = self.env.from_string(source)
         return tmpl.render(context)
-
-    def to_stream(self, view_template, dcontext=None, alt_loader=None, **context):
+    
+    def to_stream(self, view_template, dcontext=None, alt_loader=None,
+            **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
         self.load_alt_loader(alt_loader)
@@ -172,36 +174,37 @@ class Render(object):
         result = tmpl.stream(context)
         self.unload_alt_loader()
         return result
-
-    def __call__(self, view_template, dcontext=None, alt_loader=None, **context):
+    
+    def __call__(self, view_template, dcontext=None, alt_loader=None,
+            **context):
         self.load_alt_loader(alt_loader)
         tmpl = self.env.get_template(view_template)
         if not context and isinstance(dcontext, dict):
             context = dcontext
         result = tmpl.render(context)
         self.unload_alt_loader()
-        mimetype = context.pop('mimetype', self.default)        
+        mimetype = context.pop('mimetype', self.default)
         response_class = local.app.response_class
         return response_class(result, mimetype=mimetype)
-
+    
     def get_global(self, name):
         return self.env.globals[name]
-
+    
     def set_global(self, name, value):
         self.env.globals[name] = value
-
+    
     def get_filter(self, name):
         return self.env.filters[name]
-
+    
     def set_filter(self, name, value):
         self.env.filters[name] = value
-
+    
     def get_test(self, name):
         return self.env.tests[name]
-
+    
     def set_test(self, name, value):
         self.env.tests[name] = value
-
+    
     def add_extension(self, ext):
         self.env.add_extension(ext)
 

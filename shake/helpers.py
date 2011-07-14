@@ -2,7 +2,7 @@
 """
     shake.helpers
     ----------------------------------------------
-
+    
     :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
     :license: BSD. See LICENSE for more details.
 
@@ -24,7 +24,7 @@ local = Local()
 
 def url_for(endpoint, method=None, external=False, **values):
     """Generates a URL to the given endpoint with the method provided.
-
+    
     :param endpoint: the endpoint of the URL (name of the function)
     :param _external: if set to `True`, an absolute URL is generated.
     :param values: the variable arguments of the URL rule
@@ -44,13 +44,13 @@ def url_for(endpoint, method=None, external=False, **values):
 
 def execute(cmd, args=None):
     """Simple wrapper for executing commands.
-
+    
     :param cmd: command to execute
     :param args: sequence or a basestring, a basestring will be
         executed with shell=True.
     """
     from subprocess import Popen, PIPE
-
+    
     args = args or []
     if isinstance(args, basestring):
         args = '%s %s' % (cmd, args)
@@ -92,11 +92,11 @@ def to64(num, alphabet=None):
     """
     assert isinstance(num, (int, long)) and (num >= 0), \
         'Must supply a positive integer'
-
+    
     if alphabet:
         assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 64, \
             'The alphabet must be a 64 chars ASCII string'
-
+    
     alphabet = alphabet or ALPHABET64
     converted = []
     while num != 0:
@@ -111,7 +111,7 @@ def from64(snum, alphabet=None):
     if alphabet:
         assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 64, \
             'The alphabet must be a 64 chars ASCII string'
-
+        
         alphabet_reverse = dict((char, i) for (i, char) in enumerate(alphabet))
     else:
         alphabet_reverse = ALPHABET64_REVERSE
@@ -130,11 +130,11 @@ def to36(num, alphabet=None):
     """
     assert isinstance(num, (int, long)) and (num >= 0), \
         'Must supply a positive integer'
-
+    
     if alphabet:
         assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 36, \
             'The alphabet must be a 36 chars ASCII string'
-
+    
     alphabet = alphabet or ALPHABET36
     converted = []
     while num != 0:
@@ -148,10 +148,10 @@ def from36(snum, alphabet=None):
     """
     if not alphabet:
         return int(snum, 36)
-
+    
     assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 36, \
         'The alphabet must be a 36 chars ASCII string'
-
+    
     alphabet_reverse = dict((char, i) for (i, char) in enumerate(alphabet))
     num = 0
     snum = str(snum)
@@ -161,4 +161,3 @@ def from36(snum, alphabet=None):
     except KeyError:
         raise ValueError('The string is not a valid base 36 encoded integer')
     return num
-

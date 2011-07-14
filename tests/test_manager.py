@@ -9,7 +9,7 @@ import pytest
 from StringIO import StringIO
 import sys
 
-from shake.manager import (parse_args, Manager, 
+from shake.manager import (parse_args, Manager,
     prompt, prompt_pass, prompt_bool, prompt_choices)
 
 
@@ -19,8 +19,8 @@ def set_up_stdout():
 
 def restore_stdout():
     sys.stdout = sys.__stdout__
-
     
+
 def test_args():
     result = parse_args(['abc', 'xy', '-w=3', '--foo', 'bar', '-narf=zort'])
     expected = (['abc', 'xy'], {'foo': 'bar', 'w': '3', 'narf': 'zort'})
@@ -33,7 +33,7 @@ def test_args_list():
     expected = ([], {'f': ['1', '2', '3']})
     print result
     assert result == expected
-
+    
     result = parse_args(['-f', '1', '2', '3'])
     print result
     assert result == expected
@@ -58,7 +58,7 @@ def test_key_n_flag():
     expected = ([], {'abc': True, 'foo': 'bar'})
     print result
     assert result == expected
-
+    
     result = parse_args(['-abc', '-foo', 'bar'])
     print result
     assert result == expected
@@ -76,13 +76,13 @@ def test_typo_flag():
     expected = ([], {'abc': '123'})
     print result
     assert result == expected
-
+    
     result = parse_args(['-abc', '-abc', '123'])
     expected = ([], {'abc': '123'})
     print result
     assert result == expected
-
     
+
 def test_command_args():
     set_up_stdout()
     manager = Manager()
@@ -230,7 +230,7 @@ def test_help():
     def hello(name):
         "Prints your name"
         pass
-
+    
     sys.argv = ['manage.py', 'help']
     manager.run()
     assert 'Prints your name' in sys.stdout.getvalue()
@@ -282,4 +282,3 @@ def test_prompt_pass_default():
     assert result == default
     assert '%s [%s]\n' % (text, default) == sys.stdout.getvalue()
     restore_stdout()
-

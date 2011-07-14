@@ -2,12 +2,12 @@
 """
     shake.media
     ----------------------------------------------
-
+    
     Easy management of external stylesheets, scripts, meta tags and other.
-
+    
     The data structures are list of tuples instead of dicts to maintain the
     order of the attributes.
-
+    
     :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
     :license: BSD. See LICENSE for more details.
 
@@ -34,12 +34,12 @@ def _undent(text):
 
 def _render(name, templ, templ_raw=None):
     media = _get_local_media()
-
+    
     files = media.get(name, [])
     cond_files = media.get('cond_' + name, {})
-
+    
     result = []
-
+    
     for data in files:
         is_raw = isinstance(data, basestring)
         if is_raw:
@@ -47,7 +47,7 @@ def _render(name, templ, templ_raw=None):
         else:
             body = _render_attributes(data)
             result.append(templ % body)
-
+    
     for condition in cond_files.keys():
         sub_files = cond_files[condition]
         subres = ['<!--[if %s]>' % condition]
@@ -83,7 +83,7 @@ def _add_file(name, data, condition=None):
     else:
         media.setdefault(name, [])
         group = media[name]
-
+    
     if data not in group:
         group.append(data)
     return ''
@@ -96,7 +96,7 @@ def add_css(src, title=None, iecon=None, media='all', alternate=False,
         # You dont want to break the CSS parser, wouldn't you?
         src = RX_STYLE.sub(r'<\/style>', src)
         return _add_file('css', src, iecon)
-
+    
     data = [
         ('href', src),
         ('media', media),
@@ -112,7 +112,7 @@ def add_js(src, iecon=None, raw=False):
         # You dont want to break the HTML parser, wouldn't you?
         src = RX_SCRIPT.sub(r'<\/script>', src)
         return _add_file('js', src, iecon)
-
+    
     data = [
         ('src', src),
         ]

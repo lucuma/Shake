@@ -33,18 +33,18 @@ def fail(request):
 
 def no_pass(request):
     abort(HTTP_FORBIDDEN)
-
     
+
 def test_default_not_found():
     urls = [
         Rule('/', index),
         ]
     settings = {
-        'PAGE_NOT_FOUND': not_found_page
+        'PAGE_NOT_FOUND': not_found_page,
         }
     app = Shake(urls, settings)
     c = app.test_client()
-
+    
     resp = c.get('/bla')
     assert resp.status_code == HTTP_NOT_FOUND
     assert '<title>Page not found</title>' in resp.data
@@ -56,11 +56,11 @@ def test_default_error():
         ]
     settings = {
         'DEBUG': False,
-        'PAGE_ERROR': error_page
+        'PAGE_ERROR': error_page,
         }
     app = Shake(urls, settings)
     c = app.test_client()
-
+    
     resp = c.get('/')
     assert resp.status_code == HTTP_ERROR
     assert '<title>Error</title>' in resp.data
@@ -71,7 +71,7 @@ def test_default_not_allowed():
         Rule('/', no_pass),
         ]
     settings = {
-        'PAGE_NOT_ALLOWED': not_allowed_page
+        'PAGE_NOT_ALLOWED': not_allowed_page,
         }
     app = Shake(urls, settings)
     c = app.test_client()
@@ -82,7 +82,7 @@ def test_default_not_allowed():
 
 def test_render_view_controller():
     urls = [
-        Rule('/', render_view, 
+        Rule('/', render_view,
             defaults={'render': render, 'view': 'view.html'}),
         ]
     app = Shake(urls)
@@ -95,14 +95,14 @@ def test_render_view_controller():
 
 def test_render_view_controller_args():
     urls = [
-        Rule('/', render_view, 
+        Rule('/', render_view,
             defaults={
                 'render': render,
                 'view': 'view.txt',
                 'mimetype': 'foo/bar',
                 'who': 'You',
                 'action': 'are',
-                'where': 'here'
+                'where': 'here',
             }),
         ]
     app = Shake(urls)
@@ -111,4 +111,3 @@ def test_render_view_controller_args():
     resp = c.get('/')
     assert resp.data == 'You are here'
     assert resp.mimetype == 'foo/bar'
-
