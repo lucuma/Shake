@@ -2,6 +2,7 @@
 from datetime import datetime
 
 # from shake import cached_property
+# from shakext.auth import Auth
 # from shakext.sqlalchemy import SQLAlchemy
 
 from . import settings

@@ -1,4 +1,4 @@
-Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
 Some rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

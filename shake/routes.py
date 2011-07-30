@@ -101,7 +101,7 @@
     * 127.0.0.1, localhost, etc. they are all the same
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
     :license: BSD. See LICENSE for more details.
 
 """

@@ -6,7 +6,7 @@
     This module implements helper classes to create management scripts
     for your applications (like `manage.py runserver`).
     
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
     :license: BSD. See LICENSE for more details.
 
 """

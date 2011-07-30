@@ -8,7 +8,7 @@
     The data structures are list of tuples instead of dicts to maintain the
     order of the attributes.
     
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
     :license: BSD. See LICENSE for more details.
 
 """

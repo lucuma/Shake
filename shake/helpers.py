@@ -3,7 +3,7 @@
     shake.helpers
     ----------------------------------------------
     
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
     :license: BSD. See LICENSE for more details.
 
 """

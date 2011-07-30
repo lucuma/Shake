@@ -3,7 +3,7 @@
     shake.config
     ----------------------------------------------
     
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
     :license: BSD. See LICENSE for more details.
 
 """
@@ -79,11 +79,10 @@ class Settings(object):
 
 
 QUOTES = [
-    'Shaken, not stirred',
-    'Chocolate milkshake',
-    'Protein shake',
-    'Apple Martini',
-    'Shake it, baby!',
-    'Shake your Ruby',
-    'Shake on rails',
+    ('Shaken, not stirred', 'Bond, James Bond'),
+    ('Shake it, baby!', 'Austin Powers'),
+    ('Shake your Ruby', ''),
+    ('You\'re riding Shake on rails!', 'Former Rails user'),
+    ('Shake-it Shake-it Shake-it', 'Ray Charles'),
+    ('Shake Shake Shake, Shake your booty', 'KC & The Sunshine Band')
     ]

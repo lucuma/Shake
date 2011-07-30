@@ -3,9 +3,9 @@
 """
     shake vudu
     ----------------------------------------------
-    Reanimate an skeleton for your project!
+    Reanimate an skeleton, just for your project!
     
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
     :license: BSD. See LICENSE for more details.
 
 """
@@ -18,6 +18,13 @@ import re
 
 ROOTDIR = os.path.join(os.path.dirname(__file__), 'skeleton')
 FILTER = ('.pyc', '.DS_Store', '.pyo')
+
+
+class Colors(object):
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
 
 
 def make_secret():
@@ -48,7 +55,7 @@ def make_project_skeleton(pathname):
         r'<%SECRET2%>': make_secret(),
     }
     
-    print '  %s/' % pathname
+    print '   %s/' % pathname
     
     for folder, subs, files in os.walk(ROOTDIR):
         ffolder = os.path.relpath(folder, ROOTDIR)
@@ -66,8 +73,9 @@ def make_project_skeleton(pathname):
                 content = replace_vars(content, data)
             filename = re.sub(r'%PNAME%', pname, filename)
             
-            print '      create   ' + \
-                os.path.join(ffolder, filename).lstrip('./')
+            msg = [Colors.OKGREEN, ' '*5, 'create  ', Colors.ENDC,
+                os.path.join(ffolder, filename).lstrip('./')]
+            print ''.join(msg)
             
             final_path = make_dirs(pathname, ffolder, filename)
             f = open(final_path, 'wb')
