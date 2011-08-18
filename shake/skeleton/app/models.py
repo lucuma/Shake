@@ -20,7 +20,7 @@ db = SQLAlchemy(settings.SQLALCHEMY_URI, echo=False)
 #     id = db.Column(db.Integer, primary_key=True)
 #     login = db.Column(db.Unicode(255), unique=True, nullable=False)
 #     password = db.Column(db.Unicode(140), nullable=True)
-#     fullname = db.Column(db.Unicode(255), nullable=False, default='')
+#     fullname = db.Column(db.Unicode(255), nullable=False, default=u'')
 #     date_joined = db.Column(db.DateTime, default=datetime.utcnow,
 #         nullable=False)
 #     last_sign_in = db.Column(db.DateTime, nullable=True)

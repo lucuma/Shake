@@ -37,15 +37,15 @@ def flash(request, message, category='info', extra=None):
     session.setdefault(LOCAL_FLASHES, []).append(msg)
 
 
-def get_messages():
+def get_messages(request=None):
     """Pulls all flashed messages from the session and returns them.
     Further calls in the same request to the function will return
     the same messages.
     """
     flashes = getattr(local, LOCAL_FLASHES, None)
-    if flashes is None:
-        request = local.request
-        flashes = request.session.get(LOCAL_FLASHES, [])
+    if not flashes:
+        request = request or local.request
+        flashes = request.session.get(LOCAL_FLASHES) or []
         setattr(local, LOCAL_FLASHES, flashes)
         if flashes:
             del request.session[LOCAL_FLASHES]

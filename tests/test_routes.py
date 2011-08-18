@@ -173,7 +173,7 @@ def test_path():
     with pytest.raises(RequestRedirect):
         adapter.match('/FrontPage')
     assert adapter.match('/Special') == ('special', {})
-    assert adapter.match('/2007') == ('year', {'year': 2011})
+    assert adapter.match('/2011') == ('year', {'year': 2011})
     assert adapter.match('/Some/Page') == ('page', {'name': 'Some/Page'})
     assert adapter.match('/Some/Page/edit') == \
         ('editpage', {'name': 'Some/Page'})
