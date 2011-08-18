@@ -6,7 +6,7 @@ Aquí puedes ver la lista de cambios entre versiones
 
 v0.5 (`Milkshake`)
 -------------------
-Publicada el XX de Julio, 2011
+Publicada el 18 de Agosto, 2011
 
 - Proper python packaging.
 
@@ -20,9 +20,6 @@ Publicada el XX de Julio, 2011
 - El paginador ya no es parte del core sino una extensión externa.
 
 - Comando `shake` para crear rápidamente un esqueleto de aplicación.
-
-- Documentación básica: Overview y API.
-
 
 
 ================

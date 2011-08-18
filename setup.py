@@ -15,7 +15,7 @@ def run_tests():
 
 setup(
     name='Shake',
-    version='0.5dev',
+    version='0.5',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
