@@ -12,8 +12,8 @@
     Used under the modified BSD license.
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 import mimetypes

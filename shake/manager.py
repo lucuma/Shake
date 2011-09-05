@@ -6,8 +6,8 @@
     This module implements helper classes to create management scripts
     for your applications (like `manage.py runserver`).
     
-    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 import getpass

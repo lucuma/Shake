@@ -3,8 +3,8 @@
     shake.helpers
     ----------------------------------------------
     
-    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 # Get the fastest json available
@@ -161,3 +161,8 @@ def from36(snum, alphabet=None):
     except KeyError:
         raise ValueError('The string is not a valid base 36 encoded integer')
     return num
+
+
+def plural(num, plural='s', singular=''):
+    return plural if num != 1 else singular
+

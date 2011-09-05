@@ -5,8 +5,8 @@
     
     This module implements the central WSGI application object.
     
-    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 from datetime import datetime, timedelta

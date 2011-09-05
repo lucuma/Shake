@@ -14,8 +14,8 @@
     
     See AUTHORS for more details
     
-    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 try:
@@ -60,4 +60,4 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = 0.5
+__version__ = 0.51

@@ -2,8 +2,8 @@
 """
     Test view templates
     
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
 from datetime import datetime, timedelta
 import jinja2
@@ -187,7 +187,7 @@ def test_default_globals_flash_messages():
     
     def foo(request):
         flash(request, 'foo')
-        tmpl = '{% for fm in flash_messages %}{{ fm.msg }}{% endfor %}'
+        tmpl = '{% for fm in get_messages() %}{{ fm.msg }}{% endfor %}'
         assert render.from_string(tmpl) == 'foo'
     
     urls = [

@@ -5,8 +5,8 @@
     
     Implements the bridge to Jinja2.
     
-    :copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 from datetime import datetime
@@ -17,14 +17,13 @@ import jinja2
 from jinja2.exceptions import TemplateNotFound
 from werkzeug.local import LocalProxy
 
-from .helpers import local, url_for, to64
-from . import media
+from .helpers import local, url_for, to64, plural
 
 
 LOCAL_FLASHES = '_fm'
 
 
-def flash(request, message, category='info', extra=None):
+def flash(request, msg, cat='info', extra=None, **kwargs):
     """Flashes a message to the next request.  In order to remove the
     flashed message from the session and to display it to the user,
     the view has to call :func:`get_flashed_messages`.
@@ -33,7 +32,10 @@ def flash(request, message, category='info', extra=None):
     :param category: optional classification of the message.
     """
     session = request.session
-    msg = {'msg': message, 'cat': category, 'extra': extra}
+    ## 0.51: argument 'category' deprecated in favor of 'cat'
+    if 'category' in kwargs:
+        cat = kwargs['category']
+    msg = {'msg': msg, 'cat': cat, 'extra': extra}
     session.setdefault(LOCAL_FLASHES, []).append(msg)
 
 
@@ -95,11 +97,10 @@ def new_csrf_secret(request):
 class Render(object):
     
     default_globals = {
-        'ellipsis': Ellipsis,
+        'ellipsis': Ellipsis, # Easter egg?
         'now': LocalProxy(datetime.utcnow),
-        'media': media,
+        'plural': plural,
         'get_messages': get_messages,
-        'flash_messages': LocalProxy(get_messages),
         'request': local('request'),
         'settings': LocalProxy(lambda: local.app.settings),
         'url_for': url_for,
@@ -176,16 +177,20 @@ class Render(object):
         return result
     
     def __call__(self, view_template, dcontext=None, alt_loader=None,
-            **context):
+            mimetype=None, headers=None, **context):
         self.load_alt_loader(alt_loader)
         tmpl = self.env.get_template(view_template)
         if not context and isinstance(dcontext, dict):
             context = dcontext
         result = tmpl.render(context)
         self.unload_alt_loader()
-        mimetype = context.pop('mimetype', self.default)
+        mimetype = mimetype or self.default
         response_class = local.app.response_class
-        return response_class(result, mimetype=mimetype)
+        resp = response_class(result, mimetype=mimetype)
+        headers = headers or {}
+        for key, val in headers.items():
+            resp.headers[key] = val
+        return resp
     
     def get_global(self, name):
         return self.env.globals[name]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    :copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-    :license: BSD. See LICENSE for more details.
+    :Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
 import pytest
 from werkzeug.datastructures import ImmutableDict

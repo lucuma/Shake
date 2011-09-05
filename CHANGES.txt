@@ -22,6 +22,15 @@ Publicada el 18 de Agosto, 2011
 - Comando `shake` para crear rápidamente un esqueleto de aplicación.
 
 
+v0.51
+-------------------
+Publicada el 5 de Setiembre, 2011
+
+- Arreglados bugs en flahs messages, el esqueleto de la aplicación y otros.
+- Removido el módulo `media`
+- Licencia cambiada a MIT
+
+
 ================
 Roadmap
 ================
