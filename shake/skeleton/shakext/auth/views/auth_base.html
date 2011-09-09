@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<title>{% block title %}Auth{% endblock %}</title>
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+<style>
+/* Normalizes margin, padding */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, 
+fieldset, input, p, blockquote, th, td { 
+margin : 0; padding : 0;
+}
+/* Make the weird Firefox button padding smaller */
+button::-moz-focus-inner { padding:0; }
+
+body {
+background: #f4f4f4;
+color: #444;
+font-family: 'Helvetica Neue', Arial, Helvetica, Verdana, sans-serif;
+font-size: 13px;
+line-height: 1.5;
+}
+
+#page {
+width: 402px;
+margin: 5% auto 1% auto;
+}
+
+form {
+background: white;
+border: 1px solid #ccc;
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+-webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+-moz-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+margin-bottom: 10px;
+padding: 30px 40px 40px;
+width: 320px;
+}
+
+h1 {
+color: #333;
+font-size: 19px;
+font-weight: bold;
+line-height: 125%;
+padding: 6px 0;
+}
+
+label {
+cursor: pointer;
+display: block;
+font-size: 13px;
+padding: 6px 0;
+text-transform: uppercase;
+}
+label:focus, label:active {
+color: #111;
+}
+
+input {
+background: #fafafa;
+border: 1px solid #ccc;
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+color: #111;
+display: block;
+font-size: 24px;
+margin: 5px 1px 1px;
+padding: 5px 8px;
+width: 93%;
+}
+input[type=password] {
+letter-spacing: 5px;
+}
+input:focus, input:active {
+background: white;
+}
+
+p {
+padding: 2px 0px 10px;
+}
+
+div.error, div.ok {
+background: #CF4225;
+border: 1px solid #C32B0C;
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+color: white;
+font-size: 13px;
+font-weight: bold;
+margin-bottom: 12px;
+padding: 10px 8px;
+width: 93%;
+}
+
+div.ok {
+background: #8DB326;
+border: 1px solid #74A000;
+}
+
+.sign_in div.error {
+font-size: 14px;
+}
+
+div.error ul,
+div.ok ul {
+list-style-type: disc;
+list-style-position: outside;
+padding-left: 15px;
+}
+
+fieldset {
+border: none;
+border-top: 1px solid #ddd;
+margin: 24px 0 0;
+padding: 17px 0 0;
+}
+
+a {
+color: #2A95DD;
+border-bottom: 1px dotted #2A95DD;
+float: left;
+font-size: 13px;
+margin-top: 12px;
+text-decoration: none;
+}
+a.exit {
+color: #666;
+border-bottom: 1px dotted #888;
+font-size: 12px;
+margin-top: 0;
+}
+a:hover, a.exit:hover {
+color: #006AB0;
+border-bottom: 1px solid #006AB0;
+}
+
+button, a.button {
+color: #4F4F4F;
+cursor: pointer;
+display: inline-block;
+font-family: Helvetica,Arial,sans-serif;
+font-size: 13px;
+font-weight: bold;
+line-height: 140%;
+margin-right: 1px;
+overflow: visible;
+padding: 6px 12px;
+position: relative;
+text-align: center;
+text-decoration: none !important;
+background: #f3f3f3;
+background: -webkit-gradient(linear, left top, left bottom, from(#fefefe), to(#cccccc));
+background: -moz-linear-gradient(top, #fefefe, #cccccc);
+border: 1px solid #B6B6B6;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+-moz-box-shadow: 0 0 3px  rgba(0, 0, 0, 0.2);
+box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+text-shadow:0 1px 0 rgba(255, 255, 255, 0.8);
+-webkit-user-select:none;
+-moz-user-select: none;
+user-select: none;
+float: right;
+}
+
+button:hover, button:focus,
+a.button:hover, a.button:focus {
+border: 1px solid #9d9d9d;
+-webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+-moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+color: #313131;
+text-decoration: none !important;
+}
+
+button:active, 
+a.button:active {
+background: #cccccc;
+background: -webkit-gradient(linear, left top, left bottom, from(#cccccc), to(#fefefe));
+background: -moz-linear-gradient(top, #cccccc, #fefefe);
+box-shadow: none;
+-webkit-box-shadow: none;
+-moz-box-shadow: none;
+outline: none !important;
+}
+</style>
+</head> 
+<body>
+<div id="page">
+{% block page %}{% endblock %}
+</div>
+</body>
+</html>

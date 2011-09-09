@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+import os
+from setuptools import setup
+
+
+ROOTDIR = os.path.dirname(__file__)
+README = os.path.join(ROOTDIR, 'README.txt')
+
+
+def run_tests():
+    import sys, subprocess
+    errno = subprocess.call([sys.executable, 'run_tests.py'])
+    raise SystemExit(errno)
+
+
+setup(
+    name='<%PNAME%>',
+    version='1',
+    author='Juan Pepadelucuma',
+    author_email='juan@example.com',
+    packages=['<%PNAME%>'],
+    zip_safe=False,
+    description='',
+    long_description=open(README).read(),
+    include_package_data=True,
+    install_requires=[
+        'Shake',
+        'SQLAlchemy'
+    ],
+    classifiers=[
+        'Environment :: Web Environment',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ],
+    test_suite='__main__.run_tests',
+)

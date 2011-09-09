@@ -1,0 +1,5 @@
+include *.txt *.py
+recursive-include app *
+recursive-include tests *
+recursive-exclude app *.pyc
+recursive-exclude tests *.pyc
