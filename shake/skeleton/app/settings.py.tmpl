@@ -19,7 +19,9 @@ render.set_global('STATIC', '/static')
 render.set_global('STATIC_CSS', '/static/css')
 render.set_global('STATIC_JS', '/static/js')
 render.set_global('STATIC_IMG', '/static/images')
-STATIC_ROOT = os.path.join(os.path.dirname(__file__), '..', 'static')
+
+STATIC_ROOT = os.path.abspath(os.path.normpath(
+    os.path.join(os.path.dirname(__file__), '..', 'static')))
 
 
 if not DEBUG:

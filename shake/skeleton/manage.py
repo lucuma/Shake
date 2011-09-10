@@ -11,7 +11,7 @@ from app.app import app
 
 
 @manager.command
-def run(host='0.0.0.0', port=None, **kwargs):
+def runserver(host='0.0.0.0', port=None, **kwargs):
     """[-host HOST] [-port PORT]
     Runs the application on the local development server.
     """
@@ -21,14 +21,25 @@ def run(host='0.0.0.0', port=None, **kwargs):
 @manager.command
 def run_wsgi():
     """Run the application using the WSGI protocol."""
+    import os
+    import sys
+    
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    sys.path.insert(0, cwd)
     application = app
 
 
 @manager.command
-def syncdb():
+def initdb():
+    """Create the database tables (if they don't exist)"""
     from app.models import db
     
     db.create_all()
+
+
+@manager.command
+def syncdb():
+    initdb()
 
 
 @manager.command
@@ -65,4 +76,4 @@ def add_perms(login, *perms):
 
 
 if __name__ == "__main__":
-    manager.run(default='run')
+    manager.run(default='runserver')
