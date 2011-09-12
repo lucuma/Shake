@@ -16,7 +16,6 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.local import LocalManager
 from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
-from werkzeug.wsgi import SharedDataMiddleware
 
 from .config import Settings
 from .controllers import welcome_page
@@ -325,9 +324,9 @@ class Shake(object):
                 '-' * wml,
                 ''])
     
-    def run(self, host=None, port=None, use_reloader=None, use_debugger=None,
-          reloader_interval=1, threaded=False, processes=1, ssl_context=None,
-          **kwargs):
+    def run(self, host=None, port=None, debug=True,
+            threaded=True, processes=1, reloader_interval=2,
+            ssl_context=None, **kwargs):
         """Runs the application on a local development server.
         
         The development server is not intended to be used on production
@@ -340,15 +339,8 @@ class Shake(object):
         :param port:
             The port for the server. eg: 8080
         
-        :param use_reloader:
-            Should the server automatically restart the python process if
-            modules were changed? The default is the value of settings.RELOAD.
-        
-        :param use_debugger:
+        :param debug:
             Run in debug mode? The default is the value of settings.DEBUG.
-        
-        :param reloader_interval:
-            The interval for the reloader in seconds. Default `1`.
         
         :param threaded:
             Should the process handle each request in a separate thread?
@@ -356,6 +348,9 @@ class Shake(object):
         
         :param processes:
             Number of processes to spawn. Default `1`.
+        
+        :param reloader_interval:
+            The interval for the reloader in seconds. Default `2`.
         
         :param ssl_context:
             An SSL context for the connection. Either an OpenSSL context, the
@@ -365,22 +360,58 @@ class Shake(object):
         """
         host = host or self.settings.SERVER_NAME
         port = port or self.settings.SERVER_PORT
-        use_reloader = (use_reloader if (use_reloader is not None) else
-            self.settings.RELOAD)
-        use_debugger = (use_debugger if (use_debugger is not None) else
-            self.settings.DEBUG)
+        debug = (debug if (debug is not None) else self.settings.DEBUG)
         
         self._welcome_msg()
         
         return run_simple(host, port, self,
-            use_reloader=use_reloader,
-            use_debugger=use_debugger,
+            use_reloader=debug,
+            use_debugger=debug,
             reloader_interval=reloader_interval,
             threaded=threaded,
             processes=processes,
             ssl_context=ssl_context,
             static_files=self.static_dirs,
             **kwargs)
+    
+    def run_cherrypy(self, host=None, port=None, processes=1, 
+            server_name=None, **kwargs):
+        """Runs the application on top of the CherryPy WSGI server.
+        
+        This server can be used on production but it is recomended to use
+        another server, like NGINX for the static files.
+        
+        :param host:
+            The host for the application. eg: 'localhost'.
+        
+        :param port:
+            The port for the server. eg: 8080
+        
+        :param numthreads:
+            Default 1.
+        
+        :param processes:
+            Number of processes to spawn. Default `1`.
+        
+        :param server_name
+        
+        """
+        from cherrypy import wsgiserver
+
+        host = host or self.settings.SERVER_NAME
+        port = port or self.settings.SERVER_PORT
+        
+        self._welcome_msg()
+        
+        d = wsgiserver.WSGIPathInfoDispatcher({'/': self})
+        server = wsgiserver.CherryPyWSGIServer((host, port), d,
+            numthreads=processes, server_name=server_name, **kwargs)
+        try:
+            print ' * Running on http://%s:%s/' % (host, port)
+            server.start()
+        except KeyboardInterrupt:
+            print '\n * Stopping server...'
+            server.stop()
     
     def test_client(self):
         """Creates a test client for this application.

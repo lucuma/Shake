@@ -33,7 +33,8 @@ class LazyUser(object):
     the login in other computers just by changing (or re-saving) her password.
     """
     
-    def __init__(self, User):
+    def __init__(self, db, User):
+        self.db = db
         self.User = User
     
     def __get__(self, request, obj_type=None):
@@ -42,7 +43,7 @@ class LazyUser(object):
         if uhmac:
             try:
                 uid, mac = uhmac.split('$')
-                user = self.User.query.get(uid)
+                user = self.db.query(self.User).get(uid)
                 if uhmac != get_user_hmac(user):
                     raise ValueError
             except ValueError:
@@ -151,13 +152,17 @@ def get_user_model(db):
     class User(db.Model):
         
         id = db.Column(db.Integer, primary_key=True)
-        login = db.Column(db.Unicode(64), unique=True, nullable=False)
-        email = db.Column(db.String(64), nullable=True)
+        login = db.Column(db.Unicode(64),
+            unique=True, nullable=False)
+        email = db.Column(db.String(64),
+            nullable=True)
         password = db.Column(db.String(140), nullable=True)
         date_joined = db.Column(db.DateTime, default=datetime.utcnow,
             nullable=False)
-        last_sign_in = db.Column(db.DateTime, nullable=True)
-        status = db.Column(db.String(1), default='A', nullable=False)
+        last_sign_in = db.Column(db.DateTime,
+            nullable=True)
+        status = db.Column(db.String(1),
+            default='A', nullable=False)
         
         def __init__(self, login, password=None, email=None):
             self.login = login
@@ -165,7 +170,9 @@ def get_user_model(db):
             self.email = email
         
         def __repr__(self):
-            return '<User %s (%s)>' % (self.login, self.email)
+            if self.email:
+                return '<User %s (%s)>' % (self.login, self.email)
+            return '<User %s>' % self.login
         
         @property
         def is_active(self):

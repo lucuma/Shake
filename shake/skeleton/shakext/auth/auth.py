@@ -255,7 +255,7 @@ class Auth(object):
             self.get_user(request)
     
     def get_user(self, request):
-        request.__class__.user = LazyUser(self.User)
+        request.__class__.user = LazyUser(self.db, self.User)
     
     def get_urls(self):
         urls = [
@@ -302,7 +302,8 @@ class Auth(object):
                 return self._token_authentication(token)
     
     def _loginpass_authentication(self, login, password, update):
-        user = self.User.query.filter_by(login=login).first()
+        user = self.db.query(self.User) \
+            .filter(self.User.login == login).first()
         if not user:
             return None
         if not self.check_password(password, user.password):
@@ -325,7 +326,8 @@ class Auth(object):
         except ValueError:
             return None
         
-        user = self.User.query.filter_by(login=login).first()
+        user = self.db.query(self.User) \
+            .filter(self.User.login == login).first()
         if not user:
             return None
         
@@ -422,7 +424,8 @@ class Auth(object):
     def create_user(self, login, passw, **data):
         """[-login] USER_NAME [-passw] PASSWORD
         Creates a new user."""
-        user_exists = self.User.query.filter_by(login=login).count()
+        user_exists = self.db.query(self.User) \
+            .filter(self.User.login == login).count()
         if user_exists:
             raise UserExistsError(login)
         if len(passw) < self.settings.password_minlen:
@@ -430,19 +433,20 @@ class Auth(object):
         
         passw = self.hash_password(passw)
         user = self.User(login=login, password=passw, **data)
-        self.db.session.add(user)
-        self.db.session.commit()
+        self.db.add(user)
+        self.db.commit()
         return user
     
     # This method is intended to be called from the command line.
     def change_password(self, login, passw):
         """[-login] USER_NAME [-passw] NEW_PASSWORD
         Changes the password of an existing user."""
-        user = self.User.query.filter_by(login=login).first()
+        user = self.db.query(self.User) \
+            .filter(self.User.login == login).first()
         if not user:
             raise UserDoesNotExistsError(login)
         self.set_password(user, passw)
-        self.db.session.commit()
+        self.db.commit()
         return user
     
     def sign_in_view(self, request, **kwargs):
@@ -467,7 +471,7 @@ class Auth(object):
             if user:
                 if hasattr(user, 'last_sign_in'):
                     user.last_sign_in = datetime.utcnow()
-                    self.db.session.commit()
+                    self.db.commit()
                 self.sign_in(request, user)
                 return redirect(redirect_to)
             kwargs['error'] = 'FAIL'
@@ -525,7 +529,8 @@ class Auth(object):
         # Phase 2
         elif request.is_post:
             login = request.form.get('login')
-            user = self.User.query.filter_by(login=login).first()
+            user = self.db.query(self.User) \
+                .filter(self.User.login == login).first()
             if not user:
                 kwargs['error'] = 'NOT FOUND'
             else:
@@ -591,7 +596,7 @@ class Auth(object):
             
             if not kwargs['errors']:
                 user.password = self.hash_password(np1)
-                self.db.session.commit()
+                self.db.commit()
                 # Refresh the user hmac in the session
                 self.sign_in(request, user)
                 kwargs['ok'] = True

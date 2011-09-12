@@ -9,6 +9,7 @@ from .urls import urls
 app = Shake(urls, settings)
 db.init_app(app)
 auth.init_app(app)
+app.add_urls(auth.get_urls())
 
 # Used for the local development server.
 # In production, you'll have to define the static paths

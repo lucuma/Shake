@@ -20,13 +20,23 @@ def runserver(host='0.0.0.0', port=None, **kwargs):
 
 @manager.command
 def run_wsgi():
-    """Run the application using the WSGI protocol."""
+    """Expose the application to be executed using the WSGI protocol."""
     import os
     import sys
     
     cwd = os.path.abspath(os.path.dirname(__file__))
     sys.path.insert(0, cwd)
     application = app
+
+
+@manager.command
+def run_cherrypy(host=None, port=None, processes=1, server_name=None, **kwargs):
+    """Runs the application on top of the CherryPy WSGI server.
+    This server can be used on production but it is recomended to use
+    another server, like NGINX for the static files.
+    """
+    app.run_cherrypy(host, port, processes=processes, server_name=server_name,
+        **kwargs)
 
 
 @manager.command
@@ -43,7 +53,7 @@ def syncdb():
 
 
 @manager.command
-def create_user(email, passw, **data):
+def create_user(login, passw, **data):
     """[-login] LOGIN [-passw] PASSWORD
     Creates a new user.
     """

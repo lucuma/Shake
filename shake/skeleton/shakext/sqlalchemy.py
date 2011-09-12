@@ -59,46 +59,6 @@ def _include_sqlalchemy(obj):
     obj.Table = _make_table(obj)
 
 
-class BaseQuery(orm.Query):
-    """The default query object used for models.  This can be subclassed and
-    replaced for individual models by setting the :attr:`~Model.query_class`
-    attribute.  This is a subclass of a standard SQLAlchemy
-    :class:`~sqlalchemy.orm.query.Query` class and has all the methods of a
-    standard query as well.
-    """
-
-    def get_or_notfound(self, ident):
-        """Like :meth:`get` but aborts with NotFound if not found instead of
-        returning `None`.
-        """
-        value = self.get(ident)
-        if value is None:
-            raise NotFound()
-        return value
-
-    def first_or_notfound(self):
-        """Like :meth:`first` but aborts with NotFound if not found instead of
-        returning `None`.
-        """
-        value = self.first()
-        if value is None:
-            raise NotFound()
-        return value
-
-
-class _QueryProperty(object):
-
-    def __init__(self, sqlalch):
-        self.sqlalch = sqlalch
-
-    def __get__(self, obj, type):
-        try:
-            mapper = orm.class_mapper(type)
-            return type.query_class(mapper, session=self.sqlalch.session())
-        except UnmappedClassError:
-            return None
-
-
 class _EngineConnector(object):
 
     def __init__(self, sqlalch):
@@ -138,15 +98,10 @@ class _ModelTableNameDescriptor(object):
 class Model(object):
     """Baseclass for custom user models."""
 
-    #: the query class used.  The :attr:`query` attribute is an instance
-    #: of this class.  By default a :class:`BaseQuery` is used.
-    query_class = BaseQuery
-
-    #: an instance of :attr:`query_class`.  Can be used to query the
-    #: database for instances of this model.
-    query = None
-
     __tablename__ = _ModelTableNameDescriptor()
+
+    def __repr__(self):
+        return '<%s>' % self.__class__.__name__
 
 
 class SQLAlchemy(object):
@@ -193,17 +148,17 @@ class SQLAlchemy(object):
         self.options = self.build_options_dict(echo=echo, pool_size=pool_size,
             pool_timeout=pool_timeout, pool_recycle=pool_recycle)
         self.apply_driver_hacks()
-
-        self.Model = declarative_base(cls=Model, name='Model')
-        self.Model.query = _QueryProperty(self)
-
+        
         self.connector = None
         self._engine_lock = Lock()
-
         self.session = _create_scoped_session(self)
+
+        self.Model = declarative_base(cls=Model, name='Model')
+        self.Model.db = self
+        
         if app is not None:
             self.init_app(app)
-
+        
         _include_sqlalchemy(self)
 
     def build_options_dict(self, **kwargs):
@@ -226,7 +181,20 @@ class SQLAlchemy(object):
                     raise RuntimeError('SQLite in-memory database with an '
                         'empty queue (pool_size = 0) is not possible due to '
                         'data loss.')
-
+    
+    @property
+    def query(self):
+        return self.session.query
+    
+    def add(self, *args, **kwargs):
+        return self.session.add(*args, **kwargs)
+    
+    def commit(self):
+        return self.session.commit()
+    
+    def rollback(self):
+        return self.session.rollback()
+    
     @property
     def metadata(self):
         """Returns the metadata"""

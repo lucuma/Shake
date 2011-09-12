@@ -17,7 +17,6 @@ DEFAULT_SETTINGS = {
     'FORCE_SCRIPT_NAME': False,
     
     'DEBUG': True,
-    'RELOAD': True,
     
     'SECRET_KEY': None,
     'SESSION_COOKIE_NAME': 'shake_session',
