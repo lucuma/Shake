@@ -1,11 +1,10 @@
 =====================
-Shake v0.5 (beta)
+Shake v0.5.2 (beta)
 =====================
 
 
-A web framework mixed from the best ingredients
+A web framework mixed from the best ingredients::
 
-::
     from shake import Shake, Rule
 
     def hello(request):
