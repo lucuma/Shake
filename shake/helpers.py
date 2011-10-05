@@ -11,7 +11,10 @@
 try:
     import simplejson as json
 except ImportError:
-    import json
+    try:
+        import json
+    except ImportError:
+        raise ImportError('Unable to find a json implementation')
 
 import os
 from werkzeug.local import Local

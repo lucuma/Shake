@@ -39,7 +39,7 @@ except ImportError:
 # in the module but are exported as public interface.
 from jinja2 import escape, Markup
 from werkzeug.exceptions import (abort, HTTPException, Forbidden,
-    MethodNotAllowed, NotFound)
+    MethodNotAllowed, NotFound, RequestEntityTooLarge, UnsupportedMediaType)
 NotAllowed = Forbidden
 from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
@@ -60,4 +60,4 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.5.2'
+__version__ = '0.5.3'

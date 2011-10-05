@@ -15,19 +15,30 @@ def run_tests():
 
 setup(
     name='Shake',
-    version='0.5.2',
+    version='0.5.3',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
+    package_data={
+        'shake': [
+            'default_views/*.*',
+            'skeleton/app/views/*.*',
+            'skeleton/app/*.*',
+            'skeleton/static/css/*.*',
+            'skeleton/static/images/*.*',
+            'skeleton/static/js/*.*',
+            'skeleton/static/*.*',
+            'skeleton/*.*',
+        ]
+    },
     zip_safe=False,
     url='http://github.com/lucuma/Shake',
     license='MIT license (http://www.opensource.org/licenses/mit-license.php)',
     description='A web framework mixed from the best ingredients',
     long_description=open(README).read(),
-    include_package_data=True,
     install_requires=[
         'Werkzeug>=0.7',
-        'Jinja2>=2.4'
+        'Jinja2>=2.4',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

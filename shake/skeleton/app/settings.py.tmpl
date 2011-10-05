@@ -2,10 +2,9 @@
 import os
 
 from shake import Render
-from shakext.mail import Mailer
+from shake_mail import Mailer
 
 
-RELOAD = True
 DEBUG = True
 SECRET_KEY = '<%SECRET1%>'
 
@@ -22,11 +21,6 @@ render.set_global('STATIC_IMG', '/static/images')
 
 STATIC_ROOT = os.path.abspath(os.path.normpath(
     os.path.join(os.path.dirname(__file__), '..', 'static')))
-
-
-if not DEBUG:
-    PAGE_NOT_FOUND = 'app.controllers.not_found'
-    PAGE_ERROR = 'app.controllers.critical_error'
 
 
 mailer = Mailer(

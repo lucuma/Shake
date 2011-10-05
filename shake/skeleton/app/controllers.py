@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from shake import redirect, url_for, flash, NotFound
 
-from shakext.auth import protected
+from shake_auth import protected
 
 from . import settings
 from .models import db

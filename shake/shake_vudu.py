@@ -11,19 +11,22 @@
 """
 import hashlib
 import errno
-import optparse
 import os
 import re
 
+from shake import manager
 
-ROOTDIR = os.path.join(os.path.dirname(__file__), 'skeleton')
+
+ROOTDIR = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+    'skeleton')
 FILTER = ('.pyc', '.DS_Store', '.pyo')
-
+TABSPACE = ' '*5
 
 class Colors(object):
     OKGREEN = '\033[92m'
     WARNING = '\033[93m'
     FAIL = '\033[91m'
+    BOLD = '\033[1m'
     ENDC = '\033[0m'
 
 
@@ -47,7 +50,9 @@ def replace_vars(text, data):
     return text
 
 
-def make_project_skeleton(pathname):
+def make_project_skeleton(pathname, skeleton):
+    print 'Using skeleton:', skeleton
+
     ppath, pname = os.path.split(pathname)
     data = {
         r'<%PNAME%>': pname,
@@ -55,10 +60,10 @@ def make_project_skeleton(pathname):
         r'<%SECRET2%>': make_secret(),
     }
     
-    print '   %s/' % pathname
-    
-    for folder, subs, files in os.walk(ROOTDIR):
-        ffolder = os.path.relpath(folder, ROOTDIR)
+    print '\n   %s/' % pathname
+
+    for folder, subs, files in os.walk(skeleton):
+        ffolder = os.path.relpath(folder, skeleton)
         
         for filename in files:
             if filename.endswith(FILTER):
@@ -73,7 +78,7 @@ def make_project_skeleton(pathname):
                 content = replace_vars(content, data)
             filename = re.sub(r'%PNAME%', pname, filename)
             
-            msg = [Colors.OKGREEN, ' '*5, 'create  ', Colors.ENDC,
+            msg = [Colors.OKGREEN, TABSPACE, 'create  ', Colors.ENDC,
                 os.path.join(ffolder, filename).lstrip('./')]
             print ''.join(msg)
             
@@ -83,12 +88,25 @@ def make_project_skeleton(pathname):
             f.close()
 
 
+@manager.command
+def new(pathname, skeleton=ROOTDIR):
+    """PATH
+    Create a new project skeleton
+    """
+    pathname = pathname.rstrip(os.path.sep)
+    make_project_skeleton(pathname, skeleton)
+
+    msg = ['\n',
+        TABSPACE, 'Now run\n',
+        TABSPACE, Colors.BOLD, '  pip install -r ', 
+        pathname, os.path.sep, 'requirements.txt', Colors.ENDC, '\n',
+        TABSPACE, 'to finish installing the project requirements.\n']
+    print ''.join(msg)
+
+
 def main():
-    parser = optparse.OptionParser()
-    (opts, args) = parser.parse_args()
-    pathname = args[0].rstrip(os.path.sep)
-    make_project_skeleton(pathname)
+    manager.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
