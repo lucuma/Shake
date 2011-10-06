@@ -1,7 +1,6 @@
-=====================
-Shake v0.5.2 (beta)
-=====================
 
+Shake v0.5.2
+=====================
 
 A web framework mixed from the best ingredients::
 
@@ -17,6 +16,3 @@ A web framework mixed from the best ingredients::
 
     if __name__ == "__main__":
         app.run()
-
-
-

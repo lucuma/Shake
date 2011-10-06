@@ -21,6 +21,7 @@ setup(
     packages=['shake'],
     package_data={
         'shake': [
+            '.gitignore',
             'default_views/*.*',
             'skeleton/app/views/*.*',
             'skeleton/app/*.*',
