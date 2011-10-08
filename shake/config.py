@@ -80,7 +80,7 @@ class Settings(object):
 QUOTES = [
     ('Shaken, not stirred', 'Bond, James Bond'),
     ('Shake it, baby!', 'Austin Powers'),
-    ('Shake your Ruby', ''),
+    ('Shake your Ruby', 'Anonymous Coward'),
     ('You\'re riding Shake on rails!', 'Former Rails user'),
     ('Shake-it Shake-it Shake-it', 'Ray Charles'),
     ('Shake Shake Shake, Shake your booty', 'KC & The Sunshine Band')

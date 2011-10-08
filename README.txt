@@ -1,5 +1,5 @@
 
-Shake v0.5.2
+Shake v0.5.5
 =====================
 
 A web framework mixed from the best ingredients::

@@ -289,4 +289,19 @@ def prompt_choices(text, choices, default=None, resolver=string.lower,
             return default
 
 
+COLORS = {
+    'OKGREEN': '\033[92m',
+    'WARNING': '\033[93m',
+    'FAIL': '\033[91m',
+    'BOLD': '\033[1m',
+    'ENDC': '\033[0m',
+}
+
+
+def formatm(action, msg='', color='OKGREEN'):
+    color = COLORS.get(color, '')
+    lparts = [color, action, COLORS['ENDC'], msg]
+    return ''.join(lparts)
+
+
 manager = Manager()

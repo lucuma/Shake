@@ -30,16 +30,6 @@ def run_wsgi():
 
 
 @manager.command
-def run_cherrypy(host=None, port=None, processes=1, server_name=None, **kwargs):
-    """Runs the application on top of the CherryPy WSGI server.
-    This server can be used on production but it is recomended to use
-    another server, like NGINX for the static files.
-    """
-    app.run_cherrypy(host, port, processes=processes, server_name=server_name,
-        **kwargs)
-
-
-@manager.command
 def initdb():
     """Create the database tables (if they don't exist)"""
     from app.models import db

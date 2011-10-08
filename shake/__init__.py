@@ -50,8 +50,8 @@ from .controllers import (not_found_page, error_page, not_allowed_page,
 from .datastructures import StorageDict
 from .helpers import (local, json, url_for, execute, to64, from64,
     to36, from36)
-from .manager import (Manager, manager, prompt, prompt_pass, prompt_bool,
-    prompt_choices)
+from .smanager import (Manager, manager, prompt, prompt_pass, prompt_bool,
+    prompt_choices, formatm)
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (Render, TemplateNotFound, flash, get_messages,
@@ -60,4 +60,4 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.5.3'
+__version__ = '0.5.5'

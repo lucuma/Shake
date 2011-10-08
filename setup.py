@@ -2,6 +2,8 @@
 import os
 from setuptools import setup
 
+from shake import __version__
+
 
 ROOTDIR = os.path.dirname(__file__)
 README = os.path.join(ROOTDIR, 'README.txt')
@@ -15,7 +17,7 @@ def run_tests():
 
 setup(
     name='Shake',
-    version='0.5.3',
+    version=__version__,
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
@@ -25,9 +27,12 @@ setup(
             'default_views/*.*',
             'skeleton/app/views/*.*',
             'skeleton/app/*.*',
-            'skeleton/static/css/*.*',
-            'skeleton/static/images/*.*',
-            'skeleton/static/js/*.*',
+            'skeleton/app/controllers/*',
+            'skeleton/app/models/*',
+            'skeleton/app/settings/*',
+            'skeleton/static/css/*',
+            'skeleton/static/images/*',
+            'skeleton/static/js/*',
             'skeleton/static/*.*',
             'skeleton/*.*',
         ]
@@ -54,6 +59,6 @@ setup(
     test_suite='__main__.run_tests',
     entry_points="""
     [console_scripts]
-    shake = shake.shake_vudu:main
+    shake = shake.svudu:main
     """
 )
