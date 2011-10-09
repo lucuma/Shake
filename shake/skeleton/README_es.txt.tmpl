@@ -2,16 +2,9 @@
 <= PNAME =>
 =====================
 
-Bienvenida a Shake. 
+Los nombres que tienen los archivos y la forma como están organizados, es como lo encontramos más conveniente y creemos sigue mejores prácticas.
 
-
-
-Contenidos
-=====================
-
-Este es solo un esqueleto de una aplicación. Los nombres que tienen los archivos y la forma como están organizados, es como lo encontramos más conveniente y creemos sigue mejores prácticas.
-
-Esta es la estructura de archivos por defecto de una aplicación Shake autogenerada:
+Esta es la estructura de archivos por defecto de una aplicación Shake autogenerada. Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.
 
 ├── README.txt
 ├── README_es.txt
@@ -51,18 +44,20 @@ app
   Contiene el código python específico para esta aplicación.
 
 app/app.py
-  .
+  El archivo central de la aplicación, aunque todo lo que hace es instanciarla
+  y alguna configuración inicial.
 
 app/controllers
-  .
+  Controladores.
 
 app/models
-  .
+  Modelos.
 
 app/settings
-  .
+  Contiene los archivos con opciones de configuración. 
 
 app/urls.py
+  Lista de patrones de URLs.
 
 app/views
   Guarda las plantillas para las vistas, que además de HTML, pueden ser
@@ -70,19 +65,23 @@ app/views
   usan la sintáxis de Jinja2 por defecto.
 
 app/views/layouts
-  .
+  Guarda los archivos de plantillas de las cuales heredan las otras.
+  Estos archivos contienen secciones comunes, como la cabecera, pie de
+  página, etc.
 
 manage.py
-  .
+  Un programa de línea de comandos para tareas administrativas. Puedes agregar
+  tus porpios comandos a este archivo.
 
 requirements.txt
-  .
+  Una lista de dependencias de tu aplicación. Puedes instalarlas todas
+  fácilmente ejecutando:
+      pip install -r requierements.txt
 
 static
   Contiene subdirectorios para hojas de estilos, imágens y código de JavaScript.
 
 tests
-  .
+  Guarda aquí los tests automáticos para tu aplicación.
 
 
-Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.

@@ -3,3 +3,85 @@
 =====================
 
 
+Este es solo un esqueleto de una aplicación. Los nombres que tienen los archivos y la forma como están organizados, es como lo encontramos más conveniente y creemos sigue mejores prácticas.
+
+Esta es la estructura de archivos por defecto de una aplicación Shake autogenerada:
+
+├── README.txt
+├── README_es.txt
+├── app
+│   ├── app.py
+│   ├── controllers
+│   │   └── __init__.py
+│   ├── models
+│   │   └── __init__.py
+│   ├── settings
+│   │   ├── __init__.py
+│   │   └── _LOCAL.py
+│   ├── urls.py
+│   └── views
+│       ├── layouts
+│       │   └── base.html
+│       ├── index.html
+│       └── not_found.html
+│       ├── error.html
+├── manage.py
+├── requirements.txt
+├── static
+│   ├── css
+│   │   └── prueba.css
+│   ├── images
+│   │   └── favicon.ico
+│   ├── js
+│   │   ├── jquery-1.6.2.min.js
+│   │   ├── prueba.js
+│   │   └── underscore-1.1.6.min.js
+│   └── robots.txt
+└── tests
+    └── __init__.py
+
+
+app
+  Contiene el código python específico para esta aplicación.
+
+app/app.py
+  .
+
+app/controllers
+  Controladores.
+
+app/models
+  Modelos.
+
+app/settings
+  Opciones de configuración.
+
+app/urls.py
+  Lista de patrones de URLs.
+
+app/views
+  Guarda las plantillas para las vistas, que además de HTML, pueden ser
+  para generar cualquier otro tipo de archivo basado en texto. Todas las vistas
+  usan la sintáxis de Jinja2 por defecto.
+
+app/views/layouts
+  Guarda los archivos de plantillas de las cuales heredan las otras.
+  Estos archivos contienen secciones comunes de las páginas, como la cabecera.
+  
+manage.py
+  A command-line utility for administrative tasks. You can easily add your own
+  commands to this file.
+
+requirements.txt
+  Una lista de dependencias de tu aplicación. Puedes instalarlas todas
+  fácilmente ejecutando:
+      pip install -r requierements.txt
+
+static
+  Contiene subdirectorios para hojas de estilos, imágens y código de JavaScript.
+
+tests
+  Guarda aquí los tests automáticos para tu aplicación.
+
+
+Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.
