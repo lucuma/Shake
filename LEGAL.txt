@@ -1,3 +1,12 @@
+================
+Legal
+================
+
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
+
+-------------------------------------------------------------------------------
+
 Portions of the code (and inspiration) were taken from 
 Flask <http://flask.pocoo.org>.
 The original code is BSD licensed:
@@ -34,6 +43,7 @@ The original code is BSD licensed:
     SOFTWARE AND DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
     DAMAGE.
 
+-------------------------------------------------------------------------------
 
 The `routes` module was adapted from the routing package of 
 Werkzeug <http://werkzeug.pocoo.org>.
