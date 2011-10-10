@@ -14,7 +14,7 @@ body {
 font-family: Helvetica, Arial, sans-serif;
 font-size: 16px;
 line-height: 1.5;
-color: #333;
+color: #222;
 }
 
 hgroup {
@@ -34,7 +34,6 @@ padding: 0;
 
 h1 {
 font-size: 32px;
-color: #222;
 }
 
 h2 {
@@ -68,19 +67,18 @@ padding: 5px 0;
 }
 
 li p {
-color: #444;
+color: #555;
 font-size: 15px;
 }
 
 code, var, .filename {
 font-family: "Droid Sans Mono", monospace;
 padding: 0 2px;
-font-style: italic;
+font-style: normal;
 }
 
-aside p {
-font-size: 13px;
-color: #777;
+.filename {
+font-style: italic;
 }
 
 h1, h2, p, ol, h4 {
@@ -111,7 +109,7 @@ margin-right: auto;
 </li>
 <li>
   <h3>Create your database.</h3>
-  <p>Run <code>python manage.py initdb</code> to create your database. If you're not using SQLite (the default), edit the <var>SQLALCHEMY_URI</var> setting in <span class="filename">app/settings/__init__.py</span> with your username and password.</p>
+  <p>Run &ldquo;<code>python manage.py initdb</code>&rdquo; to create your database. If you're not using SQLite (the default), edit the <var>SQLALCHEMY_URI</var> setting in <span class="filename">app/settings/__init__.py</span> with your username and password.</p>
 </li>
 </ol>
 
