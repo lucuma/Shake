@@ -10,6 +10,84 @@
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 <style>
+body {
+font-family: Helvetica, Arial, sans-serif;
+font-size: 16px;
+line-height: 1.5;
+color: #333;
+}
+
+hgroup {
+padding: 20px 0 10px;
+}
+
+section {
+padding: 15px 0;
+}
+
+h1, h2, h3, h4 {
+font-weight: normal;
+line-height: 1.2;
+margin: 5px 0;
+padding: 0;
+}
+
+h1 {
+font-size: 32px;
+color: #222;
+}
+
+h2 {
+font-size: 16px;
+}
+
+hgroup h2 {
+font-size: 20px;
+color: #777;
+}
+
+h3 {
+font-size: 20px;
+color: #222;
+}
+
+h4 {
+font-weight: bold;
+font-size: 20px;
+padding: 10px 0;
+}
+
+p {
+margin: 10px 0;
+}
+
+li {
+font-size: 20px;
+color: #888;
+padding: 5px 0;
+}
+
+li p {
+color: #444;
+font-size: 15px;
+}
+
+code, var, .filename {
+font-family: "Droid Sans Mono", monospace;
+padding: 0 2px;
+font-style: italic;
+}
+
+aside p {
+font-size: 13px;
+color: #777;
+}
+
+h1, h2, p, ol, h4 {
+width: 760px;
+margin-left: auto;
+margin-right: auto;
+}
 </style>
 </head>
 <body>
@@ -17,18 +95,27 @@
 <h1>Welcome aboard</h1>
 <h2>Congratulations on your first Shake-powered app!</h2>
 </hgroup>
+<section>
+<h2>Here's what to do next:</h2>
+<ol>
+<li>
+  <h3>See the <span class="filename">README.txt</span> for info about this application skeleton.</h3>
+</li>
+<li>
+  <h3>Create your models, controllers and views.</h3>
+  <p>Put them in <span class="filename">app/models/</span>, <span class="filename">app/controllers/</span> and <span class="filename">app/views/</span>.</p>
+</li>
+<li>
+  <h3>Set up your routes and point them to your controllers.</h3>
+  <p>Routes are set up in <span class="filename">app/urls.py</span>. You're seeing this page because you haven't configured any routes yet.</p>
+</li>
+<li>
+  <h3>Create your database.</h3>
+  <p>Run <code>python manage.py initdb</code> to create your database. If you're not using SQLite (the default), edit the <var>SQLALCHEMY_URI</var> setting in <span class="filename">app/settings/__init__.py</span> with your username and password.</p>
+</li>
+</ol>
 
-<p>Here's what to do next:</p>
-<ul>
-<li>See the <var>README.txt</var> for info about this application skeleton.</li>
-<li>Uncomment the URL rules in <var>urls.py</var> or add new ones.</li>
-<li>Write you own controllers in <var>controllers/</var>.</li>
-<li>Edit the <var>SQLALCHEMY_URI</var> setting in <var>settings/__init__.py</var>, add
-new models in <var>models/__init__.py</var> and run <code>python manage.py initdb</code>
-to create the tables in the database.</li>
-</ul>
-<p><small>You're seeing this message because you haven't configured any URL yet.</small></p>
-
-<h3>Go ahead, Shake things up!</h3>
+<h4>Go ahead, Shake things up!</h4>
+</section>
 </body>
 </html>

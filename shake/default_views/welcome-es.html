@@ -10,6 +10,84 @@
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 <style>
+body {
+font-family: Helvetica, Arial, sans-serif;
+font-size: 16px;
+line-height: 1.5;
+color: #333;
+}
+
+hgroup {
+padding: 20px 0 10px;
+}
+
+section {
+padding: 15px 0;
+}
+
+h1, h2, h3, h4 {
+font-weight: normal;
+line-height: 1.2;
+margin: 5px 0;
+padding: 0;
+}
+
+h1 {
+font-size: 32px;
+color: #222;
+}
+
+h2 {
+font-size: 16px;
+}
+
+hgroup h2 {
+font-size: 20px;
+color: #777;
+}
+
+h3 {
+font-size: 20px;
+color: #222;
+}
+
+h4 {
+font-weight: bold;
+font-size: 20px;
+padding: 10px 0;
+}
+
+p {
+margin: 10px 0;
+}
+
+li {
+font-size: 20px;
+color: #888;
+padding: 5px 0;
+}
+
+li p {
+color: #444;
+font-size: 15px;
+}
+
+code, var, .filename {
+font-family: "Droid Sans Mono", monospace;
+padding: 0 2px;
+font-style: italic;
+}
+
+aside p {
+font-size: 13px;
+color: #777;
+}
+
+h1, h2, p, ol, h4 {
+width: 760px;
+margin-left: auto;
+margin-right: auto;
+}
 </style>
 </head>
 <body>
@@ -17,17 +95,27 @@
 <h1>Bienvenida/o a bordo</h1>
 <h2>¡Felicitaciones por tu primera aplicación basada en Shake!</h2>
 </hgroup>
-
+<section>
 <p>Esto es lo que puedes hacer a continuación:</p>
-<ul>
-<li>Mira el <var>README-es.txt</var> para información sobre la estructura autogenerada para esta aplicación.</li>
-<li>Descomenta las reglas de URL pre-definidas en <var>urls.py</var> or añade nuevas.</li>
-<li>Escribe tus propios controladores en <var>controllers/</var>.</li>
-<li>Edita la opción <var>SQLALCHEMY_URI</var> en <var>settings/__init__.py</var>, añade nuevos modelos en <var>models/__init__.py</var> y ejecuta <code>python manage.py initdb</code>
-para crear automáticamente las tablas en la base de datos.</li>
-</ul>
-<p><small>Ves esta página por que aún no has definido ninguna URL.</small></p>
+<ol>
+<li>
+  <h3>Lee <span class="filename">README-es.txt</span> para información sobre la estructura de esta aplicación.</h3>
+</li>
+<li>
+  <h3>Crea tus modelos, controladores y vistas.</h3>
+  <p>Ponlos en <span class="filename">app/models/</span>, <span class="filename">app/controllers/</span> y <span class="filename">app/views/</span>.</p>
+</li>
+<li>
+  <h3>Configura tus rutas y apúntalas a tus controladores.</h3>
+  <p>Las rutas se configuran editando <span class="filename">app/urls.py</span>. Ves esta página por que no has configurado ninguna ruta todavía.</p>
+</li>
+<li>
+  <h3>Crea tu base de datos.</h3>
+  <p>Corre <code>python manage.py initdb</code> para crear tu base de datos. Si no estás usando SQLite (la opción por defecto), edita la opción <var>SQLALCHEMY_URI</var> en <span class="filename">app/settings/__init__.py</span> con tu usuario y contraseña.</p>
+</li>
+</ol>
 
-<h3>Adelante, Shake things up!</h3>
+<h4>Adelante, Shake things up!</h4>
+</section>
 </body>
 </html>

@@ -2,9 +2,7 @@
 <= PNAME =>
 =====================
 
-Los nombres que tienen los archivos y la forma como están organizados, es como lo encontramos más conveniente y creemos sigue mejores prácticas.
-
-Esta es la estructura de archivos por defecto de una aplicación Shake autogenerada. Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.
+Esta es la estructura de archivos por defecto de una aplicación Shake, organizada de la forma como lo encuentramos más conveniente y siguiendo las mejores prácticas. Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.
 
 ├── README.txt
 ├── README_es.txt
@@ -44,20 +42,21 @@ app
   Contiene el código python específico para esta aplicación.
 
 app/app.py
-  El archivo central de la aplicación, aunque todo lo que hace es instanciarla
-  y alguna configuración inicial.
+  El archivo donde se istancia la aplicación (la clase Shake).
 
 app/controllers
-  Controladores.
+  Controladores. Reciben las acciones de los usuarios, interactúan con los
+  modelos y muestran la vista apropiada en la página.
 
 app/models
-  Modelos.
+  El código respnsable por mantener el estado de la aplicación (como el que
+  se comunica con la base de datos) y las reglas que aplican sobre él.
 
 app/settings
   Contiene los archivos con opciones de configuración. 
 
 app/urls.py
-  Lista de patrones de URLs.
+  Lista de reglas de URLs.
 
 app/views
   Guarda las plantillas para las vistas, que además de HTML, pueden ser
@@ -79,7 +78,8 @@ requirements.txt
       pip install -r requierements.txt
 
 static
-  Contiene subdirectorios para hojas de estilos, imágens y código de JavaScript.
+  Contiene subdirectorios para hojas de estilos, imágenes y código
+  JavaScript.
 
 tests
   Guarda aquí los tests automáticos para tu aplicación.

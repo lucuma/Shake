@@ -49,11 +49,19 @@ def not_allowed_page(request, error):
     return default_render('not_allowed.html')
 
 
-def welcome_page(request, error):
+def welcome_page(request, *args, **kwargs):
     """A default "welcome to shake" page.
     """
+    tmpl = 'welcome.html'
     quote = choice(QUOTES)
-    return default_render('welcome.html', quote=quote)
+    lang = request.args.get('lang', '')
+    if not lang:
+        lang = request.accept_languages.best \
+            or request.user_agent.language or ''
+        lang = lang.split('-')[0]
+    if lang == 'es':
+        tmpl = 'welcome-es.html'
+    return default_render(tmpl, quote=quote)
 
 
 def render_view(request, render, view, **kwargs):
