@@ -4,25 +4,29 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width" />
 <meta name="quote" content="“{{ quote[0] }}” — {{ quote[1] }}" />
-<title>Shake | Bienvenida/o a bordo</title>
+<title>Shake | Bienvenid@ a bordo</title>
 <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico" />
 <!--[if lt IE 9]>
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 <style>
-body {
+html, body {
 font-family: Helvetica, Arial, sans-serif;
 font-size: 16px;
 line-height: 1.5;
 color: #222;
+padding: 0;
+margin: 0;
+background: #fefefe;
 }
 
 hgroup {
-padding: 20px 0 10px;
+margin: 0;
+padding: 20px 0;
 }
 
 section {
-padding: 15px 0;
+padding: 20px 0 60px;
 }
 
 h1, h2, h3, h4 {
@@ -34,6 +38,8 @@ padding: 0;
 
 h1 {
 font-size: 32px;
+color: #a3312d;
+font-weight: bold;
 }
 
 h2 {
@@ -51,9 +57,14 @@ color: #222;
 }
 
 h4 {
-font-weight: bold;
+background: #333;
+color: white;
 font-size: 20px;
-padding: 10px 0;
+padding: 20px 0px;
+text-align: center;
+-moz-border-radius: 6px;
+-webkit-border-radius: 6px;
+border-radius: 6px;
 }
 
 p {
@@ -81,16 +92,18 @@ font-style: normal;
 font-style: italic;
 }
 
-h1, h2, p, ol, h4 {
-width: 760px;
+hgroup, section, h4 {
+width: 680px;
 margin-left: auto;
 margin-right: auto;
+padding-left: 15px;
+padding-right: 15px;
 }
 </style>
 </head>
 <body>
 <hgroup>
-<h1>Bienvenida/o a bordo</h1>
+<h1>Bienvenid@ a bordo</h1>
 <h2>¡Felicitaciones por tu primera aplicación basada en Shake!</h2>
 </hgroup>
 <section>
@@ -112,8 +125,7 @@ margin-right: auto;
   <p>Corre &ldquo;<code>python manage.py initdb</code>&rdquo; para crear tu base de datos. Si no estás usando SQLite (la opción por defecto), edita la opción <var>SQLALCHEMY_URI</var> en <span class="filename">app/settings/__init__.py</span> con tu usuario y contraseña.</p>
 </li>
 </ol>
-
-<h4>Adelante, Shake things up!</h4>
 </section>
+<h4>Adelante, Shake things up!</h4>
 </body>
 </html>

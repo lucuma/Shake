@@ -10,19 +10,23 @@
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 <style>
-body {
+html, body {
 font-family: Helvetica, Arial, sans-serif;
 font-size: 16px;
 line-height: 1.5;
 color: #222;
+padding: 0;
+margin: 0;
+background: #fefefe;
 }
 
 hgroup {
-padding: 20px 0 10px;
+margin: 0;
+padding: 20px 0;
 }
 
 section {
-padding: 15px 0;
+padding: 20px 0 60px;
 }
 
 h1, h2, h3, h4 {
@@ -34,6 +38,8 @@ padding: 0;
 
 h1 {
 font-size: 32px;
+color: #a3312d;
+font-weight: bold;
 }
 
 h2 {
@@ -51,9 +57,14 @@ color: #222;
 }
 
 h4 {
-font-weight: bold;
+background: #333;
+color: white;
 font-size: 20px;
-padding: 10px 0;
+padding: 20px 0px;
+text-align: center;
+-moz-border-radius: 6px;
+-webkit-border-radius: 6px;
+border-radius: 6px;
 }
 
 p {
@@ -81,10 +92,12 @@ font-style: normal;
 font-style: italic;
 }
 
-h1, h2, p, ol, h4 {
-width: 760px;
+hgroup, section, h4 {
+width: 680px;
 margin-left: auto;
 margin-right: auto;
+padding-left: 15px;
+padding-right: 15px;
 }
 </style>
 </head>
@@ -112,8 +125,7 @@ margin-right: auto;
   <p>Run &ldquo;<code>python manage.py initdb</code>&rdquo; to create your database. If you're not using SQLite (the default), edit the <var>SQLALCHEMY_URI</var> setting in <span class="filename">app/settings/__init__.py</span> with your username and password.</p>
 </li>
 </ol>
-
-<h4>Go ahead, Shake things up!</h4>
 </section>
+<h4>Go ahead, Shake things up!</h4>
 </body>
 </html>
