@@ -2,7 +2,7 @@
 import os
 from setuptools import setup
 
-VERSION = '0.5.10'
+VERSION = '0.5.12'
 ROOTDIR = os.path.dirname(__file__)
 README = os.path.join(ROOTDIR, 'README.txt')
 
@@ -53,6 +53,6 @@ setup(
     test_suite='__main__.run_tests',
     entry_points="""
     [console_scripts]
-    shake = shake.svudu:main
+    shake = shake.voodoo:main
     """
 )

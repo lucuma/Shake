@@ -123,15 +123,10 @@ class Shake(object):
     
     def add_static(self, url, path):
         url = '/' + url.strip('/')
+        path = os.path.normpath(os.path.realpath(path))
         # Instead of a path, we've probably recieved the value of __file__
         if not os.path.isdir(path):
-            path = os.path.join(
-                os.path.dirname(
-                    os.path.normpath(
-                        os.path.realpath(path)
-                    )
-                ),
-                STATIC_DIR)
+            path = os.path.join(os.path.dirname(path), STATIC_DIR)
         self.static_dirs[url] = path
     
     def before_request(self, function):
