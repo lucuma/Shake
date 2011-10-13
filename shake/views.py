@@ -20,6 +20,7 @@ from werkzeug.local import LocalProxy
 from .helpers import local, url_for, to64, plural
 
 
+VIEWS_DIR = 'views'
 LOCAL_FLASHES = '_fm'
 
 
@@ -121,6 +122,16 @@ class Render(object):
         tglobals = kwargs.pop('globals', {})
         self.default = default
         
+        # Instead of a path, we've probably recieved the value of __file__
+        if views_path and not os.path.isdir(views_path):
+            views_path = os.path.join(
+                os.path.dirname(
+                    os.path.normpath(
+                        os.path.realpath(views_path)
+                    )
+                ),
+                VIEWS_DIR)
+
         if views_path and not loader:
             loader = jinja2.FileSystemLoader(views_path)
         

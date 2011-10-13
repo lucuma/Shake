@@ -45,20 +45,20 @@ class _NullSession(SecureCookie):
 
 class Request(BaseRequest):
     """The request object used by default in shake.
-    Remembers the url rule, the matched endpoint and the view arguments.
+    Remembers the route rule, the matched endpoint and the view arguments.
     
     It is what ends up as :class:`~shake.request`.  If you want to replace
     the request object used you can subclass this and set
     :attr:`~shake.Shake.request_class` to your subclass.
     """
     
-    # The internal URL rule that matched the request.  This can be
-    # useful to inspect which methods are allowed for the URL from
+    # The internal route rule that matched the request.  This can be
+    # useful to inspect which methods are allowed for the route from
     # a before/after handler (``request.url_rule.methods``) etc.
     url_rule = None
     
     # The real endpoint that matched the request
-    # (url_rule.endpoint could be a string).  This in combination with
+    # (request.endpoint could be a string).  This in combination with
     # :attr:`kwargs` can be used to reconstruct the same or a
     # modified URL.  If an exception happened when matching, this will
     # be `None`.

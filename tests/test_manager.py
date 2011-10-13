@@ -9,7 +9,7 @@ import pytest
 from StringIO import StringIO
 import sys
 
-from shake.manager import (parse_args, Manager,
+from shake.smanager import (parse_args, Manager,
     prompt, prompt_pass, prompt_bool, prompt_choices)
 
 

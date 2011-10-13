@@ -106,6 +106,14 @@ class Shake(object):
                 " safe.  Make sure is *at least* %i chars long."
                 % SECRET_KEY_MINLEN)
     
+    def route(self, url, *args, **kwargs):
+        """Decorator for mounting a function in a URL route.
+        """
+        def real_decorator(target):
+            self.url_map.add(Rule(url, target, *args, **kwargs))
+            return target
+        return real_decorator
+    
     def add_url(self, *args, **kwargs):
         self.url_map.add(Rule(*args, **kwargs))
     
@@ -115,7 +123,15 @@ class Shake(object):
     
     def add_static(self, url, path):
         url = '/' + url.strip('/')
-        path = os.path.join(os.path.dirname(path), STATIC_DIR)
+        # Instead of a path, we've probably recieved the value of __file__
+        if not os.path.isdir(path):
+            path = os.path.join(
+                os.path.dirname(
+                    os.path.normpath(
+                        os.path.realpath(path)
+                    )
+                ),
+                STATIC_DIR)
         self.static_dirs[url] = path
     
     def before_request(self, function):

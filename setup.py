@@ -2,7 +2,7 @@
 import os
 from setuptools import setup
 
-VERSION = '0.5.8'
+VERSION = '0.5.10'
 ROOTDIR = os.path.dirname(__file__)
 README = os.path.join(ROOTDIR, 'README.txt')
 
@@ -22,17 +22,13 @@ setup(
     package_data={
         'shake': [
             '.gitignore',
-            'default_views/*.*',
-            'skeleton/app/views/*.*',
-            'skeleton/app/*.*',
-            'skeleton/app/controllers/*',
-            'skeleton/app/models/*',
-            'skeleton/app/settings/*',
-            'skeleton/static/css/*',
-            'skeleton/static/images/*',
-            'skeleton/static/js/*',
-            'skeleton/static/*.*',
-            'skeleton/*.*',
+            '*.py',
+            '*.txt',
+            '*.css',
+            '*.js',
+            '*.ico',
+            '*.html',
+            '*.tmpl',
         ]
     },
     zip_safe=False,
