@@ -2,7 +2,7 @@
 import os
 from setuptools import setup
 
-VERSION = '0.5.12'
+VERSION = '0.5.13'
 ROOTDIR = os.path.dirname(__file__)
 README = os.path.join(ROOTDIR, 'README.txt')
 
@@ -19,18 +19,23 @@ setup(
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
-    package_data={
-        'shake': [
-            '.gitignore',
-            '*.py',
-            '*.txt',
-            '*.css',
-            '*.js',
-            '*.ico',
-            '*.html',
-            '*.tmpl',
-        ]
-    },
+    package_data={'shake': [
+        '*.*',
+        'default_views/*.*',
+        'skeleton/.gitignore',
+        'skeleton/*.*',
+        'skeleton/app/*.*',
+        'skeleton/app/controllers/*.*',
+        'skeleton/app/models/*.*',
+        'skeleton/app/settings/*.*',
+        'skeleton/app/views/*.*',
+        'skeleton/app/views/layouts/*.*',
+        'skeleton/static/*.*',
+        'skeleton/static/css/*.*',
+        'skeleton/static/images/*.*',
+        'skeleton/static/js/*.*',
+        'skeleton/tests/*.*',
+        ]},
     zip_safe=False,
     url='http://github.com/lucuma/Shake',
     license='MIT license (http://www.opensource.org/licenses/mit-license.php)',
