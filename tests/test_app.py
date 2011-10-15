@@ -5,8 +5,9 @@
 """
 import os
 import pytest
-from werkzeug.exceptions import (BadRequest, Unauthorized, Forbidden,
-    NotFound, MethodNotAllowed, NotAcceptable, RequestTimeout, Gone,
+from werkzeug.exceptions import (BadRequest, BadRequestKeyError,
+    Unauthorized, Forbidden, NotFound, MethodNotAllowed,
+    NotAcceptable, RequestTimeout, Gone,
     LengthRequired, PreconditionFailed, RequestEntityTooLarge,
     RequestURITooLarge, UnsupportedMediaType, InternalServerError,
     NotImplemented, BadGateway, ServiceUnavailable)
@@ -730,3 +731,28 @@ def test_session_nosecret():
     
     with pytest.raises(RuntimeError):
         c.get('/')
+
+
+def test_postdata_keyerror():
+    """Bugfix v0.5.14 Test than the main application handles correctly a
+    `werkzeug.exceptions.BadRequestKeyErrorexception`
+    raised in a controller when doing `request.form['foo']` and `foo` 
+    isn't in request.form.
+    """
+
+    def p1(request):
+        foo = request.form['bar']
+    
+    urls = [
+        Rule('/', p1),
+        ]
+    app = Shake(urls)
+    c = app.test_client()
+
+    with pytest.raises(BadRequestKeyError):
+        resp = c.get('/')
+    
+    with pytest.raises(BadRequestKeyError):
+        resp = c.post('/', data={'a':123})
+
+

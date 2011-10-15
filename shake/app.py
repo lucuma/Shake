@@ -11,8 +11,9 @@
 """
 from datetime import datetime, timedelta
 import os
+import sys
 
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, BadRequestKeyError
 from werkzeug.local import LocalManager
 from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
@@ -229,6 +230,8 @@ class Shake(object):
                 endpoint = self.error_handlers.get(code)
                 if endpoint is None:
                     if self.settings.DEBUG:
+                        if isinstance(error, BadRequestKeyError):
+                            reraise(error)
                         return error(environ, start_response)
                     # In production try to use the default error handler
                     endpoint = self.error_handlers.get(500)
@@ -244,7 +247,7 @@ class Shake(object):
                 handler(error)
             endpoint = self.error_handlers.get(500)
             if endpoint is None or self.settings.DEBUG:
-                raise
+                reraise(error)
             
             if isinstance(endpoint, basestring):
                 endpoint = import_string(endpoint)
@@ -435,3 +438,11 @@ class Shake(object):
     def __call__(self, environ, start_response):
         local.app = self
         return self.wsgi_app(environ, start_response)
+
+
+def reraise(exception):
+    """Re-raise an exception.
+    """
+    # Re-raise and remove ourselves from the stack trace.
+    raise exception, None, sys.exc_info()[-1]
+
