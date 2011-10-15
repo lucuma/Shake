@@ -16,7 +16,7 @@ import os
 import re
 
 import jinja2
-from .pyceo import Manager, formatm
+from pyceo import Manager, formatm
 
 
 manager = Manager()

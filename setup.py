@@ -2,7 +2,7 @@
 import os
 from setuptools import setup
 
-VERSION = '0.5.13'
+VERSION = '0.5.14'
 ROOTDIR = os.path.dirname(__file__)
 README = os.path.join(ROOTDIR, 'README.txt')
 
