@@ -6,7 +6,7 @@ from .models.users import auth
 
 urls = [
     # Submount('', auth.get_urls()),
-    # EndpointPrefix('app.controllers.main', [
+    # EndpointPrefix('app.controllers.main.', [
     #     Rule('/', 'index'),
     # ]),
 ]

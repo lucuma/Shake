@@ -4,6 +4,7 @@ from datetime import datetime
 from shake import cached_property
 from shake_auth import Auth
 
+from ..settings import AUTH_SETTINGS
 from .main import db
 
 
@@ -55,4 +56,4 @@ class User(db.Model):
             self.login)
 
 
-auth = Auth(settings.AUTH_SETTINGS, db, User)
+auth = Auth(AUTH_SETTINGS, db, User)
