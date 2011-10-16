@@ -4,7 +4,7 @@ from setuptools import setup
 
 VERSION = '0.6'
 ROOTDIR = os.path.dirname(__file__)
-README = os.path.join(ROOTDIR, 'README.txt')
+README = os.path.join(ROOTDIR, 'README.md')
 
 
 def run_tests():
