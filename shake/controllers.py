@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    shake.controllers
-    ----------------------------------------------
+    # shake.controllers
     
     Generic controllers
     
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    :func:`send_file` and :func:`from_dir` copied almost unchanged
-    from the Flask framework <http://flask.pocoo.org/>
-    Copyright (c) 2010 by Armin Ronacher.
-    Used under the modified BSD license.
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
+    --------
+    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    
+    MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 import mimetypes

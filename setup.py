@@ -2,7 +2,7 @@
 import os
 from setuptools import setup
 
-VERSION = '0.6'
+
 ROOTDIR = os.path.dirname(__file__)
 README = os.path.join(ROOTDIR, 'README.md')
 
@@ -15,7 +15,7 @@ def run_tests():
 
 setup(
     name='Shake',
-    version=VERSION,
+    version='0.7',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],

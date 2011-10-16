@@ -17,13 +17,16 @@
             app.run()
     
     Portions of code and/or inspiration taken from:
-    - Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
-    - Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
+    * Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
+    * Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
     
     Coded with love by Juan-Pablo Scaletti. See AUTHORS for more details
     
-    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
+
+    --------
+    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    
+    MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 try:
@@ -74,5 +77,5 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.6'
+__version__ = '0.7'
 manager = pyceo.Manager()

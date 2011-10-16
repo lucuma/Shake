@@ -2,7 +2,8 @@
 from shake import Shake
 
 from . import settings, controllers
-from .models import db, auth
+from .models.main import db
+from .models.users import auth
 from .urls import urls
 
 

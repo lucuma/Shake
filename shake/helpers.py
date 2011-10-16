@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    shake.helpers
-    ----------------------------------------------
+    # shake.helpers
     
-    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
+    
+    --------
+    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    
+    MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 # Get the fastest json available

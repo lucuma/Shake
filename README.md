@@ -14,3 +14,8 @@ A web framework mixed from the best ingredients:
     if __name__ == "__main__":
         app.run()
 
+
+--------
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php)

@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    Voodoo
-    ----------------------------------------------
-    Reanimate an application skeleton and put it at your service.
+    # Voodoo
+
+    Reanimate an application skeleton, just for you.
     
-    :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    :MIT License. (http://www.opensource.org/licenses/mit-license.php)
+
+    --------
+    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    
+    MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 import datetime

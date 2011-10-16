@@ -32,7 +32,7 @@ def run_wsgi():
 @manager.command
 def initdb():
     """Create the database tables (if they don't exist)"""
-    from app.models import db
+    from app.models.main import db
     
     db.create_all()
 
@@ -66,7 +66,8 @@ def add_perms(login, *perms):
     """[-login] LOGIN [-perms] *PERMISSIONS
     Add permissions to the user
     """
-    from app.models import db, User
+    from app.models.main import db
+    from app.models.users import User
     
     user = User.query.filter_by(login=login).first()
     if not user:
