@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-    Shake
-    ======
-    
-    A web framework mixed from the best ingredients.
-    
-    Coded with love by Juan-Pablo Scaletti.
+    # Shake
+
+    A web framework mixed from the best ingredients:
+
+        from shake import Shake, Rule
+
+        def hello(request):
+            return 'Hello World!'
+
+        urls = [Rule('/', hello),]
+
+        app = Shake(urls)
+
+        if __name__ == "__main__":
+            app.run()
     
     Portions of code and/or inspiration taken from:
     - Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
     - Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
-    - Django <djangoproject.com> Copyright 2005, Django Software Foundation.
     
-    See AUTHORS for more details
+    Coded with love by Juan-Pablo Scaletti. See AUTHORS for more details
     
     :Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
     :MIT License. (http://www.opensource.org/licenses/mit-license.php)
@@ -66,5 +74,5 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.5.14'
+__version__ = '0.6'
 manager = pyceo.Manager()

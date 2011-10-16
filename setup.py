@@ -2,7 +2,7 @@
 import os
 from setuptools import setup
 
-VERSION = '0.5.14'
+VERSION = '0.6'
 ROOTDIR = os.path.dirname(__file__)
 README = os.path.join(ROOTDIR, 'README.txt')
 
@@ -44,6 +44,7 @@ setup(
     install_requires=[
         'Werkzeug>=0.7',
         'Jinja2>=2.4',
+        'pyCEO>=0.2',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
