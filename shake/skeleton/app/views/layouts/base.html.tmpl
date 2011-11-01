@@ -6,7 +6,7 @@
 <meta name="framework" content="Shake" />
 <title>{% block title %}{% endblock %}</title>
 <link rel="shortcut icon" type="image/x-icon" href="{{ STATIC_IMG }}/favicon.ico" />
-<link href="{{ STATIC_CSS }}/<= PNAME =>.css" rel="stylesheet" />
+<link href="{{ STATIC_CSS }}/[[ PNAME ]].css" rel="stylesheet" />
 </head>
 <body>
 
@@ -15,6 +15,6 @@
 <script src="{{ STATIC_JS }}/jquery-1.6.2.min.js"></script>
 <script src="{{ STATIC_JS }}/underscore-1.1.6.min.js"></script>
 <script>var CSRF_TOKEN = '{{ csrf_secret.value }}';</script>
-<script src="{{ STATIC_JS }}/<= PNAME =>.js"></script>
+<script src="{{ STATIC_JS }}/[[ PNAME ]].js"></script>
 </body>
 </html>

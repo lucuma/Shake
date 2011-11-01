@@ -1,11 +1,8 @@
 =====================
-<= PNAME =>
+[[ PNAME ]]
 =====================
 
-
-Este es solo un esqueleto de una aplicación. Los nombres que tienen los archivos y la forma como están organizados, es como lo encontramos más conveniente y creemos sigue mejores prácticas.
-
-Esta es la estructura de archivos por defecto de una aplicación Shake autogenerada:
+Esta es la estructura de archivos por defecto de una aplicación Shake, organizada de la forma como lo encuentramos más conveniente y siguiendo las mejores prácticas. Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.
 
 ├── README.txt
 ├── README_es.txt
@@ -45,19 +42,21 @@ app
   Contiene el código python específico para esta aplicación.
 
 app/app.py
-  .
+  El archivo donde se istancia la aplicación (la clase Shake).
 
 app/controllers
-  Controladores.
+  Controladores. Reciben las acciones de los usuarios, interactúan con los
+  modelos y muestran la vista apropiada en la página.
 
 app/models
-  Modelos.
+  El código respnsable por mantener el estado de la aplicación (como el que
+  se comunica con la base de datos) y las reglas que aplican sobre él.
 
 app/settings
-  Opciones de configuración.
+  Contiene los archivos con opciones de configuración. 
 
 app/urls.py
-  Lista de patrones de URLs.
+  Lista de reglas de URLs.
 
 app/views
   Guarda las plantillas para las vistas, que además de HTML, pueden ser
@@ -66,11 +65,12 @@ app/views
 
 app/views/layouts
   Guarda los archivos de plantillas de las cuales heredan las otras.
-  Estos archivos contienen secciones comunes de las páginas, como la cabecera.
-  
+  Estos archivos contienen secciones comunes, como la cabecera, pie de
+  página, etc.
+
 manage.py
-  A command-line utility for administrative tasks. You can easily add your own
-  commands to this file.
+  Un programa de línea de comandos para tareas administrativas. Puedes agregar
+  tus porpios comandos a este archivo.
 
 requirements.txt
   Una lista de dependencias de tu aplicación. Puedes instalarlas todas
@@ -78,10 +78,11 @@ requirements.txt
       pip install -r requierements.txt
 
 static
-  Contiene subdirectorios para hojas de estilos, imágens y código de JavaScript.
+  Contiene subdirectorios para hojas de estilos, imágenes y código
+  JavaScript.
 
 tests
   Guarda aquí los tests automáticos para tu aplicación.
 
 
-Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.
+

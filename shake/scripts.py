@@ -21,10 +21,11 @@ ROOTDIR = os.path.join(os.path.dirname(os.path.realpath(__file__)),
     'skeleton')
 
 ENV_OPTIONS = {
-    'block_start_string': '<%',
-    'block_end_string': '%>',
-    'variable_start_string': '<=',
-    'variable_end_string': '=>',
+    'autoescape': False,
+    'block_start_string': '[%',
+    'block_end_string': '%]',
+    'variable_start_string': '[[',
+    'variable_end_string': ']]',
 }
 
 FILTER = ('.pyc', '.DS_Store', '.pyo')

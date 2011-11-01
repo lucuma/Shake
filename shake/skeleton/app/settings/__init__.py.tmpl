@@ -6,7 +6,7 @@ from shake_mail import Mailer
 
 
 DEBUG = True
-SECRET_KEY = '<= SECRET1 =>'
+SECRET_KEY = '[[ SECRET1 ]]'
 
 
 SQLALCHEMY_URI = 'sqlite:///db.sqlite'
@@ -32,7 +32,7 @@ mailer = Mailer(
 )
 
 AUTH_SETTINGS = {
-    'pepper': '<= SECRET2 =>',
+    'pepper': '[[ SECRET2 ]]',
     'render': render,
     'mailer': mailer,
     'password_change': True,
