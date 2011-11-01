@@ -126,6 +126,16 @@ class Request(BaseRequest):
         if not data:
             return SecureCookie(secret_key=SECRET_KEY)
         return SecureCookie.unserialize(data, SECRET_KEY)
+    
+    def get_language(self, default='en'):
+        lang = None
+        if self.args:
+            lang = self.args.get('lang', '')
+        if not lang:
+            lang = request.accept_languages.best \
+                or request.user_agent.language or default
+        lang = lang.split('-')[0]
+        return lang
 
 
 class Response(BaseResponse):
@@ -140,3 +150,4 @@ class Response(BaseResponse):
     
     """
     default_mimetype = 'text/plain'
+

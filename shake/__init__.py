@@ -66,9 +66,8 @@ from werkzeug.utils import cached_property, import_string, redirect
 from .app import Shake
 from .controllers import (not_found_page, error_page, not_allowed_page,
     render_view, send_file, from_dir)
-from .datastructures import StorageDict
-from .helpers import (local, json, url_for, execute, to64, from64,
-    to36, from36)
+from .helpers import (local, Local, LocalProxy, json, url_for, execute, to64, from64,
+    to36, from36, StorageDict)
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (Render, TemplateNotFound, flash, get_messages,

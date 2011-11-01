@@ -9,7 +9,7 @@
     MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
-from .datastructures import StorageDict
+from .helpers import StorageDict
 
 
 DEFAULT_SETTINGS = {

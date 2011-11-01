@@ -15,7 +15,7 @@ def run_tests():
 
 setup(
     name='Shake',
-    version='0.7',
+    version='0.8',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
@@ -44,7 +44,8 @@ setup(
     install_requires=[
         'Werkzeug>=0.7',
         'Jinja2>=2.4',
-        'pyCEO>=0.2',
+        'pyCEO',
+        'Voodoo',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -59,6 +60,6 @@ setup(
     test_suite='__main__.run_tests',
     entry_points="""
     [console_scripts]
-    shake = shake.voodoo:main
+    shake = shake.scripts:main
     """
 )
