@@ -1,14 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-    # shake.helpers
-    
-    
-    --------
-    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.helpers
+
+
+--------------------------------
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
+import io
+import mimetypes
+import os
+import sys
+from time import time
+from zlib import adler32
+
 # Get the fastest json available
 try:
     import simplejson as json
@@ -16,10 +23,15 @@ except ImportError:
     try:
         import json
     except ImportError:
-        raise ImportError('Unable to find a json implementation')
+        try:
+            from django.utils import simplejson as json
+        except ImportError:
+            raise ImportError('Unable to find a JSON implementation')
 
-import os
+from werkzeug.datastructures import Headers
 from werkzeug.local import Local, LocalProxy
+from werkzeug.urls import url_quote
+from werkzeug.wsgi import wrap_file
 
 from .routes import BuildError
 
@@ -27,12 +39,23 @@ from .routes import BuildError
 local = Local()
 
 
-def url_for(endpoint, method=None, external=False, **values):
+def url_for(endpoint, anchor=None, method=None, external=False, **values):
     """Generates a URL to the given endpoint with the method provided.
     
-    :param endpoint: the endpoint of the URL (name of the function)
-    :param _external: if set to `True`, an absolute URL is generated.
-    :param values: the variable arguments of the URL rule
+    param endpoint:
+        The endpoint of the URL (name of the function).
+    
+    param anchor:
+        If provided this is added as anchor to the URL.
+    
+    param method:
+        If provided this explicitly specifies an HTTP method.
+    
+    param external:
+        Set to `True`, to generate an absolute URL.
+
+    param values:
+        The variable arguments of the URL rule
     """
     try:
         urls = local.urls
@@ -44,14 +67,17 @@ def url_for(endpoint, method=None, external=False, **values):
             force_external=external)
     except BuildError:
         url = ''
+    
+    if anchor is not None:
+        url += '#' + url_quote(anchor)
     return url
 
 
 def execute(cmd, args=None):
     """Simple wrapper for executing commands.
     
-    :param cmd: command to execute
-    :param args: sequence or a basestring, a basestring will be
+    param cmd: Command to execute
+    param args: Sequence or a basestring, a basestring will be
         executed with shell=True.
     """
     from subprocess import Popen, PIPE
@@ -70,8 +96,13 @@ def execute(cmd, args=None):
     return proc.stdout.read()
 
 
-def url_join(path, *args):
-    url = '/'.join([path.rstrip('/')] + list(args))
+def path_join(base_path, *paths):
+    base_path = os.path.normpath(os.path.dirname(os.path.realpath(base_path)))
+    return os.path.join(base_path, *paths)
+
+
+def url_join(base_path, *paths):
+    url = '/'.join([base_path.rstrip('/')] + list(paths))
     url = os.path.normpath(url)
     return url.replace("\\", "/")
 
@@ -173,22 +204,22 @@ def plural(num, plural='s', singular=''):
 
 
 class StorageDict(dict):
-    """A StorageDict object is like a dictionary except ``obj.key`` can be used
-    in addition to ``obj['key']`.
+    """A StorageDict object is like a dictionary except `obj.key` can be used
+    in addition to `obj['key']`.
     
     Basic Usage:
     
-    >>> o = StorageDict(a=1)
-    >>> o.a
-    1
-    >>> o['a']
-    1
-    >>> o.a = 2
-    >>> o['a']
-    2
-    >>> del o.a
-    >>> print o.a
-    None
+        >>> o = StorageDict(a=1)
+        >>> o.a
+        1
+        >>> o['a']
+        1
+        >>> o.a = 2
+        >>> o['a']
+        2
+        >>> del o.a
+        >>> print o.a
+        None
     
     """
     
@@ -216,4 +247,143 @@ class StorageDict(dict):
     def __setstate__(self, value):
         for (key, value) in value.items():
             self[key] = value
+
+
+def send_file(request, filename_or_fp, mimetype=None, as_attachment=False,
+        attachment_filename=None, add_etags=True, cache_timeout=60 * 60 * 12,
+        conditional=False, use_x_sendfile=False, response_class=None):
+    """Sends the contents of a file to the client.  This will use the
+    most efficient method available and configured.  By default it will
+    try to use the WSGI server's file_wrapper support.  Alternatively
+    you can set the `use_x_sendfile` parameter to `True` to directly emit
+    an `X-Sendfile` header.  This however requires support of the underlying
+    webserver for `X-Sendfile`.
+
+    By default it will try to guess the mimetype for you, but you can
+    also explicitly provide one.  For extra security you probably want
+    to send certain files as attachment (HTML for instance).  The mimetype
+    guessing requires a `filename` or an `attachment_filename` to be
+    provided.
+
+    Please never pass filenames to this function from user sources without
+    checking them first.  Something like this is usually sufficient to
+    avoid security problems::
+
+        if '..' in filename or filename.startswith('/'):
+            raise NotFound()
+    
+    param request:
+        ...
+    
+    param filename_or_fp: 
+        The absolute path of the file to send.
+        Alternatively a file object might be provided in which case
+        `X-Sendfile` might not work and fall back to the traditional method.
+        Make sure that the file pointer is positioned at the start
+        of data to send before calling `send_file`.
+    
+    param mimetype:
+        The mimetype of the file if provided, otherwise
+        auto detection happens.
+    
+    param as_attachment:
+        Set to `True` if you want to send this file with
+        a `Content-Disposition: attachment` header.
+    
+    param attachment_filename:
+        The filename for the attachment if it
+        differs from the file's filename.
+    
+    param add_etags:
+        Set to `False` to disable attaching of etags.
+    
+    param conditional:
+        Set to `True` to enable conditional responses.
+    
+    param cache_timeout:
+        The timeout in seconds for the headers.
+    
+    param use_x_sendfile:
+        Set to `True` to directly emit an `X-Sendfile` header.
+        This however requires support of the underlying webserver.
+    
+    param response_class:
+        Set to overwrite the default Response class.
+    
+    --------------------------------
+    Copied almost unchanged from Flask <http://flask.pocoo.org/>
+    Copyright © 2010 by Armin Ronacher.
+    Used under the modified BSD license.
+    """
+    from .wrappers import Response
+
+    mtime = None
+    if isinstance(filename_or_fp, basestring):
+        filename = filename_or_fp
+        file = None
+    else:
+        assert bool(mimetype or attachment_filename)
+        add_etags = False
+        file = filename_or_fp
+        filename = getattr(file, 'name', None)
+    
+    if filename is not None:
+        filename = os.path.abspath(filename)
+    if mimetype is None and (filename or attachment_filename):
+        mimetype = mimetypes.guess_type(filename or attachment_filename)[0]
+    if mimetype is None:
+        mimetype = 'application/octet-stream'
+
+    headers = Headers()
+    if as_attachment:
+        if attachment_filename is None:
+            if filename is None:
+                raise TypeError('filename unavailable, required for '
+                    'sending as attachment')
+            attachment_filename = os.path.basename(filename)
+        headers.add('Content-Disposition', 'attachment',
+            filename=attachment_filename)
+
+    if use_x_sendfile and filename:
+        if file is not None:
+            file.close()
+        headers['X-Sendfile'] = filename
+        data = None
+    else:
+        if file is None:
+            file = io.open(filename, 'rb')
+            mtime = os.path.getmtime(filename)
+        data = wrap_file(request.environ, file)
+    
+    if response_class is None:
+        response_class = Response
+    resp = response_class(data, mimetype=mimetype, headers=headers,
+        direct_passthrough=True)
+
+    # if we know the file modification date, we can store it as the
+    # the time of the last modification.
+    if mtime is not None:
+        resp.last_modified = int(mtime)
+
+    resp.cache_control.public = True
+    if cache_timeout:
+        resp.cache_control.max_age = cache_timeout
+        resp.expires = int(time() + cache_timeout)
+
+    if add_etags and filename is not None:
+        resp.set_etag('flask-%s-%s-%s' % (
+            os.path.getmtime(filename),
+            os.path.getsize(filename),
+            adler32(
+                filename.encode('utf8') if isinstance(filename, unicode)
+                else filename
+            ) & 0xffffffff
+        ))
+        if conditional:
+            resp = resp.make_conditional(request)
+            # make sure we don't send x-sendfile for serespers that
+            # ignore the 304 status code for x-sendfile.
+            if resp.status_code == 304:
+                resp.headers.pop('x-sendfile', None)
+    return resp
 

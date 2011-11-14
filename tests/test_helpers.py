@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-    Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.tests.test_helpers
+
+Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
+import io
 import os
-import pytest
 import random
+from StringIO import StringIO
 import time
 
+import pytest
 from shake import Shake, Rule, url_for
-from shake.helpers import (url_join, execute, to64, from64, to36, from36,
-    StorageDict)
+from shake.helpers import (url_join, execute, path_join, url_join,
+    to64, from64, to36, from36, StorageDict, send_file)
+from werkzeug.http import parse_options_header
 
 
 def endpoint(request, name=None):
@@ -23,18 +28,54 @@ def endpoint(request, name=None):
 def test_url_for():
     
     def index(request):
-        return url_for(endpoint, name='world')
+        expected = '/hello/world/'
+        url = url_for(endpoint, name='world')
+        assert url == expected
+
+        expected = 'http://localhost/hello/world/'
+        url = url_for(endpoint, name='world', external=True)
+        assert url == expected
+
+        expected = '/hello/world/#awesome'
+        url = url_for(endpoint, name='world', anchor='awesome')
+        assert url == expected
+
+        expected = 'http://localhost/hello/world/#awesome'
+        url = url_for(endpoint, name='world', anchor='awesome', external=True)
+        assert url == expected
     
     urls = [
         Rule('/', index),
-        Rule('/home/', endpoint),
         Rule('/hello/<name>/', endpoint),
         ]
     app = Shake(urls)
     c = app.test_client()
-    
     resp = c.get('/')
-    assert resp.data == '/hello/world/'
+
+
+def test_url_for_method():
+    
+    def index(request):
+        expected = '/get/resource/'
+        url = url_for(endpoint, name='resource')
+        assert url == expected
+
+        expected = '/get/resource/'
+        url = url_for(endpoint, name='resource', method='GET')
+        assert url == expected
+
+        expected = '/update/resource/'
+        url = url_for(endpoint, name='resource', method='POST')
+        assert url == expected
+    
+    urls = [
+        Rule('/', index),
+        Rule('/get/<name>/', endpoint, methods=['GET']),
+        Rule('/update/<name>/', endpoint, methods=['POST']),
+        ]
+    app = Shake(urls)
+    c = app.test_client()
+    resp = c.get('/')
 
 
 def test_named_url_for():
@@ -217,6 +258,7 @@ def test_custom_alphabet36_invalid():
     with pytest.raises(ValueError):
         from36('!', CUSTOM)
 
+
 def test_storagedict_creation():
     st1 = StorageDict(a=1)
     st2 = StorageDict({'a': 1})
@@ -261,4 +303,137 @@ def test_storagedict_update():
     assert st.c == 12
     assert st['c'] == 12
     assert st.get('c') == 12
+
+
+def test_send_file_regular():
+
+    def index(request):
+        filename = path_join(__file__, 'static/index.html')
+        resp = send_file(request, filename)
+        assert resp.direct_passthrough
+        assert resp.mimetype == 'text/html'
+        with io.open(filename) as f:
+            assert resp.data == f.read()
+        
+        filename = path_join(__file__, 'static/favicon.ico')
+        resp = send_file(request, filename)
+        assert resp.direct_passthrough
+        assert resp.mimetype == 'image/x-icon'
+    
+    app = Shake()
+    app.add_url('/', index)
+    c = app.test_client()
+    resp = c.get('/')
+
+
+def test_send_file_xsendfile():
+
+    def index(request):
+        filename = path_join(__file__, 'static/index.html')
+        resp = send_file(request, filename, use_x_sendfile=True)
+        assert resp.direct_passthrough
+        assert 'x-sendfile' in resp.headers
+        assert resp.headers['x-sendfile'] == filename
+        assert resp.mimetype == 'text/html'
+    
+    app = Shake()
+    app.add_url('/', index)
+    c = app.test_client()
+    resp = c.get('/')
+
+
+def test_send_file_object():
+
+    def index(request):
+        filename = path_join(__file__, 'static/index.html')
+
+        with io.open(filename) as f:
+            data = f.read()
+
+        with io.open(filename) as f:
+            with pytest.raises(AssertionError):
+                resp = send_file(request, f)
+        
+        with io.open(filename) as f:
+            resp = send_file(request, f, mimetype='text/html')
+            assert resp.direct_passthrough
+            assert resp.mimetype == 'text/html'
+            assert resp.data == data
+        
+        with io.open(filename) as f:
+            resp = send_file(request, f, attachment_filename='foo.html')
+            assert resp.direct_passthrough
+            assert resp.mimetype == 'text/html'
+            assert resp.data == data
+        
+        f = StringIO('Test')
+        resp = send_file(request, f, attachment_filename='test')
+        assert resp.mimetype == 'application/octet-stream'
+        assert resp.data == 'Test'
+
+        f = StringIO('Test')
+        resp = send_file(request, f, mimetype='text/plain')
+        assert resp.mimetype == 'text/plain'
+        assert resp.data == 'Test'
+    
+    app = Shake()
+    app.add_url('/', index)
+    c = app.test_client()
+    resp = c.get('/')
+
+
+def test_send_file_object_xsendfile():
+
+    def index(request):
+        filename = path_join(__file__, 'static/index.html')
+        
+        with io.open(filename) as f:
+            resp = send_file(request, f, mimetype='text/html',
+                use_x_sendfile=True)
+            assert 'x-sendfile' in resp.headers
+            assert resp.headers['x-sendfile'] == filename
+            assert resp.mimetype == 'text/html'
+        
+        f = StringIO('Test')
+        resp = send_file(request, f, mimetype='text/plain',
+            use_x_sendfile=True)
+        assert 'x-sendfile' not in resp.headers
+    
+    app = Shake()
+    app.add_url('/', index)
+    c = app.test_client()
+    resp = c.get('/')
+
+
+def test_send_file_attachment():
+
+    def index(request):
+        filename = path_join(__file__, 'static/index.html')
+        
+        with io.open(filename) as f:
+            resp = send_file(request, f, mimetype='text/html',
+                as_attachment=True)
+            cd_header = resp.headers['Content-Disposition']
+            value, options = parse_options_header(cd_header)
+            assert value == 'attachment'
+        
+        resp = send_file(request, filename, as_attachment=True)
+        cd_header = resp.headers['Content-Disposition']
+        value, options = parse_options_header(cd_header)
+        assert value == 'attachment'
+        assert options['filename'] == 'index.html'
+
+        f = StringIO('Test')
+        resp = send_file(request, f, attachment_filename='readme.txt',
+            as_attachment=True)
+        assert resp.mimetype == 'text/plain'
+        cd_header = resp.headers['Content-Disposition']
+        value, options = parse_options_header(cd_header)
+        assert value == 'attachment'
+        assert options['filename'] == 'readme.txt'
+    
+    app = Shake()
+    app.add_url('/', index)
+    c = app.test_client()
+    resp = c.get('/')
 

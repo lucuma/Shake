@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    # shake.config
-    
+# shake.config
 
-    --------
-    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+
+--------------------------------
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 from .helpers import StorageDict
@@ -39,35 +39,46 @@ DEFAULT_SETTINGS = {
 
 class Settings(object):
     
-    def __init__(self, custom):
+    def __init__(self, default, custom, case_insensitive=False):
+        if isinstance(default, dict):
+            default = StorageDict(default)
         if isinstance(custom, dict):
             custom = StorageDict(custom)
+        self.__dict__['default'] = default
         self.__dict__['custom'] = custom
+        self.__dict__['case_insensitive'] = case_insensitive
     
     def __contains__(self, key):
         return hasattr(self.custom, key)
     
     def __getattr__(self, key):
+        if (self.__dict__['case_insensitive']):
+            key = key.lower()
         if hasattr(self.__dict__['custom'], key):
             return getattr(self.__dict__['custom'], key)
-        elif key in DEFAULT_SETTINGS:
-            return DEFAULT_SETTINGS[key]
-        
-        raise AttributeError('No %s was found in the custom or'
-            ' default settings' % key)
+        elif hasattr(self.__dict__['default'], key):
+            return getattr(self.__dict__['default'], key)
+        raise AttributeError('No %s was found in the custom nor'
+            ' in the default settings' % key)
     
     def __setattr__(self, key, value):
+        if (self.case_insensitive):
+            key = key.lower()
         setattr(self.custom, key, value)
     
     __getitem__ = __getattr__
     __setitem__ = __setattr__
     
     def get(self, key, default=None):
+        if (self.case_insensitive):
+            key = key.lower()
         if hasattr(self.custom, key):
             return getattr(self.custom, key)
-        return DEFAULT_SETTINGS.get(key, default)
+        return getattr(self.default, key, default)
     
     def setdefault(self, key, value):
+        if (self.case_insensitive):
+            key = key.lower()
         if hasattr(self.custom, key):
             return getattr(self.custom, key)
         setattr(self.custom, key, value)
@@ -75,8 +86,17 @@ class Settings(object):
     
     def update(self, dict_):
         custom = self.custom
+        ci = self.case_insensitive
         for key, value in dict_.items():
+            if ci:
+                key = key.lower()
             setattr(custom, key, value)
+
+
+class ShakeSettings(Settings):
+    
+    def __init__(self, custom):
+        Settings.__init__(self, DEFAULT_SETTINGS, custom)
 
 
 QUOTES = [

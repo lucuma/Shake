@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    # shake.app
-    
-    This module implements the central WSGI application object.
-    
-    
-    --------
-    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.app
+
+This module implements the central WSGI application object.
+
+
+--------------------------------
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 from datetime import datetime, timedelta
@@ -20,7 +20,7 @@ from werkzeug.local import LocalManager
 from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
 
-from .config import Settings
+from .config import ShakeSettings
 from .controllers import welcome_page
 from .routes import Map, Rule
 from .helpers import local, json
@@ -84,7 +84,7 @@ class Shake(object):
         url_map = url_map if url_map else []
         settings = settings if settings else {}
         
-        settings = Settings(settings)
+        settings = ShakeSettings(settings)
         self.settings = settings
         if not isinstance(url_map, Map):
             url_map = Map(url_map)

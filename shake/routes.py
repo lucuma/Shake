@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-    # shake.routes
-    
-    When it comes to combining multiple "controller" or "view" functions
-    (however you want to call them) you need a dispatcher. A simple way would
-    be applying regular expression tests on the ``PATH_INFO`` and calling
-    registered callback functions that return the value then.
-    
-    This module implements a much more powerful system than simple regular
-    expression matching because it can also convert values in the URLs and
-    build URLs.
-    
-    Here a simple example that creates an URL map for an application with
-    two subdomains (www and kb) and some URL rules:
-    
+# shake.routes
+
+When it comes to combining multiple "controller" or "view" functions
+(however you want to call them) you need a dispatcher. A simple way would
+be applying regular expression tests on the ``PATH_INFO`` and calling
+registered callback functions that return the value then.
+
+This module implements a much more powerful system than simple regular
+expression matching because it can also convert values in the URLs and
+build URLs.
+
+Here a simple example that creates an URL map for an application with
+two subdomains (www and kb) and some URL rules:
+
     >>> m = Map([
     ...     # Static URLs
     ...     Rule('/', 'static/index'),
@@ -27,17 +27,17 @@
     ...         Rule('/browse/<int:id>/<int:page>', 'kb/browse')
     ...     ])
     ... ], default_subdomain='www')
-    
-    If the application doesn't use subdomains it's perfectly fine to not set
-    the default subdomain and not use the `Subdomain` rule factory. The
-    endpoint in the rules can be anything, for example import paths or unique
-    identifiers. The WSGI application can use those endpoints to get the
-    handler for that URL. It doesn't have to be a string at all but it's
-    recommended.
-    
-    Now it's possible to create a URL adapter for one of the subdomains and
-    build URLs:
-    
+
+If the application doesn't use subdomains it's perfectly fine to not set
+the default subdomain and not use the `Subdomain` rule factory. The
+endpoint in the rules can be anything, for example import paths or unique
+identifiers. The WSGI application can use those endpoints to get the
+handler for that URL. It doesn't have to be a string at all but it's
+recommended.
+
+Now it's possible to create a URL adapter for one of the subdomains and
+build URLs:
+
     >>> c = m.bind('example.com')
     >>> c.build("kb/browse", dict(id=42))
     'http://kb.example.com/browse/42/'
@@ -49,24 +49,24 @@
     '/about'
     >>> c.build("static/index", force_external=True)
     'http://www.example.com/'
-    
+
     >>> c = m.bind('example.com', subdomain='kb')
     >>> c.build("static/about")
     'http://www.example.com/about'
-    
-    The first argument to bind is the server name *without* the subdomain.
-    Per default it will assume that the script is mounted on the root, but
-    often that's not the case so you can provide the real mount point as
-    second argument:
-    
+
+The first argument to bind is the server name *without* the subdomain.
+Per default it will assume that the script is mounted on the root, but
+often that's not the case so you can provide the real mount point as
+second argument:
+
     >>> c = m.bind('example.com', '/applications/example')
-    
-    The third argument can be the subdomain, if not given the default
-    subdomain is used. For more details about binding have a look at the
-    documentation of the `MapAdapter`.
-    
-    And here is how you can match URLs:
-    
+
+The third argument can be the subdomain, if not given the default
+subdomain is used. For more details about binding have a look at the
+documentation of the `MapAdapter`.
+
+And here is how you can match URLs:
+
     >>> c = m.bind('example.com')
     >>> c.match("/")
     ('static/index', {})
@@ -77,34 +77,34 @@
     ('kb/index', {})
     >>> c.match("/browse/42/23")
     ('kb/browse', {'id': 42, 'page': 23})
-    
-    If matching fails you get a `NotFound` exception, if the rule thinks
-    it's a good idea to redirect (for example because the URL was defined
-    to have a slash at the end but the request was missing that slash) it
-    will raise a `RequestRedirect` exception. Both are subclasses of the
-    `HTTPException` so you can use those errors as responses in the
-    application.
-    
-    If matching succeeded but the URL rule was incompatible to the given
-    method (for example there were only rules for `GET` and `HEAD` and
-    routing system tried to match a `POST` request) a `MethodNotAllowed`
-    method is raised.
-    
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Forked from the routing package of Werkzeug <http://werkzeug.pocoo.org/>
-    Copyright (c) 2010 by the Werkzeug Team. Used under the modified
-    BSD license.
-    
-    * Added support for named rules.
-    * Case insensitive routing
-    * 127.0.0.1, localhost, etc. they are all the same
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
 
-    --------
-    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+If matching fails you get a `NotFound` exception, if the rule thinks
+it's a good idea to redirect (for example because the URL was defined
+to have a slash at the end but the request was missing that slash) it
+will raise a `RequestRedirect` exception. Both are subclasses of the
+`HTTPException` so you can use those errors as responses in the
+application.
+
+If matching succeeded but the URL rule was incompatible to the given
+method (for example there were only rules for `GET` and `HEAD` and
+routing system tried to match a `POST` request) a `MethodNotAllowed`
+method is raised.
+
+
+----------------
+Forked from the routing package of Werkzeug <http://werkzeug.pocoo.org/>
+Copyright (c) 2010 by the Werkzeug Team. Used under the modified
+BSD license.
+
+* Added support for named rules.
+* Case insensitive routing
+* 127.0.0.1, localhost, etc. they are all the same
+
+
+----------------
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 import posixpath

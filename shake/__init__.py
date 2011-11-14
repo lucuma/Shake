@@ -1,60 +1,37 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake
+# Shake
 
-    A web framework mixed from the best ingredients:
+A web framework mixed from the best ingredients:
 
-        from shake import Shake, Rule
+    from shake import Shake, Rule
 
-        def hello(request):
-            return 'Hello World!'
+    def hello(request):
+        return 'Hello World!'
 
-        urls = [Rule('/', hello),]
+    urls = [Rule('/', hello),]
 
-        app = Shake(urls)
+    app = Shake(urls)
 
-        if __name__ == "__main__":
-            app.run()
-    
-    Portions of code and/or inspiration taken from:
-    * Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
-    * Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
-    
-    Coded with love by Juan-Pablo Scaletti. See AUTHORS for more details
-    
+    if __name__ == "__main__":
+        app.run()
 
-    --------
-    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+
+--------------------------------
+Coded by Juan-Pablo Scaletti. See AUTHORS for more details
+
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
+
+Portions of code and/or inspiration taken from:
+* Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
+* Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
+Used under the modified BSD license.
 
 """
-try:
-    import jinja2
-except ImportError:
-    raise ImportError('Unable to load the Jinja2 package.'
-        ' Shake needs the Jinja2 library to run.'
-        ' You can get it from http://pypi.python.org/pypi/Jinja2'
-        ' If you\'ve already installed Jinja2, then make sure you have '
-        ' it in your PYTHONPATH.')
-try:
-    import pyceo
-except ImportError:
-    raise ImportError('Unable to load the pyCEO package.'
-        ' Shake needs the pyCEO library to run.'
-        ' You can get it from http://pypi.python.org/pypi/pyCEO'
-        ' If you\'ve already installed pyCEO, then make sure you have '
-        ' it in your PYTHONPATH.')
-try:
-    import werkzeug
-except ImportError:
-    raise ImportError('Unable to load the Werkzeug package.'
-        ' Shake needs the Werkzeug library to run.'
-        ' You can get it from http://werkzeug.pocoo.org/download\n'
-        ' If you\'ve already installed Werkzeug, then make sure you have '
-        ' it in your PYTHONPATH.')
-
-# Utilities we import from Werkzeug and Jinja2 that are unused
+import pyceo
+# Utilities we import from Jinja2 and Werkzeug that are unused
 # in the module but are exported as public interface.
 from jinja2 import escape, Markup
 from werkzeug.exceptions import (abort, HTTPException, Forbidden,
@@ -64,10 +41,11 @@ from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
 
 from .app import Shake
+from .config import Settings
 from .controllers import (not_found_page, error_page, not_allowed_page,
-    render_view, send_file, from_dir)
-from .helpers import (local, Local, LocalProxy, json, url_for, execute, to64, from64,
-    to36, from36, StorageDict)
+    render_view)
+from .helpers import (local, Local, LocalProxy, json, url_for, execute,
+    path_join, url_join, to64, from64, to36, from36, StorageDict, send_file)
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (Render, TemplateNotFound, flash, get_messages,
@@ -76,5 +54,5 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.7'
+__version__ = '0.11'
 manager = pyceo.Manager()

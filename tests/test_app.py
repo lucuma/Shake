@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-    Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.tests.test_app
+
+Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
 import os
+
 import pytest
+from shake import (Shake, abort, redirect, Response, Rule, json, NotAllowed)
 from werkzeug.exceptions import (BadRequest, BadRequestKeyError,
     Unauthorized, Forbidden, NotFound, MethodNotAllowed,
     NotAcceptable, RequestTimeout, Gone,
     LengthRequired, PreconditionFailed, RequestEntityTooLarge,
     RequestURITooLarge, UnsupportedMediaType, InternalServerError,
     NotImplemented, BadGateway, ServiceUnavailable)
-
-from shake import (Shake, abort, redirect, Response, Rule, json, NotAllowed)
 
 
 HTTP_OK = 200

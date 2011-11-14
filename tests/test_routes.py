@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-    Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.tests.test_routes
+
+Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
 import pytest
-from werkzeug.datastructures import ImmutableDict
-from werkzeug.test import create_environ
-
 from shake import (Response, BuildError, EndpointPrefix, Map,
     MethodNotAllowed, NotFound, RequestRedirect, Rule, RuleTemplate,
     Submount, Subdomain)
 from shake.routes import UnicodeConverter
+from werkzeug.datastructures import ImmutableDict
+from werkzeug.test import create_environ
 
 
 def test_basic_routing():

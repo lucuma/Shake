@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    # shake.wrappers
-    
+# shake.wrappers
 
-    --------
-    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+
+--------------------------------
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 """
 import hashlib

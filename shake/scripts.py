@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    # Shake's command-line scripts
-    
-    ---------------------------------------
-    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.scripts
+
+Command-line scripts
+
+
+--------------------------------
+Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+MIT License. (http://www.opensource.org/licenses/mit-license.php).
 
 """
 import hashlib

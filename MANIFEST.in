@@ -1,4 +1,4 @@
-include *.py *.md
+include *.*
 recursive-include shake *
 recursive-include tests *
 recursive-include docs *

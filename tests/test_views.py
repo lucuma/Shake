@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-    Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.tests.test_views
+
+Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
 from datetime import datetime, timedelta
-import jinja2
 import os
-import pytest
 
+import jinja2
+import pytest
 from shake import (Shake, Rule, Render, ViewNotFound, flash, get_messages,
     get_csrf_secret, new_csrf_secret, local)
 

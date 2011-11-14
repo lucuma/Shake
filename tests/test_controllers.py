@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-    Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-    MIT License. (http://www.opensource.org/licenses/mit-license.php)
+# shake.tests.test_controllers
+
+Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
+MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
 import os
-import pytest
 
+import pytest
 from shake import Shake, abort, Rule, Render
-from shake.controllers import not_found_page, error_page, not_allowed_page
-from shake.controllers import render_view, send_file, send_file
+from shake.controllers import (not_found_page, error_page, not_allowed_page,
+    render_view)
 
 
 HTTP_OK = 200
