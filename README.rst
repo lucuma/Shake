@@ -2,8 +2,6 @@
 Shake
 ========
 
-A web framework mixed from the best ingredients:
-
 ::
     from shake import Shake, Rule
 

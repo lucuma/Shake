@@ -18,9 +18,9 @@ A web framework mixed from the best ingredients:
 
 
 --------------------------------
-Coded by Juan-Pablo Scaletti. See AUTHORS for more details
-
 Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+
+Coded by Juan-Pablo Scaletti. See AUTHORS for more details
 
 MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
@@ -41,11 +41,11 @@ from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
 
 from .app import Shake
-from .config import Settings
 from .controllers import (not_found_page, error_page, not_allowed_page,
     render_view)
 from .helpers import (local, Local, LocalProxy, json, url_for, execute,
-    path_join, url_join, to64, from64, to36, from36, StorageDict, send_file)
+    path_join, url_join, to64, from64, to36, from36,
+    StorageDict, Settings, send_file)
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (Render, TemplateNotFound, flash, get_messages,
@@ -54,5 +54,5 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.14'
+__version__ = '0.15'
 manager = pyceo.Manager()
