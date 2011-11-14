@@ -4,7 +4,7 @@ from setuptools import setup
 
 
 ROOTDIR = os.path.dirname(__file__)
-README = os.path.join(ROOTDIR, 'README.md')
+README = os.path.join(ROOTDIR, 'README.rst')
 
 
 def run_tests():
@@ -15,7 +15,7 @@ def run_tests():
 
 setup(
     name='Shake',
-    version='0.11',
+    version='0.14',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
@@ -44,8 +44,8 @@ setup(
     install_requires=[
         'Werkzeug>=0.7',
         'Jinja2>=2.4',
-        'pyCEO',
-        'Voodoo',
+        'pyCEO>=0.3',
+        'Voodoo>=0.3',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

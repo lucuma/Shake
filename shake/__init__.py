@@ -54,5 +54,5 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.11'
+__version__ = '0.14'
 manager = pyceo.Manager()

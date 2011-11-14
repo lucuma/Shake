@@ -4,3 +4,4 @@
 build
 dist
 Shake.egg*
+tests/__pycache__
