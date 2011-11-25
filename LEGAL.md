@@ -8,7 +8,7 @@ License. (http://www.opensource.org/licenses/mit-license.php)
 
 ## Other copyright notices
 
-Portions of the code (and inspiration) were taken from Flask
+Portions of the code, tests and inspiration were taken from Flask
 (http://flask.pocoo.org). The original code is BSD licensed:
 
 > Copyright (c) 2010 by Armin Ronacher and contributors. Some rights reserved.
@@ -25,7 +25,9 @@ Portions of the code (and inspiration) were taken from Flask
 
 ---------------------------------------
 
-The "routes" module was adapted from the routing package of Werkzeug (http://werkzeug.pocoo.org). The original code is BSD licensed.
+The `routes` module (and associated tests) were forked from the routing
+package of Werkzeug (http://werkzeug.pocoo.org). 
+The original code is BSD licensed.
 
 > Copyright © 2010 the Werkzeug Team.
 >

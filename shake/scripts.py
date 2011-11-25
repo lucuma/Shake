@@ -8,8 +8,8 @@ Command-line scripts
 import hashlib
 import os
 
-from pyceo import Manager, formatm
-import voodoo
+from . import voodoo
+from .pyceo import Manager, formatm
 
 
 manager = Manager()

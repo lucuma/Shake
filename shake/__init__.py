@@ -27,10 +27,9 @@ MIT License. (http://www.opensource.org/licenses/mit-license.php)
 Portions of code and/or inspiration taken from:
 * Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
 * Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
-Used under the modified BSD license.
+Used under the modified BSD license. See LEGAL.md for more details
 
 """
-import pyceo
 # Utilities we import from Jinja2 and Werkzeug that are unused
 # in the module but are exported as public interface.
 from jinja2 import escape, Markup
@@ -43,9 +42,10 @@ from werkzeug.utils import cached_property, import_string, redirect
 from .app import Shake
 from .controllers import (not_found_page, error_page, not_allowed_page,
     render_view)
-from .helpers import (local, Local, LocalProxy, json, url_for, execute,
+from .helpers import (local, Local, LocalProxy, json, url_for,
     path_join, url_join, to64, from64, to36, from36,
-    StorageDict, Settings, send_file)
+    StorageDict, Settings, safe_join, send_file)
+from .pyceo import Manager
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (Render, TemplateNotFound, flash, get_messages,
@@ -54,5 +54,7 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-__version__ = '0.15'
-manager = pyceo.Manager()
+manager = Manager()
+
+__version__ = '0.17'
+

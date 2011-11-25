@@ -6,6 +6,7 @@
 import io
 import mimetypes
 import os
+import posixpath
 import sys
 from time import time
 from zlib import adler32
@@ -23,6 +24,7 @@ except ImportError:
             raise ImportError('Unable to find a JSON implementation')
 
 from werkzeug.datastructures import Headers
+from werkzeug.exceptions import NotFound
 from werkzeug.local import Local, LocalProxy
 from werkzeug.urls import url_quote
 from werkzeug.wsgi import wrap_file
@@ -65,29 +67,6 @@ def url_for(endpoint, anchor=None, method=None, external=False, **values):
     if anchor is not None:
         url += '#' + url_quote(anchor)
     return url
-
-
-def execute(cmd, args=None):
-    """Simple wrapper for executing commands.
-    
-    param cmd: Command to execute
-    param args: Sequence or a basestring, a basestring will be
-        executed with shell=True.
-    """
-    from subprocess import Popen, PIPE
-    
-    args = args or []
-    if isinstance(args, basestring):
-        args = '%s %s' % (cmd, args)
-        shell = True
-    else:
-        args.insert(0, cmd)
-        shell = False
-    proc = Popen(args, shell=shell, stderr=PIPE, stdout=PIPE)
-    retcode = proc.wait()
-    if retcode != 0:
-        raise Exception(proc.stderr.read())
-    return proc.stdout.read()
 
 
 def path_join(base_path, *paths):
@@ -243,7 +222,33 @@ class StorageDict(dict):
             self[key] = value
 
 
-def send_file(request, filename_or_fp, mimetype=None, as_attachment=False,
+def safe_join(directory, filename):
+    """Safely join `directory` and `filename`.
+
+    Example usage:
+
+        def wiki_page(request, filename):
+            filepath = safe_join(WIKI_FOLDER, filename)
+            with open(filepath, 'rb') as fd:
+                content = fd.read() # Read and process the file content.
+            return content
+
+    param directory:
+        the base directory.
+    
+    param filename:
+        the untrusted filename relative to that directory.
+    
+    raises:
+        `NotFound` if the resulting path would fall out of `directory`.
+    """
+    filename = posixpath.normpath(filename)
+    if os.path.isabs(filename):
+        raise NotFound
+    return os.path.join(directory, filename)
+
+
+def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
         attachment_filename=None, add_etags=True, cache_timeout=60 * 60 * 12,
         conditional=False, use_x_sendfile=False, response_class=None):
     """Sends the contents of a file to the client.  This will use the
@@ -269,7 +274,7 @@ def send_file(request, filename_or_fp, mimetype=None, as_attachment=False,
     param request:
         ...
     
-    param filename_or_fp: 
+    param filepath_or_fp: 
         The absolute path of the file to send.
         Alternatively a file object might be provided in which case
         `X-Sendfile` might not work and fall back to the traditional method.
@@ -312,41 +317,41 @@ def send_file(request, filename_or_fp, mimetype=None, as_attachment=False,
     from .wrappers import Response
 
     mtime = None
-    if isinstance(filename_or_fp, basestring):
-        filename = filename_or_fp
+    if isinstance(filepath_or_fp, basestring):
+        filepath = filepath_or_fp
         file = None
     else:
         assert bool(mimetype or attachment_filename)
         add_etags = False
-        file = filename_or_fp
-        filename = getattr(file, 'name', None)
+        file = filepath_or_fp
+        filepath = getattr(file, 'name', None)
     
-    if filename is not None:
-        filename = os.path.abspath(filename)
-    if mimetype is None and (filename or attachment_filename):
-        mimetype = mimetypes.guess_type(filename or attachment_filename)[0]
+    if filepath is not None:
+        filepath = os.path.abspath(filepath)
+    if mimetype is None and (filepath or attachment_filename):
+        mimetype = mimetypes.guess_type(filepath or attachment_filename)[0]
     if mimetype is None:
         mimetype = 'application/octet-stream'
 
     headers = Headers()
     if as_attachment:
         if attachment_filename is None:
-            if filename is None:
+            if filepath is None:
                 raise TypeError('filename unavailable, required for '
                     'sending as attachment')
-            attachment_filename = os.path.basename(filename)
+            attachment_filename = os.path.basename(filepath)
         headers.add('Content-Disposition', 'attachment',
             filename=attachment_filename)
 
-    if use_x_sendfile and filename:
+    if use_x_sendfile and filepath:
         if file is not None:
             file.close()
-        headers['X-Sendfile'] = filename
+        headers['X-Sendfile'] = filepath
         data = None
     else:
         if file is None:
-            file = io.open(filename, 'rb')
-            mtime = os.path.getmtime(filename)
+            file = io.open(filepath, 'rb')
+            mtime = os.path.getmtime(filepath)
         data = wrap_file(request.environ, file)
     
     if response_class is None:
@@ -364,13 +369,13 @@ def send_file(request, filename_or_fp, mimetype=None, as_attachment=False,
         resp.cache_control.max_age = cache_timeout
         resp.expires = int(time() + cache_timeout)
 
-    if add_etags and filename is not None:
+    if add_etags and filepath is not None:
         resp.set_etag('flask-%s-%s-%s' % (
-            os.path.getmtime(filename),
-            os.path.getsize(filename),
+            os.path.getmtime(filepath),
+            os.path.getsize(filepath),
             adler32(
-                filename.encode('utf8') if isinstance(filename, unicode)
-                else filename
+                filepath.encode('utf8') if isinstance(filepath, unicode)
+                else filepath
             ) & 0xffffffff
         ))
         if conditional:

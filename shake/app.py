@@ -110,8 +110,8 @@ class Shake(object):
             return target
         return real_decorator
     
-    def add_url(self, *args, **kwargs):
-        self.url_map.add(Rule(*args, **kwargs))
+    def add_url(self, rule, *args, **kwargs):
+        self.url_map.add(Rule(rule, *args, **kwargs))
     
     def add_urls(self, urls):
         for url in urls:
