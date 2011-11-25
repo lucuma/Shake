@@ -15,7 +15,7 @@ def run_tests():
 
 setup(
     name='Shake',
-    version='0.15',
+    version='0.17',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
@@ -44,8 +44,6 @@ setup(
     install_requires=[
         'Werkzeug>=0.7',
         'Jinja2>=2.4',
-        'pyCEO>=0.3',
-        'Voodoo>=0.3',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
