@@ -55,7 +55,7 @@ def new(app_path, skeleton=ROOTDIR):
     }
     env_options = ENV_OPTIONS.copy()
 
-    vodoo.reanimate_skeleton(skeleton, app_path, data=data,
+    voodoo.reanimate_skeleton(skeleton, app_path, data=data,
         filter_ext=FILTER, env_options=env_options)
 
     msg = ['\n',

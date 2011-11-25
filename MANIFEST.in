@@ -2,5 +2,4 @@ include *.*
 recursive-include shake *
 recursive-include tests *
 recursive-include docs *
-prune docs/_build
-prune tests/__pycache__
+prune docs/build
