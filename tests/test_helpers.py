@@ -2,6 +2,8 @@
 """
 # shake.tests.test_helpers
 
+Helpers tests.
+
 Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
 MIT License. (http://www.opensource.org/licenses/mit-license.php)
 """
@@ -12,9 +14,9 @@ from StringIO import StringIO
 import time
 
 import pytest
-from shake import Shake, Rule, url_for
-from shake.helpers import (url_join, execute, path_join, url_join,
-    to64, from64, to36, from36, StorageDict, send_file)
+from shake import Shake, Rule, url_for, NotFound
+from shake.helpers import (url_join, path_join, url_join,
+    to64, from64, to36, from36, StorageDict, send_file, safe_join)
 from werkzeug.http import parse_options_header
 
 
@@ -96,25 +98,6 @@ def test_named_url_for():
     resp = c.get('/')
     assert resp.status_code == 200
     assert resp.data == '/home1/ /home2/ /home3/'
-
-
-def test_named_url_for_dup():
-    
-    def test(request):
-        return url_for('a')
-    
-    urls = [
-        Rule('/', test),
-        Rule('/home1/', endpoint, name='a'),
-        Rule('/home2/', endpoint, name='a'),
-        Rule('/home3/', endpoint, name='a'),
-        ]
-    app = Shake(urls)
-    c = app.test_client()
-    
-    resp = c.get('/')
-    assert resp.status_code == 200
-    assert resp.data == '/home3/'
  
 
 def test_url_join():
@@ -125,15 +108,6 @@ def test_url_join():
         '/path/dir1/dir2/dir3'
     assert url_join('/path/', 'dir1/', '/dir2//', '../dir3/') == \
         '/path/dir1/dir3'
-
-
-def test_execute():
-    with pytest.raises(OSError):
-        execute('qwerty99933654321x')
-    
-    result1 = execute('stat', [__file__])
-    result2 = execute('stat', __file__)
-    assert result1 == result2
 
 
 def test_to64():
@@ -436,4 +410,19 @@ def test_send_file_attachment():
     app.add_url('/', index)
     c = app.test_client()
     resp = c.get('/')
+
+
+def test_safe_join_safe():
+    assert safe_join('', '') == '.'
+    assert safe_join('/static', 'foo/') == '/static/foo'
+    assert safe_join('/static', 'foo/bar') == '/static/foo/bar'
+    assert safe_join('/static/', 'foo/bar') == '/static/foo/bar'
+
+
+def test_safe_join_unsafe():
+    with pytest.raises(NotFound):
+        safe_join('/static', '/foo/bar')
+        safe_join('/static', '//foo/bar')
+        safe_join('/static', '../etc/passwords')
+        safe_join('/static', 'foo/../../etc/passwords')
 
