@@ -60,7 +60,7 @@ def new(app_path, skeleton=ROOTDIR):
 
     msg = ['\n',
         TABSPACE, 'Now run\n', TABSPACE, 
-        formatm(''.join(['  pip install -r ', pathname,
+        formatm(''.join(['  pip install -r ', app_path,
             os.path.sep, 'requirements.txt']), '\n', color='BOLD'),
         TABSPACE, 'to finish installing your application requirements.\n']
     print ''.join(msg)
