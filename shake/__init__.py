@@ -56,5 +56,5 @@ from .wrappers import Request, Response, SecureCookie
 
 manager = Manager()
 
-__version__ = '0.19'
+__version__ = '0.21'
 

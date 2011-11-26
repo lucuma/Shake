@@ -1,87 +1,92 @@
-=====================
-[[ PNAME ]]
-=====================
 
-Esta es la estructura de archivos por defecto de una aplicación Shake, organizada de la forma como lo encuentramos más conveniente y siguiendo las mejores prácticas. Es una buena base para empezar, pero no es de ningún modo, obligatoria. Puedes adaptarlo a tu gusto y a las necesidades de tu aplicación.
+# [[ PNAME ]]
 
-├── README.md
-├── app
-│   ├── app.py
-│   ├── controllers
-│   │   ├── main.py
-│   ├── models
-│   │   ├── main.py
-│   │   └── users.py
-│   ├── settings
-│   │   ├── __init__.py
-│   │   └── _LOCAL.py
-│   ├── urls.py
-│   └── views
-│       ├── layouts
-│       │   └── base.html
-│       ├── index.html
-│       └── not_found.html
-│       ├── error.html
-├── manage.py
-├── requirements.txt
-├── static
-│   ├── css
-│   │   └── [[ PNAME ]].css
-│   ├── images
-│   │   └── favicon.ico
-│   ├── js
-│   │   ├── jquery-1.6.2.min.js
-│   │   ├── [[ PNAME ]].js
-│   │   └── underscore-1.1.6.min.js
-│   └── robots.txt
-└── tests
+
+This is the default directory structure for a Shake application. Is a good
+starting point but isn't mandatory. You can adapt it to your needs and
+preferences.
+
+    ├── README.md
+    ├── app
+    │   ├── app.py
+    │   ├── controllers
+    │   │   ├── main.py
+    │   ├── models
+    │   │   ├── main.py
+    │   │   └── users.py
+    │   ├── settings
+    │   │   ├── __init__.py
+    │   │   └── _LOCAL.py
+    │   ├── urls.py
+    │   └── views
+    │       ├── layouts
+    │       │   └── base.html
+    │       ├── index.html
+    │       └── not_found.html
+    │       ├── error.html
+    ├── manage.py
+    ├── requirements.txt
+    ├── static
+    │   ├── css
+    │   │   └── [[ PNAME ]].css
+    │   ├── images
+    │   │   └── favicon.ico
+    │   ├── js
+    │   │   ├── jquery-1.6.2.min.js
+    │   │   ├── [[ PNAME ]].js
+    │   │   └── underscore-1.1.6.min.js
+    │   └── robots.txt
+    └── tests
 
 
 app
-  Contiene el código python específico para esta aplicación.
+:   This directory contains all the pyton codes specific for this application.
 
 app/app.py
-  El archivo donde se istancia la aplicación (la clase Shake).
+:   The file where your main application object is created.
 
 app/controllers
-  Controladores. Reciben las acciones de los usuarios, interactúan con los
-  modelos y muestran la vista apropiada en la página.
+:   A controller handles a web request from the user, interact with the 
+    models and returns back and appropiated rendered view.
 
 app/models
-  El código respnsable por mantener el estado de la aplicación (como el que
-  se comunica con la base de datos) y las reglas que aplican sobre él.
-
+:   The classes that model and wrap the data stored in our application's
+    database, and the rules to manage it.
+  
 app/settings
-  Contiene los archivos con opciones de configuración. 
+:   This subdirectory contains the small amount of configuration code that your
+    application will need, including your database configuration and others.
 
 app/urls.py
-  Lista de reglas de URLs.
+:   List of URL routing rules to make the apllication call a specific
+    controller for a given URL.
 
 app/views
-  Guarda las plantillas para las vistas, que además de HTML, pueden ser
-  para generar cualquier otro tipo de archivo basado en texto. Todas las vistas
-  usan la sintáxis de Jinja2 por defecto.
+:   The views subdirectory holds the display templates to fill in with data
+    from our application, convert to HTML (or any other tet-based format), and
+    return to the user's browser. All templates uses the Jinja2 syntax by
+    default.
 
 app/views/layouts
-  Guarda los archivos de plantillas de las cuales heredan las otras.
-  Estos archivos contienen secciones comunes, como la cabecera, pie de
-  página, etc.
+:    Holds the template files for layouts to be used with views. This contains
+    the common section such as the header, footer, etc.
 
 manage.py
-  Un programa de línea de comandos para tareas administrativas. Puedes agregar
-  tus porpios comandos a este archivo.
+:   A command line program for managment tasks. You can add your own commands
+    to this file.
 
 requirements.txt
-  Una lista de dependencias de tu aplicación. Puedes instalarlas todas
-  fácilmente ejecutando:
-      pip install -r requierements.txt
+:   A list of the python modules required by your aplicación. To install all of
+    them, just do:
+
+        pip install -r requierements.txt
 
 static
-  Contiene subdirectorios para hojas de estilos, imágenes y código
-  JavaScript.
+:   This directory has web files that don't change, such as JavaScript files
+    (`static/scripts), images (`static/images`), stylesheets (`static/styles`),
+    and others.
 
 tests
-  Guarda aquí los tests automáticos para tu aplicación.
-
+:   The tests you write.
 
 
