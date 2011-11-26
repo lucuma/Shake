@@ -5,8 +5,8 @@ from .models.users import auth
 
 
 urls = [
-    # Submount('', auth.get_urls()),
-    # EndpointPrefix('app.controllers.main.', [
-    #     Rule('/', 'index'),
-    # ]),
+    Submount('', auth.get_urls()),
+    EndpointPrefix('app.controllers.main.', [
+        Rule('/', 'index'),
+    ]),
 ]

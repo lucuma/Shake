@@ -15,8 +15,8 @@ SQLALCHEMY_URI = 'sqlite:///db.sqlite'
 render = Render(os.path.join(os.path.dirname(__file__) , '..', 'views'))
 
 render.set_global('STATIC', '/static')
-render.set_global('STATIC_CSS', '/static/css')
-render.set_global('STATIC_JS', '/static/js')
+render.set_global('STATIC_CSS', '/static/styles')
+render.set_global('STATIC_JS', '/static/scripts')
 render.set_global('STATIC_IMG', '/static/images')
 
 STATIC_ROOT = os.path.abspath(os.path.normpath(

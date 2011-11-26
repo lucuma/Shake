@@ -14,7 +14,6 @@ from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
 
 from .config import ShakeSettings
-from .controllers import welcome_page
 from .routes import Map, Rule
 from .helpers import local, json
 from .wrappers import Request, Response
@@ -217,19 +216,14 @@ class Shake(object):
                 handler(error)
             
             endpoint = None
-            if code == 404 and not self.url_map._rules:
-                # No URL rules? Forget about the 404 and show a welcome page
-                code = 200
-                endpoint = welcome_page
-            else:
-                endpoint = self.error_handlers.get(code)
-                if endpoint is None:
-                    if self.settings.DEBUG:
-                        if isinstance(error, BadRequestKeyError):
-                            reraise(error)
-                        return error(environ, start_response)
-                    # In production try to use the default error handler
-                    endpoint = self.error_handlers.get(500)
+            endpoint = self.error_handlers.get(code)
+            if endpoint is None:
+                if self.settings.DEBUG:
+                    if isinstance(error, BadRequestKeyError):
+                        reraise(error)
+                    return error(environ, start_response)
+                # In production try to use the default error handler
+                endpoint = self.error_handlers.get(500)
             
             if isinstance(endpoint, basestring):
                 endpoint = import_string(endpoint)
@@ -323,9 +317,9 @@ class Shake(object):
     
     def _welcome_msg(self):
         """Prints a welcome message, if you run an application
-        without any URL."""
+        with just a few URL."""
         if os.environ.get('WERKZEUG_RUN_MAIN') != 'true' \
-                and not self.url_map._rules:
+                and len(self.url_map._rules) < 7:
             wml = len(WELCOME_MESSAGE) + 2
             print '\n '.join(['',
                 '-' * wml,
