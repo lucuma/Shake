@@ -40,53 +40,57 @@ preferences.
 
 
 app
-:   This directory contains all the pyton codes specific for this application.
+:   This directory contains all the pyton codes specific for
+    this application.
 
 app/app.py
 :   The file where your main application object is created.
 
 app/controllers
-:   A controller handles a web request from the user, interact with the 
-    models and returns back and appropiated rendered view.
+:   A controller handles a web request from the user, interact
+    with the models and returns back and appropiated rendered
+    view.
 
 app/models
-:   The classes that model and wrap the data stored in our application's
-    database, and the rules to manage it.
+:   The classes that model and wrap the data stored in our
+    application's database, and the rules to manage it.
   
 app/settings
-:   This subdirectory contains the small amount of configuration code that your
-    application will need, including your database configuration and others.
+:   This subdirectory contains the small amount of configuration
+    code that your application will need, including your
+    database configuration and others.
 
 app/urls.py
-:   List of URL routing rules to make the apllication call a specific
-    controller for a given URL.
+:   List of URL routing rules to make the apllication call a
+    specific controller for a given URL.
 
 app/views
-:   The views subdirectory holds the display templates to fill in with data
-    from our application, convert to HTML (or any other tet-based format), and
-    return to the user's browser. All templates uses the Jinja2 syntax by
-    default.
+:   The views subdirectory holds the display templates to fill
+    in with data from our application, convert to HTML (or any
+    other text-based format), and return to the user's browser.
+    All templates uses the Jinja2 syntax by default.
 
 app/views/layouts
-:    Holds the template files for layouts to be used with views. This contains
-    the common section such as the header, footer, etc.
+:   Holds the template files for layouts to be used with views.
+    This contains the common section such as the header, footer,
+   etc.
 
 manage.py
-:   A command line program for managment tasks. You can add your own commands
-    to this file.
+:   A command line program for managment tasks. You can add your
+    own commands to this file.
 
 requirements.txt
-:   A list of the python modules required by your aplicación. To install all of
-    them, just do:
+:   A list of the python modules required by your aplicación. To
+    install all of them, just do:
 
         pip install -r requierements.txt
 
 static
-:   This directory has web files that don't change, such as JavaScript files
-    (`static/scripts), images (`static/images`), stylesheets (`static/styles`),
+:   This directory has web files that don't change, such as
+    JavaScript files (`static/scripts), images 
+    (`static/images`), stylesheets (`static/styles`),
     and others.
 
 tests
-:   The tests you write.
-
+:   The tests you'll write. Yes, you should write tests.
 
