@@ -39,13 +39,13 @@ NotAllowed = Forbidden
 from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
 
+from . import pyceo, voodoo
 from .app import Shake
 from .controllers import (not_found_page, error_page, not_allowed_page,
     render_view)
 from .helpers import (local, Local, LocalProxy, json, url_for,
     path_join, url_join, to64, from64, to36, from36,
     StorageDict, Settings, safe_join, send_file)
-from .pyceo import Manager
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (Render, TemplateNotFound, flash, get_messages,
@@ -54,7 +54,7 @@ ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie
 
 
-manager = Manager()
+manager = pyceo.Manager()
 
-__version__ = '0.21'
+__version__ = '0.22'
 

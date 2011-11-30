@@ -3,5 +3,5 @@
 *.pyc
 build
 dist
-Shake.egg*
+*.egg*
 tests/__pycache__

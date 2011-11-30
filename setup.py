@@ -9,13 +9,13 @@ README = os.path.join(ROOTDIR, 'README.rst')
 
 def run_tests():
     import sys, subprocess
-    errno = subprocess.call([sys.executable, 'run_tests.py'])
+    errno = subprocess.call([sys.executable, 'runtests.py'])
     raise SystemExit(errno)
 
 
 setup(
     name='Shake',
-    version='0.21',
+    version='0.23',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],

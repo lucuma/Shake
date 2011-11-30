@@ -2,4 +2,6 @@ include *.*
 recursive-include shake *
 recursive-include tests *
 recursive-include docs *
+recursive-exclude shake *.pyc .DS_Store
+recursive-exclude tests *.pyc .DS_Store
 prune docs/build

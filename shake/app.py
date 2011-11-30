@@ -317,9 +317,9 @@ class Shake(object):
     
     def _welcome_msg(self):
         """Prints a welcome message, if you run an application
-        with just a few URL."""
+        without URLs."""
         if os.environ.get('WERKZEUG_RUN_MAIN') != 'true' \
-                and len(self.url_map._rules) < 7:
+                and len(self.url_map._rules) < 2:
             wml = len(WELCOME_MESSAGE) + 2
             print '\n '.join(['',
                 '-' * wml,
@@ -376,45 +376,6 @@ class Shake(object):
             ssl_context=ssl_context,
             static_files=self.static_dirs,
             **kwargs)
-    
-    def run_cherrypy(self, host=None, port=None, processes=1, 
-            server_name=None, **kwargs):
-        """Runs the application on top of the CherryPy WSGI server.
-        
-        This server can be used on production but it is recomended to use
-        another server, like NGINX for the static files.
-        
-        :param host:
-            The host for the application. eg: 'localhost'.
-        
-        :param port:
-            The port for the server. eg: 8080
-        
-        :param numthreads:
-            Default 1.
-        
-        :param processes:
-            Number of processes to spawn. Default `1`.
-        
-        :param server_name
-        
-        """
-        from cherrypy import wsgiserver
-
-        host = host or self.settings.SERVER_NAME
-        port = port or self.settings.SERVER_PORT
-        
-        self._welcome_msg()
-        
-        d = wsgiserver.WSGIPathInfoDispatcher({'/': self})
-        server = wsgiserver.CherryPyWSGIServer((host, port), d,
-            numthreads=processes, server_name=server_name, **kwargs)
-        try:
-            print ' * Running on http://%s:%s/' % (host, port)
-            server.start()
-        except KeyboardInterrupt:
-            print '\n * Stopping server...'
-            server.stop()
     
     def test_client(self):
         """Creates a test client for this application.
