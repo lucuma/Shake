@@ -15,7 +15,7 @@ def run_tests():
 
 setup(
     name='Shake',
-    version='0.23',
+    version='0.24',
     author='Juan-Pablo Scaletti',
     author_email='juanpablo@lucumalabs.com',
     packages=['shake'],
@@ -31,9 +31,9 @@ setup(
         'skeleton/app/views/*.*',
         'skeleton/app/views/layouts/*.*',
         'skeleton/static/*.*',
-        'skeleton/static/css/*.*',
+        'skeleton/static/styles/*.*',
         'skeleton/static/images/*.*',
-        'skeleton/static/js/*.*',
+        'skeleton/static/scripts/*.*',
         'skeleton/tests/*.*',
         ]},
     zip_safe=False,
