@@ -5,9 +5,16 @@
     Admin scripts
 
 """
+import os
+import sys
+
 from shake import manager
 
 from app.app import app
+
+
+bundles_path = os.path.join(os.path.dirname(__file__), 'bundles')
+sys.path.insert(1, bundles_path)
 
 
 @manager.command
