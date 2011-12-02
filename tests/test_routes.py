@@ -414,15 +414,28 @@ def test_rule_templates():
         ('/test/test4/bar/', '', 'handle_bar'),
         ('/test/test4/baz/', '', 'handle_baz'),
         ('/test/test4/foo/', '', 'handle_foo'),
-        ('/test1-blah', '', 'test1bar'),
-        ('/test1-meh', '', 'test1baz'),
-        ('/test2-blah', '', 'test2bar'),
-        ('/test2-meh', '', 'test2baz'),
-        ('/test3-blah', '', 'test3bar'),
-        ('/test3-meh', '', 'test3baz'),
-        ('/test4-blah', '', 'test4bar'),
-        ('/test4-meh', '', 'test4baz'),
+        ('/test1-blah', '', 'test1.bar'),
+        ('/test1-meh', '', 'test1.baz'),
+        ('/test2-blah', '', 'test2.bar'),
+        ('/test2-meh', '', 'test2.baz'),
+        ('/test3-blah', '', 'test3.bar'),
+        ('/test3-meh', '', 'test3.baz'),
+        ('/test4-blah', '', 'test4.bar'),
+        ('/test4-meh', '', 'test4.baz'),
     ])
+
+
+def test_endpoint_prefix():
+    url_map = r.Map([
+        r.EndpointPrefix('foo', [
+            r.Rule('/foo/bar', 'bar'),
+        ]),
+        r.EndpointPrefix('bar.', [
+            r.Rule('/bar/meh', 'meh'),
+        ]),
+    ])
+    out = [x.endpoint for x in url_map.iter_rules()]
+    assert out == ['foo.bar', 'bar.meh']
 
 
 def test_complex_routing_rules():

@@ -388,7 +388,7 @@ class EndpointPrefix(RuleFactory):
 
         url_map = Map([
             Rule('/', endpoint='index'),
-            EndpointPrefix('blog/', [
+            EndpointPrefix('blog', [
                 Submount('/blog', [
                     Rule('/', endpoint='index'),
                     Rule('/entry/<entry_slug>', endpoint='show'),
@@ -399,7 +399,7 @@ class EndpointPrefix(RuleFactory):
     """
 
     def __init__(self, prefix, rules):
-        self.prefix = prefix
+        self.prefix = prefix.rstrip('.') + '.'
         self.rules = rules
 
     def get_rules(self, map):
