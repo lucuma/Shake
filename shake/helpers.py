@@ -195,17 +195,35 @@ class StorageDict(dict):
         None
     
     """
+    def __init__(self, dd=None, _default_value=None, _case_insensitive=False,
+            **kwargs):
+        data = dd if dd else kwargs
+        self.__dict__['_default_value'] = _default_value
+        self.__dict__['_case_insensitive'] = _case_insensitive
+        if _case_insensitive:
+            dict.__init__(self, [(k.upper(), v) for k, v in data.items()])
+        else:
+            dict.__init__(self, **data)
     
     def __getattr__(self, key):
+        if self._case_insensitive:
+            key = key.upper()
         try:
             return self[key]
         except KeyError, error:
-            raise AttributeError(error)
+            if self._default_value is not None:
+                return self._default_value
+            else:
+                raise AttributeError(error)
     
     def __setattr__(self, key, value):
+        if self._case_insensitive:
+            key = key.upper()
         self[key] = value
     
     def __delattr__(self, key):
+        if self._case_insensitive:
+            key = key.upper()
         try:
             del self[key]
         except KeyError, error:
@@ -218,6 +236,8 @@ class StorageDict(dict):
         return dict(self)
     
     def __setstate__(self, value):
+        if self._case_insensitive:
+            key = key.upper()
         for (key, value) in value.items():
             self[key] = value
 
@@ -385,62 +405,4 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
             if resp.status_code == 304:
                 resp.headers.pop('x-sendfile', None)
     return resp
-
-
-class Settings(object):
-    """A helper to manage custom and default settings
-    """
-    
-    def __init__(self, default, custom, case_insensitive=False):
-        if isinstance(default, dict):
-            default = StorageDict(default)
-        if isinstance(custom, dict):
-            custom = StorageDict(custom)
-        self.__dict__['default'] = default
-        self.__dict__['custom'] = custom
-        self.__dict__['case_insensitive'] = case_insensitive
-    
-    def __contains__(self, key):
-        return hasattr(self.custom, key)
-    
-    def __getattr__(self, key):
-        if (self.__dict__['case_insensitive']):
-            key = key.lower()
-        if hasattr(self.__dict__['custom'], key):
-            return getattr(self.__dict__['custom'], key)
-        elif hasattr(self.__dict__['default'], key):
-            return getattr(self.__dict__['default'], key)
-        raise AttributeError('No %s was found in the custom nor'
-            ' in the default settings' % key)
-    
-    def __setattr__(self, key, value):
-        if (self.case_insensitive):
-            key = key.lower()
-        setattr(self.custom, key, value)
-    
-    __getitem__ = __getattr__
-    __setitem__ = __setattr__
-    
-    def get(self, key, default=None):
-        if (self.case_insensitive):
-            key = key.lower()
-        if hasattr(self.custom, key):
-            return getattr(self.custom, key)
-        return getattr(self.default, key, default)
-    
-    def setdefault(self, key, value):
-        if (self.case_insensitive):
-            key = key.lower()
-        if hasattr(self.custom, key):
-            return getattr(self.custom, key)
-        setattr(self.custom, key, value)
-        return value
-    
-    def update(self, dict_):
-        custom = self.custom
-        ci = self.case_insensitive
-        for key, value in dict_.items():
-            if ci:
-                key = key.lower()
-            setattr(custom, key, value)
 

@@ -3,7 +3,7 @@
 # shake.config
 
 """
-from .helpers import Settings
+from .wrappers import Settings
 
 
 DEFAULT_SETTINGS = {

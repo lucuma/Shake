@@ -6,17 +6,20 @@ Implements the bridge to Jinja2.
 """
 from datetime import datetime
 import hashlib
+import io
 import os
 
 import jinja2
 from jinja2.exceptions import TemplateNotFound
 from werkzeug.local import LocalProxy
+import yaml
 
-from .helpers import local, url_for, to64, plural
+from .helpers import local, url_for, to64, plural, StorageDict
 
 
 VIEWS_DIR = 'views'
 LOCAL_FLASHES = '_fm'
+LOCAL_I18N_STRINGS = '_i18ns'
 
 
 def flash(request, msg, cat='info', extra=None, **kwargs):
@@ -90,18 +93,79 @@ def new_csrf_secret(request):
     return csrf_secret
 
 
-class Render(object):
+class BaseRender(object):
     
     default_globals = {
         'ellipsis': Ellipsis, # Easter egg?
-        'now': LocalProxy(datetime.utcnow),
         'plural': plural,
-        'get_messages': get_messages,
+        'now': LocalProxy(datetime.utcnow),
+
+        'url_for': url_for,
+        'flash_messages': LocalProxy(get_messages),
+        'csrf_secret': LocalProxy(lambda: get_csrf_secret(local.request)),
+
         'request': local('request'),
         'settings': LocalProxy(lambda: local.app.settings),
-        'url_for': url_for,
-        'csrf_secret': LocalProxy(lambda: get_csrf_secret(local.request)),
+
+        'get_messages': get_messages,
         }
+
+    def __init__(self, default_mimetype='text/html', i18n=None,
+            default_language='es-US'):
+        self.default_mimetype = default_mimetype
+        self.i18n_dir = i18n
+        self.default_language = default_language
+        self.default_globals['i18n'] = LocalProxy(self.get_18n_strings)
+    
+    def _get_template(self, filename):
+        raise NotImplementedError
+    
+    def _render(self, tmpl, context):
+        raise NotImplementedError
+    
+    def __call__(self, filename, dcontext=None, mimetype=None,
+            headers=None, **context):
+        tmpl = self._get_template(filename)
+        if not context and isinstance(dcontext, dict):
+            context = dcontext
+        result = self._render(tmpl, context)
+        mimetype = mimetype or self.default_mimetype
+        response_class = local.app.response_class
+        resp = response_class(result, mimetype=mimetype)
+        headers = headers or {}
+        for key, val in headers.items():
+            resp.headers[key] = val
+        return resp
+    
+    def load_i18n_strings(self, lang_s, lang):
+        if not self.i18n_dir:
+            return None
+        lang = lang.replace('-', '_')
+        filename = os.path.join(self.i18n_dir, lang + '.yml')
+        if not os.path.isfile(filename):
+            if lang == lang_s:
+                return
+            filename = os.path.join(self.i18n_dir, lang_s + '.yml')
+        
+        try:
+            with io.open(filename) as f:
+                strings = yaml.safe_load(f)
+            return StorageDict(strings, _default_value=u'',
+                _case_insensitive=True)
+        except (IOError, AttributeError):
+            return
+    
+    def get_18n_strings(self):
+        lang_s, lang = local.request.get_language(self.default_language)
+        strings = getattr(local, LOCAL_I18N_STRINGS, None)
+        if not strings:
+            strings = self.load_i18n_strings(lang_s, lang)
+            if strings:
+                setattr(local, LOCAL_I18N_STRINGS, strings)
+        return strings
+
+
+class Render(BaseRender):
     
     default_tests = {
         # Test for the mysterious Ellipsis object :P
@@ -110,12 +174,14 @@ class Render(object):
     
     default_filters = {}
     
-    def __init__(self, views_path=None, loader=None, default='text/html',
-            **kwargs):
+    def __init__(self, views_path=None, loader=None,
+            default_mimetype='text/html',
+            i18n=None, default_language='es-US', **kwargs):
+        BaseRender.__init__(self, default_mimetype=default_mimetype,
+            i18n=i18n, default_language=default_language)
         filters = kwargs.pop('filters', {})
         tests = kwargs.pop('tests', {})
         tglobals = kwargs.pop('globals', {})
-        self.default = default
         
         if views_path:
             views_path = os.path.normpath(os.path.realpath(views_path))
@@ -143,57 +209,29 @@ class Render(object):
         self.env = env
         self._loader = None
     
-    def load_alt_loader(self, alt_loader):
-        if alt_loader:
-            self._loader = loader = self.env.loader
-            self.env.loader = jinja2.ChoiceLoader([loader, alt_loader])
+    def _get_template(self, filename):
+        return self.env.get_template(filename)
     
-    def unload_alt_loader(self):
-        if self._loader:
-            self.env.loader = self._loader
-            self._loader = None
+    def _render(self, tmpl, context):
+        return tmpl.render(context)
     
-    def to_string(self, view_template, dcontext=None, alt_loader=None,
-            **context):
+    def to_string(self, filename, dcontext=None, **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
-        self.load_alt_loader(alt_loader)
-        tmpl = self.env.get_template(view_template)
-        result = tmpl.render(context)
-        self.unload_alt_loader()
-        return result
+        tmpl = self._get_template(filename)
+        return self._render(tmpl, context)
     
     def from_string(self, source, dcontext=None, **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
         tmpl = self.env.from_string(source)
-        return tmpl.render(context)
+        return self._render(tmpl, context)
     
-    def to_stream(self, view_template, dcontext=None, alt_loader=None,
-            **context):
+    def to_stream(self, filename, dcontext=None, **context):
         if not context and isinstance(dcontext, dict):
             context = dcontext
-        self.load_alt_loader(alt_loader)
-        tmpl = self.env.get_template(view_template)
-        result = tmpl.stream(context)
-        self.unload_alt_loader()
-        return result
-    
-    def __call__(self, view_template, dcontext=None, alt_loader=None,
-            mimetype=None, headers=None, **context):
-        self.load_alt_loader(alt_loader)
-        tmpl = self.env.get_template(view_template)
-        if not context and isinstance(dcontext, dict):
-            context = dcontext
-        result = tmpl.render(context)
-        self.unload_alt_loader()
-        mimetype = mimetype or self.default
-        response_class = local.app.response_class
-        resp = response_class(result, mimetype=mimetype)
-        headers = headers or {}
-        for key, val in headers.items():
-            resp.headers[key] = val
-        return resp
+        tmpl = self._get_template(filename)
+        return tmpl.stream(context)
     
     def get_global(self, name):
         return self.env.globals[name]

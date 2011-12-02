@@ -14,9 +14,11 @@ from shake import (Shake, Rule, Render, ViewNotFound, flash, get_messages,
     get_csrf_secret, new_csrf_secret, local)
 
 
+HTTP_OK = 200
+
 views_dir = os.path.join(os.path.dirname(__file__), 'res')
 static_dir = os.path.join(os.path.dirname(__file__), 'static')
-    
+
 
 def test_render():
     render = Render(views_dir)
@@ -44,7 +46,7 @@ def test_from_to_string():
 
 def test_mimetype():
     render1 = Render(views_dir)
-    render2 = Render(views_dir, default='foo/bar')
+    render2 = Render(views_dir, default_mimetype='foo/bar')
     
     def t1(request):
         resp = render1('view.html')
@@ -214,24 +216,6 @@ def test_default_globals_url_for():
     c.get('/')
 
 
-def test_alt_loader():
-    render = Render(views_dir)
-    alt_loader = jinja2.FileSystemLoader(static_dir)
-    
-    def foo(request):
-        resp = render.to_string('view.html', alt_loader=alt_loader)
-        assert resp == '<h1>Hello World</h1>'
-        resp = render.to_string('robots.txt', alt_loader=alt_loader)
-        assert resp == '# Domo arigato Mr. Roboto!'
-    
-    urls = [
-        Rule('/', foo),
-        ]
-    app = Shake(urls)
-    c = app.test_client()
-    c.get('/')
-
-
 def test_flash_messagesech():
     
     def t1(request):
@@ -332,3 +316,35 @@ def test_csrf_token_query():
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/t')
+
+
+def test_i18n():
+    render = Render(i18n=views_dir)
+    
+    def ok(request):
+        return render.from_string('{{ i18n.HELLO }}')
+    
+    def fail(request):
+        return render.from_string('{{ i18n.FOOBAR }}')
+    
+    urls = [
+        Rule('/ok/', ok),
+        Rule('/fail/', fail),
+    ]
+    app = Shake(urls)
+    c = app.test_client()
+
+    resp = c.get('/ok/?lang=en-US')
+    assert resp.status_code == HTTP_OK
+    assert resp.data == 'Hello World'
+
+    resp = c.get('/ok/?lang=en_US')
+    assert resp.status_code == HTTP_OK
+    assert resp.data == 'Hello World'
+
+    resp = c.get('/ok/?lang=es-AR')
+    assert resp.data == 'Hola mundo'
+
+    resp = c.get('/fail/?lang=en-US')
+    assert resp.data == ''
+

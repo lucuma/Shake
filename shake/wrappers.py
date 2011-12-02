@@ -11,7 +11,7 @@ from werkzeug.wrappers import Response as BaseResponse
 from werkzeug.contrib.securecookie import SecureCookie as BaseSecureCookie
 from werkzeug.datastructures import ImmutableMultiDict
 
-from .helpers import local, json
+from .helpers import local, json, StorageDict
 
 
 class SecureCookie(BaseSecureCookie):
@@ -121,15 +121,15 @@ class Request(BaseRequest):
             return SecureCookie(secret_key=SECRET_KEY)
         return SecureCookie.unserialize(data, SECRET_KEY)
     
-    def get_language(self, default='en'):
+    def get_language(self, default='en-US'):
         lang = None
         if self.args:
             lang = self.args.get('lang', '')
         if not lang:
             lang = request.accept_languages.best \
                 or request.user_agent.language or default
-        lang = lang.split('-')[0]
-        return lang
+        lang_s = lang.replace('_', '-').split('-')[0]
+        return lang_s, lang
 
 
 class Response(BaseResponse):
@@ -144,4 +144,50 @@ class Response(BaseResponse):
     
     """
     default_mimetype = 'text/plain'
+
+
+class Settings(object):
+    """A helper to manage custom and default settings
+    """
+    
+    def __init__(self, default, custom, case_insensitive=False):
+        if isinstance(default, dict):
+            default = StorageDict(default, _case_insensitive=case_insensitive)
+        if isinstance(custom, dict):
+            custom = StorageDict(custom, _case_insensitive=case_insensitive)
+        self.__dict__['default'] = default
+        self.__dict__['custom'] = custom
+    
+    def __contains__(self, key):
+        return hasattr(self.custom, key)
+    
+    def __getattr__(self, key):
+        if hasattr(self.__dict__['custom'], key):
+            return getattr(self.__dict__['custom'], key)
+        elif hasattr(self.__dict__['default'], key):
+            return getattr(self.__dict__['default'], key)
+        raise AttributeError('No %s was found in the custom nor'
+            ' in the default settings' % key)
+    
+    def __setattr__(self, key, value):
+        setattr(self.custom, key, value)
+    
+    __getitem__ = __getattr__
+    __setitem__ = __setattr__
+    
+    def get(self, key, default=None):
+        if hasattr(self.custom, key):
+            return getattr(self.custom, key)
+        return getattr(self.default, key, default)
+    
+    def setdefault(self, key, value):
+        if hasattr(self.custom, key):
+            return getattr(self.custom, key)
+        setattr(self.custom, key, value)
+        return value
+    
+    def update(self, dict_):
+        custom = self.custom
+        for key, value in dict_.items():
+            setattr(custom, key, value)
 

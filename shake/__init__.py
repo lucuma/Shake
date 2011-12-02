@@ -45,16 +45,16 @@ from .controllers import (not_found_page, error_page, not_allowed_page,
     render_view)
 from .helpers import (local, Local, LocalProxy, json, url_for,
     path_join, url_join, to64, from64, to36, from36,
-    StorageDict, Settings, safe_join, send_file)
+    StorageDict, safe_join, send_file)
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
-from .views import (Render, TemplateNotFound, flash, get_messages,
-    get_csrf_secret, new_csrf_secret)
+from .views import (BaseRender, Render, TemplateNotFound,
+    flash, get_messages, get_csrf_secret, new_csrf_secret)
 ViewNotFound = TemplateNotFound
-from .wrappers import Request, Response, SecureCookie
+from .wrappers import Request, Response, SecureCookie, Settings
 
 
 manager = pyceo.Manager()
 
-__version__ = '0.25'
+__version__ = '0.26'
 
