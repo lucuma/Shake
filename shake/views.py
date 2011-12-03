@@ -15,6 +15,7 @@ from werkzeug.local import LocalProxy
 import yaml
 
 from .helpers import local, url_for, to64, plural, StorageDict
+from .wrappers import Response
 
 
 VIEWS_DIR = 'views'
@@ -109,6 +110,9 @@ class BaseRender(object):
 
         'get_messages': get_messages,
         }
+    
+    # The class that is used for response objects.
+    response_class = Response
 
     def __init__(self, default_mimetype='text/html', i18n=None,
             default_language='es-US'):
@@ -130,7 +134,7 @@ class BaseRender(object):
             context = dcontext
         result = self._render(tmpl, context)
         mimetype = mimetype or self.default_mimetype
-        response_class = local.app.response_class
+        response_class = self.response_class
         resp = response_class(result, mimetype=mimetype)
         headers = headers or {}
         for key, val in headers.items():
@@ -177,6 +181,7 @@ class Render(BaseRender):
     def __init__(self, views_path=None, loader=None,
             default_mimetype='text/html',
             i18n=None, default_language='es-US', **kwargs):
+        
         BaseRender.__init__(self, default_mimetype=default_mimetype,
             i18n=i18n, default_language=default_language)
         filters = kwargs.pop('filters', {})
