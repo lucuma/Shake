@@ -56,5 +56,5 @@ from .wrappers import Request, Response, SecureCookie, Settings
 
 manager = pyceo.Manager()
 
-__version__ = '0.26'
+__version__ = '0.27'
 
