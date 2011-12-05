@@ -38,15 +38,17 @@ def run_wsgi():
 
 @manager.command
 def initdb():
-    """Create the database tables (if they don't exist)"""
-    from app.models.main import db
-    
-    db.create_all()
+    syncdb()
+    create_user(u'admin', '123456')
 
 
 @manager.command
 def syncdb():
-    initdb()
+    """Create the database tables (if they don't exist)"""
+    from app.models.main import db
+    print 'Creating tables...'
+    db.create_all()
+    print 'Done.'
 
 
 @manager.command
