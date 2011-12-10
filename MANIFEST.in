@@ -1,7 +1,10 @@
-include *.*
+include *.py *.txt *.rst *.md
 recursive-include shake *
 recursive-include tests *
 recursive-include docs *
-recursive-exclude shake *.pyc .DS_Store
-recursive-exclude tests *.pyc .DS_Store
+recursive-exclude shake *.pyc
+recursive-exclude shake .DS_Store
+recursive-exclude tests *.pyc
+recursive-exclude tests .DS_Store
+recursive-exclude docs .DS_Store
 prune docs/build
