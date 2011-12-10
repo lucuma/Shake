@@ -1,33 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-# Shake
+    # Shake
 
-A web framework mixed from the best ingredients:
+    A web framework mixed from the best ingredients:
 
-    from shake import Shake, Rule
+        from shake import Shake, Rule
 
-    def hello(request):
-        return 'Hello World!'
+        def hello(request):
+            return 'Hello World!'
 
-    urls = [Rule('/', hello),]
+        urls = [Rule('/', hello),]
 
-    app = Shake(urls)
+        app = Shake(urls)
 
-    if __name__ == "__main__":
-        app.run()
+        if __name__ == "__main__":
+            app.run()
 
 
---------------------------------
-Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    --------------------------------
+    Copyright © 2010-2011 by Lúcuma labs (http://lucumalabs.com).
+    See AUTHORS for more details
+    MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
-Coded by Juan-Pablo Scaletti. See AUTHORS for more details
-
-MIT License. (http://www.opensource.org/licenses/mit-license.php)
-
-Portions of code and/or inspiration taken from:
-* Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
-* Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
-Used under the modified BSD license. See LEGAL.md for more details
+    Portions of code and/or inspiration taken from:
+    * Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
+    * Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
+    Used under the modified BSD license. See LEGAL.md for more details
 
 """
 # Utilities we import from Jinja2 and Werkzeug that are unused
@@ -56,5 +54,5 @@ from .wrappers import Request, Response, SecureCookie, Settings
 
 manager = pyceo.Manager()
 
-__version__ = '0.28'
+__version__ = '0.29'
 
