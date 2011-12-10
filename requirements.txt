@@ -4,7 +4,6 @@
 #
 #     pip install -r requirements.txt
 
-Shake
-Shake-SQLAlchemy
-Shake-Auth
-Shake-Mail
+Werkzeug>=0.7
+Jinja2>=2.4
+pyYAML

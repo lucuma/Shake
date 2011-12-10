@@ -45,7 +45,7 @@ from .controllers import (not_found_page, error_page, not_allowed_page,
     render_view)
 from .helpers import (local, Local, LocalProxy, json, url_for,
     path_join, url_join, to64, from64, to36, from36,
-    StorageDict, safe_join, send_file)
+    StorageDict, safe_join, send_file, to_unicode, to_bytestring)
 from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .views import (BaseRender, Render, TemplateNotFound,
