@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-# shake.app
+    # Shake.app
 
-This module implements the central WSGI application object.
+    This module implements the central WSGI application object.
+
 """
 from datetime import datetime, timedelta
 import os
@@ -15,7 +16,8 @@ from werkzeug.utils import import_string
 
 from .config import ShakeSettings
 from .routes import Map, Rule
-from .helpers import local, json
+from .helpers import local
+from .serializers import to_json
 from .wrappers import Request, Response
 
 
@@ -309,7 +311,7 @@ class Shake(object):
             return self.response_class(resp_value)
         if isinstance(resp_value, dict):
             return self.response_class(
-                json.dumps(resp_value, indent=None),
+                to_json(resp_value, indent=None),
                 mimetype='application/json')
         if resp_value is None:
             return self.response_class('')

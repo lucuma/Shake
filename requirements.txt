@@ -6,4 +6,6 @@
 
 Werkzeug>=0.7
 Jinja2>=2.4
+pyCEO>=0.3
 pyYAML
+Voodoo>=0.3

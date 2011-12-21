@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-# shake.views
+    # Shake.views
 
-Implements the bridge to Jinja2.
+    Implements the bridge to Jinja2.
+
 """
 from datetime import datetime
 import hashlib

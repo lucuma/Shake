@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-# shake.scripts
+    # Shake.scripts
 
-Command-line scripts
+    Command-line scripts
+
 """
 import hashlib
 import os
 
-from . import voodoo
-from .pyceo import Manager, formatm
+from pyceo import Manager, formatm
+import voodoo
 
 
 manager = Manager()

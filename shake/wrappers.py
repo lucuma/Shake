@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-# shake.wrappers
+    # Shake.wrappers
 
 """
 import hashlib
@@ -11,7 +11,8 @@ from werkzeug.wrappers import Response as BaseResponse
 from werkzeug.contrib.securecookie import SecureCookie as BaseSecureCookie
 from werkzeug.datastructures import ImmutableMultiDict
 
-from .helpers import local, json, StorageDict
+from .helpers import local, StorageDict
+from .serializers import from_json
 
 
 class SecureCookie(BaseSecureCookie):
@@ -103,7 +104,7 @@ class Request(BaseRequest):
         parsed JSON data.
         """
         if self.mimetype == 'application/json':
-            return json.loads(self.data)
+            return from_json(self.data)
     
     @cached_property
     def session(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-# shake.config
+    # Shake.config
 
 """
 from .wrappers import Settings

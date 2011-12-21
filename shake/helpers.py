@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-# shake.helpers
+    # Shake.helpers
 
 """
 import datetime
@@ -13,18 +13,6 @@ import sys
 import types
 from time import time
 from zlib import adler32
-
-# Get the fastest json available
-try:
-    import simplejson as json
-except ImportError:
-    try:
-        from django.utils import simplejson as json
-    except ImportError:
-        try:
-            import json
-        except ImportError:
-            raise ImportError('Unable to find a JSON implementation')
 
 from werkzeug.datastructures import Headers
 from werkzeug.exceptions import NotFound
@@ -410,8 +398,18 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
     return resp
 
 
-PROTECTED_TYPES = (types.NoneType, int, long, float, Decimal,
-    datetime.datetime, datetime.date, datetime.time)
+def is_protected_type(obj):
+    """Determine if the object instance is of a protected type.
+
+    Objects of protected types are preserved as-is when passed to
+    force_unicode(strings_only=True).
+    """
+    return isinstance(obj, (
+        types.NoneType,
+        int, long,
+        datetime.datetime, datetime.date, datetime.time,
+        float, Decimal)
+    )
 
 
 def to_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
@@ -429,7 +427,7 @@ def to_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     # is an instance of unicode.
     if isinstance(s, unicode):
         return s
-    if strings_only and isinstance(s, PROTECTED_TYPES):
+    if strings_only and is_protected_type(s):
         return s
     encoding = encoding or 'utf-8'
     try:

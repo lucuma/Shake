@@ -1,5 +1,5 @@
-# Shake
 
+# Shake
 
 A web framework mixed from the best ingredients:
 
@@ -17,7 +17,6 @@ A web framework mixed from the best ingredients:
 
 
 ---------------------------------------
-
-Coded by Juan-Pablo Scaletti <juanpablo@lucumalabs.com>.<br />
-Copyright © 2011 by [Lúcuma labs] (http://lucumalabs.com).<br />
+Copyright © 2011 by [Lúcuma labs] (http://lucumalabs.com).  
+See `AUTHORS.md` for more details.  
 License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).
