@@ -50,9 +50,12 @@ from .views import (BaseRender, Render, TemplateNotFound,
 ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie, Settings
 
-
 import pyceo
 manager = pyceo.Manager()
+
+# Aliases
+redirect_to = redirect
+
 
 __version__ = '0.31'
 

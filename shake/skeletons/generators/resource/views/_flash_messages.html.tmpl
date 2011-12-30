@@ -1,0 +1,14 @@
+
+{% for message in get_messages() -%}
+<div class="flash {{ message.cat }} clearfix">
+{%- if message.msg == 'CREATED' -%}
+[[ resource|title ]] was successfully created.
+{%- elif message.msg == 'UPDATED' -%}
+[[ resource|title ]] was successfully updated.
+{%- elif message.msg == 'DELETED' -%}
+[[ resource|title ]] was successfully deleted.
+{%- else -%}
+{{ message.msg }}
+{%- endif %}
+</div>
+{%- endfor %}

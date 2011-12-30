@@ -1,0 +1,48 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}[[ resource_plural|title ]]{% endblock %}
+
+
+{% block content %}
+<div class="container">
+{% include '[[ resource_plural ]]/_flash_messages.html' %}
+
+<h1>Listing [[ resource_plural ]]</h1>
+
+<table>
+  <tr>
+    [% for fname, ftype, ffield in fields -%]
+    <th>[[ fname|title ]]</th>
+    [% endfor -%]
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+{% for item in [[ resource_plural ]] %}
+  <tr>
+    [% for fname, ftype, ffield in fields -%]
+    <td>{{ item.[[ fname ]] }}</td>
+    [% endfor %]
+    <td><a href="{{ url_for('show_[[ resource ]]', uid=item.id) }}">Show</a></td>
+    <td><a href="{{ url_for('edit_[[ resource ]]', uid=item.id) }}">Edit</a></td>
+    <td><a rel="nofollow" href="{{ url_for('delete_[[ resource ]]', uid=item.id) }}">Delete</a></td>
+  </tr>
+{% endfor %}
+</table>
+
+<br />
+
+<a href="{{ url_for('new_[[ resource ]]') }}">New [[ resource ]]</a>
+</div>
+{% endblock %}
+
+
+{% block head -%}
+<link href="{{ STATIC_CSS }}/scaffolds.css" rel="stylesheet" />
+{% endblock %}
+
+{% block script -%}
+<script src="{{ STATIC_JS }}/scaffolds.js"></script>
+{% endblock %}
+

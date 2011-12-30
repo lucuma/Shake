@@ -1,0 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+"""
+from wtforms import *
+
+
+class [[ table_name ]]Form(Form):
+    
+    [% for fname, ftype, ffield in fields -%]
+    [[ fname ]] = [[ ffield ]]('[[ fname|title ]]')
+    [% endfor %]

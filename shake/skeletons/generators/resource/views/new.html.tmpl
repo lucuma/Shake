@@ -1,0 +1,23 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}New [[ resource ]]{% endblock %}
+
+
+{% block content %}
+<div class="container">
+<h1>{{ self.title() }}</h1>
+
+{% include '[[ resource_plural ]]/_form.html' %}
+
+<a href="{{ url_for('index_[[ resource_plural ]]') }}">Cancel</a>
+</div>
+{% endblock %}
+
+
+{% block head -%}
+<link href="{{ STATIC_CSS }}/scaffolds.css" rel="stylesheet" />
+{% endblock %}
+
+{% block script -%}
+<script src="{{ STATIC_JS }}/scaffolds.js"></script>
+{% endblock %}

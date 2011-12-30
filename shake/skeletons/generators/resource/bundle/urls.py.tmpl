@@ -1,0 +1,36 @@
+# -*- coding: utf-8 -*-
+"""
+URLs for the [[ resource_plural ]] bundle.
+
+The priority is based upon order of creation:
+first created -> highest priority.
+"""
+from shake import Rule, EndpointPrefix
+
+
+[[ resource_plural ]]_urls = [
+
+    EndpointPrefix('app.[[ resource_plural ]].controllers', [
+        
+        Rule('/', 'index', methods=['GET'],
+            name='index_[[ resource_plural ]]'),
+        
+        Rule('/new', 'new', methods=['GET'],
+            name='new_[[ resource ]]'),
+        
+        Rule('/', 'create', methods=['POST'],
+            name='create_[[ resource ]]'),
+        
+        Rule('/<int:uid>/', 'show', methods=['GET'],
+            name='show_[[ resource ]]'),
+        
+        Rule('/<int:uid>/edit', 'edit', methods=['GET'],
+            name='edit_[[ resource ]]'),
+        
+        Rule('/<int:uid>/', 'update', methods=['POST', 'PUT'],
+            name='update_[[ resource ]]'),
+        
+        Rule('/<int:uid>/delete', 'delete',
+            name='delete_[[ resource ]]'),
+    ]),
+]

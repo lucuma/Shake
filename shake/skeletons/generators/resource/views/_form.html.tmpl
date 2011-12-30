@@ -1,0 +1,20 @@
+{% from "_formhelpers.html" import input %}
+<form method="post" action="
+{%- if [[ resource ]] -%}
+  {{ url_for('update_[[ resource ]]', uid=[[ resource ]].id) }}
+{%- else -%}
+  {{ url_for('create_[[ resource ]]') }}
+{%- endif -%}
+">
+  [% for fname, ftype, ffield in fields %]
+  <div class="field">
+  {{ input(form.[[ fname ]]) }}
+  </div>
+  [% endfor %]
+  <div class="actions">
+  <button type="submit">
+  {%- if [[ resource ]] %}Update{% else %}Save{% endif -%}
+  </button>
+  {{ csrf_secret.input }}
+  </div>
+</form>

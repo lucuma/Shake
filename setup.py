@@ -86,5 +86,5 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     test_suite = '__main__.run_tests',
-    entry_points = {'console_scripts': ['shake = shake.scripts:main']},
+    entry_points = {'console_scripts': ['shake = shake.cli:main']},
 )

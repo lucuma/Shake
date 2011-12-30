@@ -1,0 +1,10 @@
+
+{% macro input(f) -%}
+  {{ f.label }}
+  {{ f(**kwargs)|safe }}
+  {% if f.errors -%}
+    <ul class="errors">
+    {% for error in f.errors %}<li>{{ error }}{% endfor %}
+    </ul>
+  {%- endif %}
+{%- endmacro %}
