@@ -9,31 +9,27 @@
 
 <h1>Listing [[ resource_plural ]]</h1>
 
-<table>
-  <tr>
+
+<div class="subtitle">
     [% for fname, ftype, ffield in fields -%]
-    <th>[[ fname|title ]]</th>
+    <h2>[[ fname|title ]]</h2>
     [% endfor -%]
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
+</div>
 
+<div class="table">
 {% for item in [[ resource_plural ]] %}
-  <tr>
+  <ul class="entry">
     [% for fname, ftype, ffield in fields -%]
-    <td>{{ item.[[ fname ]] }}</td>
+    <li>{{ item.[[ fname ]] }}</li>
     [% endfor %]
-    <td><a href="{{ url_for('show_[[ resource ]]', uid=item.id) }}">Show</a></td>
-    <td><a href="{{ url_for('edit_[[ resource ]]', uid=item.id) }}">Edit</a></td>
-    <td><a rel="nofollow" href="{{ url_for('delete_[[ resource ]]', uid=item.id) }}">Delete</a></td>
-  </tr>
+    <li><a href="{{ url_for('show_[[ resource ]]', uid=item.id) }}">Show</a></li>
+    <li><a href="{{ url_for('edit_[[ resource ]]', uid=item.id) }}">Edit</a></li>
+    <li><a rel="nofollow" href="{{ url_for('delete_[[ resource ]]', uid=item.id) }}">Delete</a></li>
+  </ul>
 {% endfor %}
-</table>
+</div>
 
-<br />
-
-<a href="{{ url_for('new_[[ resource ]]') }}">New [[ resource ]]</a>
+<a class="newentry" href="{{ url_for('new_[[ resource ]]') }}">New [[ resource ]]</a>
 </div>
 {% endblock %}
 

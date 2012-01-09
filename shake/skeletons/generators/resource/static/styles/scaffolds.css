@@ -22,6 +22,11 @@ font-size: 30px;
 line-height: 36px;
 }
 
+h2 {
+font-size: 22px;
+font-weight: bold;
+}
+
 pre {
 background-color: #eee;
 padding: 10px;
@@ -40,39 +45,31 @@ color: #00438a;
 text-decoration: underline;
 }
 
-table {
+.table {
 width: 100%;
 margin-bottom: 18px;
 padding: 0;
 font-size: 13px;
-border-collapse: collapse;
 }
 
-table th, table td {
-padding: 10px 10px 9px;
-line-height: 18px;
+.entry {
+display: table;
+padding-top: 9px;
 text-align: left;
 }
 
-table td.action {
-padding-left: 1px;
-padding-right: 1px;
-}
-
-table th {
-padding-top: 9px;
-font-weight: bold;
-vertical-align: middle;
-}
-
-table td {
-vertical-align: top;
+.entry li {
 border-top: 1px solid #ddd;
+float: left;
+padding-left: 15px;
 }
 
-table tbody th {
-border-top: 1px solid #ddd;
-vertical-align: top;
+.entry li:first-child {
+width: 700px;
+}
+
+.newentry {
+margin-top: 20px;
 }
 
 .field {
