@@ -50,12 +50,31 @@ from .views import (BaseRender, Render, TemplateNotFound,
 ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie, Settings
 
-import pyceo
-manager = pyceo.Manager()
-
 # Aliases
 redirect_to = redirect
 
+__version__ = '0.33'
 
-__version__ = '0.31'
+
+import pyceo
+import os
+
+
+ENV_ARG = 'env'
+ENV_KEY = 'SHAKE_ENV'
+DEFAULT_ENV = 'development'
+
+
+def set_env(args, kwargs):
+    if ENV_ARG in kwargs:
+        global env
+        os.environ[ENV_KEY] = kwargs.pop(ENV_ARG)
+
+
+def env_is(value, default=DEFAULT_ENV):
+    return os.environ.get(ENV_KEY, default) == value
+
+
+# Automatically set the environment for each command
+manager = pyceo.Manager(pre=set_env)
 

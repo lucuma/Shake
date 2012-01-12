@@ -124,7 +124,7 @@ from pprint import pformat
 from urlparse import urljoin
 
 from werkzeug.urls import url_encode, url_decode, url_quote
-from werkzeug.utils import redirect, format_string
+from werkzeug.utils import redirect, format_string, import_string
 from werkzeug.exceptions import HTTPException, NotFound, MethodNotAllowed
 from werkzeug.datastructures import ImmutableDict, MultiDict
 
@@ -371,6 +371,8 @@ class Submount(RuleFactory):
     """
 
     def __init__(self, path, rules):
+        if isinstance(rules, basestring):
+            rules = import_string(rules)
         self.path = path.rstrip('/')
         self.rules = rules
 

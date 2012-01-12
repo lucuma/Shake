@@ -8,12 +8,21 @@ Command-line scripts
 import hashlib
 import os
 from subprocess import Popen, PIPE
+import tempfile
+import time
 
 from .globals import *
 from .generators import generator
 
 
 APP_SKELETON = os.path.join(ROOTDIR, 'application')
+
+PIP_IGNORE_LINES = (
+    'Requirement already', 'Cleaning up...',
+    'warning:', 'no previously-included',
+)
+
+TAB = '      '
 
 
 def make_secret():
@@ -22,16 +31,25 @@ def make_secret():
 
 def install_requirements(app_path, quiet=False):
     if not quiet:
-        msg = 'pip install -r %s%srequirements.txt -q' % (app_path, os.path.sep)
-        print voodoo.formatm('run', msg, color='green')
-
+        msg = 'pip install -r %s%srequirements.txt' % (app_path, os.path.sep)
+        print voodoo.formatm('run', msg, color='green'), '\n'
+    
     args = msg.split(' ')
-    proc = Popen(args, shell=False, stderr=PIPE, stdout=PIPE)
-    retcode = proc.wait()
-    if retcode != 0:
-        raise Exception(proc.stderr.read())
-    if not quiet:
-        print proc.stdout.read()
+    pipe_output, file_name = tempfile.mkstemp()
+    proc = Popen(args, shell=False, stdout=pipe_output)
+    
+    # # proc.poll() returns None while the program is still running
+    # while proc.poll() is None:
+    #     # sleep for 1 second
+    #     time.sleep(1)
+    #     last_line =  open(file_name).readline()
+    #     # It's possible that it hasn't output yet
+    #     if len(last_line) == 0:
+    #         continue
+    #     line = last_line[-1].strip()
+    #     if line and not line.startswith(PIP_IGNORE_LINES):
+    #         print TAB + line
+    proc.communicate()
 
 
 @manager.command
@@ -62,7 +80,7 @@ def new(app_path, skeleton=APP_SKELETON, **options):
         install_requirements(app_path, quiet)
 
     if not quiet:
-        print voodoo.formatm('Done!', '', color='green')
+        print '\n' + TAB + 'Done!'
 
 
 def main():

@@ -10,11 +10,10 @@ import sys
 
 from shake import manager
 
-from app.app import app
-
-
 lib_path = os.path.join(os.path.dirname(__file__), 'lib')
 sys.path.insert(1, lib_path)
+
+from app.app import app
 
 
 @manager.command

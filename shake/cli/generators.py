@@ -189,7 +189,8 @@ class ResourceGenerator(BaseGenerator):
         content = voodoo.read_from(app_dst, binary=False)
         # Find the first two blank lines
         # Not the robustest method, but for now it works
-        nc = "\nfrom .%s import models\n\n\n" % self.resource_plural
+        nc = "\nfrom .%(rp)s import models as %(rp)s_models\n\n\n" % \
+            {'rp': self.resource_plural}
         content = re.sub(r'(\n\s*){3}', nc, content)
         voodoo.write_to(app_dst, content, binary=False)
 

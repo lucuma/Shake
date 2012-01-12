@@ -3,16 +3,12 @@ from datetime import datetime
 
 from sqlalchemy import *
 
-from ..models import db
+from ..models import db, BaseMixin
 
 
-class [[ table_name ]](db.Model):
+class [[ table_name ]](db.Model, BaseMixin):
     
-    id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     [% for fname, ftype, ffield in fields -%]
     [[ fname ]] = Column([[ ftype ]])
     [% endfor %]
-    def __repr__(self):
-        return '<%s %d>' % (self.__class__.__name__, self.id)
 

@@ -24,6 +24,7 @@ from .wrappers import Request, Response
 local_manager = LocalManager([local])
 SECRET_KEY_MINLEN = 20
 STATIC_DIR = 'static'
+
 WELCOME_MESSAGE = "Welcome aboard. You're now using Shake!"
 
 
@@ -321,7 +322,7 @@ class Shake(object):
         """Prints a welcome message, if you run an application
         without URLs."""
         if os.environ.get('WERKZEUG_RUN_MAIN') != 'true' \
-                and len(self.url_map._rules) < 2:
+                and len(self.url_map._rules) == 0:
             wml = len(WELCOME_MESSAGE) + 2
             print '\n '.join(['',
                 '-' * wml,
