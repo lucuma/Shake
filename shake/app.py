@@ -330,7 +330,7 @@ class Shake(object):
                 '-' * wml,
                 ''])
     
-    def run(self, host=None, port=None, debug=True,
+    def run(self, host=None, port=None, debug=None,
             threaded=True, processes=1, reloader_interval=2,
             ssl_context=None, **kwargs):
         """Runs the application on a local development server.
@@ -366,7 +366,8 @@ class Shake(object):
         """
         host = host or self.settings.SERVER_NAME
         port = port or self.settings.SERVER_PORT
-        debug = (debug if (debug is not None) else self.settings.DEBUG)
+        debug = bool(debug if (debug is not None) else
+            self.settings.get('DEBUG', True))
         
         self._welcome_msg()
         

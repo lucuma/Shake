@@ -7,5 +7,5 @@
 Shake
 Shake-SQLAlchemy
 Shake-Auth
-Shake-Mail
+MailShake
 WTForms

@@ -53,7 +53,7 @@ from .wrappers import Request, Response, SecureCookie, Settings
 # Aliases
 redirect_to = redirect
 
-__version__ = '0.33'
+__version__ = '0.34'
 
 
 import pyceo
@@ -67,12 +67,15 @@ DEFAULT_ENV = 'development'
 
 def set_env(args, kwargs):
     if ENV_ARG in kwargs:
-        global env
         os.environ[ENV_KEY] = kwargs.pop(ENV_ARG)
 
 
 def env_is(value, default=DEFAULT_ENV):
     return os.environ.get(ENV_KEY, default) == value
+
+
+def get_env(default=DEFAULT_ENV):
+    return os.environ.get(ENV_KEY, default)
 
 
 # Automatically set the environment for each command
