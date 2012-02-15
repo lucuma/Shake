@@ -381,7 +381,7 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
         resp.expires = int(time() + cache_timeout)
 
     if add_etags and filepath is not None:
-        resp.set_etag('flask-%s-%s-%s' % (
+        resp.set_etag('shake-%s-%s-%s' % (
             os.path.getmtime(filepath),
             os.path.getsize(filepath),
             adler32(

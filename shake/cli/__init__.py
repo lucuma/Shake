@@ -7,9 +7,13 @@ Command-line scripts
 """
 import hashlib
 import os
-from subprocess import Popen, PIPE
-import tempfile
+from subprocess import Popen
 import time
+
+try:
+    import virtualenv
+except ImportError:
+    virtualenv = False
 
 from .globals import *
 from .generators import generator
@@ -29,26 +33,36 @@ def make_secret():
     return hashlib.sha1(os.urandom(64)).hexdigest()
 
 
-def install_requirements(app_path, quiet=False):
+def make_env(app_path, quiet=False):
+    if not virtualenv:
+        return
+    try:
+        env_path = os.path.join(app_path, 'env')
+        print voodoo.formatm('run', 'virtualenv %s' % env_path, color='green')
+        virtualenv.create_environment(
+            env_path,
+            site_packages=False,
+            unzip_setuptools=True,
+            use_distribute=True
+        )
+        return True
+    except:
+        return False
+
+
+def install_requirements(app_path, with_env=True, quiet=False):
     if not quiet:
         msg = 'pip install -r %s%srequirements.txt' % (app_path, os.path.sep)
         print voodoo.formatm('run', msg, color='green'), '\n'
     
+    if with_env:
+        msg = '%s%s%s' % (
+            os.path.join(app_path, 'env', 'bin'),
+            os.path.sep,
+            msg
+        )
     args = msg.split(' ')
-    pipe_output, file_name = tempfile.mkstemp()
-    proc = Popen(args, shell=False, stdout=pipe_output)
-    
-    # # proc.poll() returns None while the program is still running
-    # while proc.poll() is None:
-    #     # sleep for 1 second
-    #     time.sleep(1)
-    #     last_line =  open(file_name).readline()
-    #     # It's possible that it hasn't output yet
-    #     if len(last_line) == 0:
-    #         continue
-    #     line = last_line[-1].strip()
-    #     if line and not line.startswith(PIP_IGNORE_LINES):
-    #         print TAB + line
+    proc = Popen(args, shell=False)
     proc.communicate()
 
 
@@ -77,7 +91,8 @@ def new(app_path, skeleton=APP_SKELETON, **options):
         filter_ext=FILTER, env_options=ENV_OPTIONS, **options)
     
     if not pretend:
-        install_requirements(app_path, quiet)
+        with_env = make_env(app_path, quiet)
+        install_requirements(app_path, with_env, quiet)
 
     if not quiet:
         print '\n' + TAB + 'Done!'
