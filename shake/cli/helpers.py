@@ -3,12 +3,33 @@
 # Shake.cli.utils
 
 """
+import hashlib
 import os
+from subprocess import Popen
 import re
+
+import voodoo
+
+from .globals import (FIELD_TYPES, DEFAULT_FIELD_TYPE,
+    SINGULAR_RULES, PLURAL_RULES)
 
 
 _FIRST_CAP_RE = re.compile('(.)([A-Z][a-z]+)')
 _ALL_CAP_RE = re.compile('([a-z0-9])([A-Z])')
+
+
+def make_secret():
+    return hashlib.sha1(os.urandom(64)).hexdigest()
+
+
+def install_requirements(app_path, quiet=False):
+    msg = 'pip install -r %s%srequirements.txt' % (app_path, os.path.sep)
+    if not quiet:
+        print voodoo.formatm('run', msg, color='white'), '\n'
+
+    args = msg.split(' ')
+    proc = Popen(args, shell=False)
+    proc.communicate()
 
 
 def underscores_to_camelcase(name):
@@ -19,48 +40,56 @@ def camelcase_to_underscores(name):
     s1 = _FIRST_CAP_RE.sub(r'\1_\2', name)
     name = _ALL_CAP_RE.sub(r'\1_\2', s1).lower()
     return name
-
-
-PLURAL_RULES = [
-    ('[ml]ouse$', '([ml])ouse$', '\\1ice'), 
-    ('child$', 'child$', 'children'), 
-    ('booth$', 'booth$', 'booths'), 
-    ('foot$', 'foot$', 'feet'), 
-    ('ooth$', 'ooth$', 'eeth'), 
-    ('l[eo]af$', 'l([eo])af$', 'l\\1aves'), 
-    ('sis$', 'sis$', 'ses'), 
-    ('man$', 'man$', 'men'), 
-    ('ife$', 'ife$', 'ives'), 
-    ('eau$', 'eau$', 'eaux'), 
-    ('lf$', 'lf$', 'lves'), 
-    ('[sxz]$', '$', 'es'), 
-    ('[^aeioudgkprt]h$', '$', 'es'), 
-    ('(qu|[^aeiou])y$', 'y$', 'ies'), 
-    ('$', '$', 's')
-]
  
 
-def regex_rules(rules=PLURAL_RULES):
+def regex_rules(rules):
     for line in rules:
         pattern, search, replace = line
         yield lambda word: re.search(pattern, word) and \
             re.sub(search, replace, word)
 
 
-def pluralize(noun):
-    for rule in regex_rules():
+def singularize(noun):
+    for rule in regex_rules(SINGULAR_RULES):
         result = rule(noun)
         if result: 
             return result
     return noun
 
 
-def sanitize_name(base, name):
-    plural = pluralize(name)
-    f1 = os.path.join(base, name) + '.py'
-    f2 = os.path.join(base, plural) + '.py'
+def pluralize(noun):
+    for rule in regex_rules(PLURAL_RULES):
+        result = rule(noun)
+        if result: 
+            return result
+    return noun
 
-    if os.path.exists(f1) or os.path.exists(f2):
-        return '_' + name
-    return name
+
+def sanitize_name(name):
+    singular = singularize(name)
+    plural = name
+    if singular == name:
+        plural = pluralize(name)
+
+    num = 2
+    while os.path.exists(plural + '.py'):
+        plural = plural + str(num)
+        num = num + 1
+    
+    return singular, plural
+
+
+def get_model_fields(args):
+    fields = []
+    for f in args:
+        try:
+            fname, ftype = f.split(':')
+        except ValueError:
+            fname = f
+            ftype = 'string'
+        ftype = re.sub(r'[^a-z0-9]', '', ftype.lower())
+        field = FIELD_TYPES.get(ftype, DEFAULT_FIELD_TYPE)
+        field = (fname, field[0], field[1])
+        fields.append(field)
+    return fields
 

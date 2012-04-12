@@ -5,69 +5,20 @@
 Command-line scripts
 
 """
-import hashlib
 import os
-from subprocess import Popen
-import time
 
-try:
-    import virtualenv
-except ImportError:
-    virtualenv = False
+from pyceo import Manager, format_title
+import voodoo
 
-from .globals import *
-from .generators import generator
+from . import globals as g
+from . import helpers as h
 
 
-APP_SKELETON = os.path.join(ROOTDIR, 'application')
-
-PIP_IGNORE_LINES = (
-    'Requirement already', 'Cleaning up...',
-    'warning:', 'no previously-included',
-)
-
-TAB = '      '
-
-
-def make_secret():
-    return hashlib.sha1(os.urandom(64)).hexdigest()
-
-
-def make_env(app_path, quiet=False):
-    if not virtualenv:
-        return
-    try:
-        env_path = os.path.join(app_path, 'env')
-        print voodoo.formatm('run', 'virtualenv %s' % env_path, color='green')
-        virtualenv.create_environment(
-            env_path,
-            site_packages=False,
-            unzip_setuptools=True,
-            use_distribute=True
-        )
-        return True
-    except:
-        return False
-
-
-def install_requirements(app_path, with_env=True, quiet=False):
-    if not quiet:
-        msg = 'pip install -r %s%srequirements.txt' % (app_path, os.path.sep)
-        print voodoo.formatm('run', msg, color='green'), '\n'
-    
-    if with_env:
-        msg = '%s%s%s' % (
-            os.path.join(app_path, 'env', 'bin'),
-            os.path.sep,
-            msg
-        )
-    args = msg.split(' ')
-    proc = Popen(args, shell=False)
-    proc.communicate()
+manager = Manager()
 
 
 @manager.command
-def new(app_path, skeleton=APP_SKELETON, **options):
+def new(app_path, skeleton=g.APP_SKELETON, **options):
     """APP_PATH [SKELETON_PATH]
     
     The 'shake new' command creates a new Shake application with a default
@@ -84,18 +35,78 @@ def new(app_path, skeleton=APP_SKELETON, **options):
 
     app_path = app_path.rstrip(os.path.sep)
     data = {
-        'SECRET1': make_secret(),
-        'SECRET2': make_secret(),
+        'SECRET1': h.make_secret(),
+        'SECRET2': h.make_secret(),
     }
     voodoo.reanimate_skeleton(skeleton, app_path, data=data,
-        filter_ext=FILTER, env_options=ENV_OPTIONS, **options)
+        filter_ext=g.FILTER, env_options=g.ENV_OPTIONS, **options)
     
     if not pretend:
-        with_env = make_env(app_path, quiet)
-        install_requirements(app_path, with_env, quiet)
+        h.install_requirements(app_path, quiet)
 
     if not quiet:
-        print '\n' + TAB + 'Done!'
+        print voodoo.formatm('Done!', '', color='white')
+
+
+@manager.command
+def add(name=None, *args, **options):
+    """NAME [field:type, ...] [options]
+
+    Generates the model, views and controller of a resource.
+    The resource is ready to use as a starting point for your RESTful,
+    resource-oriented application.
+
+    Pass the name of the model (in singular form), either CamelCased or
+    under_scored, as the first argument, and an optional list of attribute
+    pairs.
+
+    Attribute pairs are field:type arguments specifying the
+    model's attributes. Timestamps are added by default, so you don't have to
+    specify them by hand as 'created_at:datetime'.
+
+    You don't have to think up every attribute up front, but it helps to
+    sketch out a few so you can start working with the resource immediately.
+
+    Examples:
+        shake add post
+        shake add post title:string body:text published:boolean
+        shake add post purchase order_id:integer amount:numeric
+
+    """
+    if not name:
+        print manager.get_help()
+        return
+
+    quiet = options.get('quiet', options.get('q', False))
+    pretend = options.get('pretend', options.get('p', False))
+    name = name.rstrip(os.path.sep)
+    singular, plural = h.sanitize_name(name)
+
+    bundle_src = os.path.join(g.RESOURCE_SKELETON, 'bundle')
+    views_src = os.path.join(g.RESOURCE_SKELETON, 'views')
+    bundle_dst = plural
+    views_dst = os.path.join('views', plural)
+
+    data = {
+        'singular': singular,
+        'plural': plural,
+        'table_name': h.underscores_to_camelcase(singular),
+        'fields': h.get_model_fields(args),
+    }
+    
+    # Bundle
+    if not quiet:
+        print voodoo.formatm('invoke', bundle_dst, color='white')
+    bundle_dst = os.path.abspath(bundle_dst)
+    voodoo.reanimate_skeleton(bundle_src, bundle_dst, data=data,
+        filter_ext=g.FILTER, env_options=g.ENV_OPTIONS, **options)
+
+    # Views
+    if not quiet:
+        print voodoo.formatm('invoke', views_dst, color='white')
+    views_dst = os.path.abspath(views_dst)
+    voodoo.reanimate_skeleton(views_src, views_dst, data=data,
+        filter_ext=g.FILTER, env_options=g.ENV_OPTIONS, **options)
 
 
 def main():
@@ -108,6 +119,11 @@ def main():
     -s, [--skip]     # Skip files that already exist
     -q, [--quiet]    # Suppress status output
     """
+
+
+generator = manager.subcommand('generate',
+    description='shake generate GENERATOR [ARGS] [OPTIONS]',
+    item_name='generator')
 
 
 if __name__ == "__main__":

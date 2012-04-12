@@ -58,7 +58,17 @@ class Shake(object):
     # The class that is used for response objects.
     response_class = Response
     
-    def __init__(self, url_map=None, settings=None):
+    def __init__(self, *args):
+        url_map = []
+        settings = {}
+        largs = len(args)
+        if largs == 1:
+            settings = args[0]
+            if isinstance(settings, (list, tuple, Map)):
+                url_map = args[0]
+        elif largs > 1:
+            url_map = args[0]
+            settings = args[1]
         local.app = self
         
         # Functions to run before each request and response
@@ -75,9 +85,6 @@ class Shake(object):
         # If not empty, it'll be passed to a
         # `werkzeug.wsgi.SharedDataMiddleware` instance.
         self.static_dirs = {}
-        
-        url_map = url_map if url_map else []
-        settings = settings if settings else {}
         
         settings = ShakeSettings(settings)
         self.settings = settings

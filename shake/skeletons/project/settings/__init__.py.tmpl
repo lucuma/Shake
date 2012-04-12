@@ -1,0 +1,45 @@
+# -*- coding: utf-8 -*-
+"""
+General settings
+"""
+from os.path import join, dirname
+
+import shake
+from mailshake import ToConsoleMailer
+
+
+SECRET_KEY = '[[ SECRET1 ]]'
+
+BASE_DIR = join(dirname(__file__) , '..')
+VIEWS_DIR = join(BASE_DIR, 'views')
+STATIC_DIR = join(BASE_DIR, 'static')
+
+STATIC_URL = '/static'
+STATIC_URL_STYLES = STATIC_URL + '/styles'
+STATIC_URL_SCRIPTS = STATIC_URL + '/scripts'
+STATIC_URL_IMAGES = STATIC_URL + '/images'
+
+AUTH_SETTINGS = {
+    'pepper': '[[ SECRET2 ]]',
+    'password_change': True,
+    'password_reset': True,
+    'password_min_len': 6,
+}
+
+MAILER_CLASS = ToConsoleMailer
+MAILER_SETTINGS = {}
+
+
+#----------------------------------------------------------------------------
+
+# Import environment settings
+if shake.env_is('production'):
+    from prod import *
+else:
+    from dev import *
+
+# Import local settings
+try:
+    from LOCAL import *
+except ImportError:
+    pass

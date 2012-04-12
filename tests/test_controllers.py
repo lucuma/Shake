@@ -8,7 +8,7 @@ MIT License. (http://www.opensource.org/licenses/mit-license.php)
 import os
 
 import pytest
-from shake import Shake, abort, Rule, Render
+from shake import Shake, Rule, Render, Forbidden
 from shake.controllers import (not_found_page, error_page, not_allowed_page,
     render_view)
 
@@ -34,7 +34,7 @@ def fail(request):
 
 
 def no_pass(request):
-    abort(HTTP_FORBIDDEN)
+    raise Forbidden
     
 
 def test_default_not_found():

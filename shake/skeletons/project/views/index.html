@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome aboard{% endblock %}
+
+
+{% block content %}
+<div class="welcome">
+
+<h1>{{ self.title() }}</h1>
+<h2>Congratulations on your Shake-powered app!</h2>
+
+<h3>Here's what to do next:</h3>
+<ol>
+<li>
+  <h4>See the <span class="filename">README.md</span> for info about this application structure.</h3>
+</li>
+<li>
+  <h4>Add new bundles</h4>
+  <p><small>Bundles are related models, controllers, URLs and views.</p>
+  <p>Create one with the command <code>shake add <em>yourbundle</em></code>.</p>
+</li>
+<li>
+  <h4>Set up your routes.</h4>
+  <p>Routes are set up in <span class="filename">urls.py</span></p>
+  <p>Your bundle's internal routes are defined in <span class="filename"><em>yourbundle</em>/__init__.py</span></p>
+</li>
+<li>
+  <h4>Create your database.</h4>
+  <p>Run &ldquo;<code>python manage.py syncdb</code>&rdquo; to create your database. If you already've a database created, edit the <var>SQLALCHEMY_URI</var> setting in <span class="filename">settings/__init__.py</span> with your username and password.</p>
+</li>
+<li>
+  <h4>Edit this file (<span class="filename">views/index.html</span>) or replace it with one of your own.</h4>
+</li>
+</ol>
+
+<h5>Go ahead, Shake things up!</h5>
+</div>
+{% endblock %}
+
+
+{% block head %}
+<style>
+@import url(http://fonts.googleapis.com/css?family=Pacifico);
+
+h1, h2, h3, h4, h5 {
+font-weight: normal;
+line-height: 1.2;
+margin: 5px 0;
+padding: 0;
+}
+
+ol {
+list-style-type: decimal;  
+}
+
+ul {
+list-style-type: dics; 
+}
+
+.welcome {
+width: 640px;
+margin: 20px auto 0;
+}
+
+.welcome h1 {
+font-size: 70px;
+color: #a3312d;
+font-weight: bold;
+padding: 30px 0 0;
+font-family: 'Pacifico';
+text-align: center;
+}
+
+.welcome h2 {
+font-size: 20px;
+color: #777;
+padding: 0 0 40px;
+text-align: center;
+}
+
+.welcome h3 {
+font-size: 20px;
+color: #555;
+padding-bottom: 20px;
+}
+
+.welcome h4 {
+font-size: 20px;
+color: #222;
+}
+
+.welcome h5 {
+background: #333;
+color: white;
+font-size: 20px;
+padding: 15px;
+text-align: center;
+-moz-border-radius: 40px 0 40px 0;
+-webkit-border-radius: 40px 0 40px 0;
+border-radius: 40px 0 40px 0;
+width: 340px;
+margin: 40px auto;
+}
+
+.welcome p {
+margin: 10px 0;
+}
+
+.welcome ol {
+margin: 15px 0 0;
+padding: 0;
+}
+
+.welcome li {
+font-size: 20px;
+color: #888;
+padding: 5px 0;
+}
+
+.welcome li p {
+color: #555;
+font-size: 15px;
+}
+
+.welcome code, .welcome var, .welcome  .filename {
+font-family: monospace;
+padding: 0 2px;
+font-style: normal;
+font-weight: bold;
+color: #333;
+}
+</style>
+{% endblock %}

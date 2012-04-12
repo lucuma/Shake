@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+"""
+Bundle URLs
+
+The priority is based upon order of creation:
+first created -> highest priority.
+"""
+from shake import Rule, EndpointPrefix, Submount
+
+from . import controllers
+
+
+urls = [
+    EndpointPrefix('[[ resource_plural ]].controllers', [
+        Rule('/', 'index'),
+    ]),
+]

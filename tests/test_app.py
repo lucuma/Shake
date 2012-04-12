@@ -8,8 +8,8 @@ MIT License. (http://www.opensource.org/licenses/mit-license.php)
 import os
 
 import pytest
-from shake import (Shake, abort, redirect, Response, Rule, json, NotAllowed)
-from werkzeug.exceptions import (BadRequest, BadRequestKeyError,
+from shake import (Shake, redirect, Response, Rule, json,
+    NotAllowed, BadRequest,
     Unauthorized, Forbidden, NotFound, MethodNotAllowed,
     NotAcceptable, RequestTimeout, Gone,
     LengthRequired, PreconditionFailed, RequestEntityTooLarge,
@@ -737,9 +737,8 @@ def test_session_nosecret():
 
 def test_postdata_keyerror():
     """Bugfix v0.5.14 Test than the main application handles correctly a
-    `werkzeug.exceptions.BadRequestKeyErrorexception`
-    raised in a controller when doing `request.form['foo']` and `foo` 
-    isn't in request.form.
+    `KeyError` raised in a controller when doing `request.form['foo']` and
+    `foo` isn't in request.form.
     """
 
     def p1(request):
@@ -751,10 +750,10 @@ def test_postdata_keyerror():
     app = Shake(urls)
     c = app.test_client()
 
-    with pytest.raises(BadRequestKeyError):
+    with pytest.raises(KeyError):
         resp = c.get('/')
     
-    with pytest.raises(BadRequestKeyError):
+    with pytest.raises(KeyError):
         resp = c.post('/', data={'a':123})
 
 

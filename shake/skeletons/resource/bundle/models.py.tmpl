@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+"""
+"""
+from datetime import datetime
+
+import shake
+
+from main import app
+from models import db
+
+[% if fields %]
+class [[ table_name ]](db.Model, BaseMixin):
+
+    __tablename__ = '[[ resource_plural ]]'
+    
+    [% for fname, ftype, ffield in fields -%]
+    [[ fname ]] = db.Column(db.[[ ftype ]])
+    [% endfor %]
+    created_at = db.Column(db.DateTime, default=datetime.utcnow,
+        nullable=False)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow,
+        nullable=False)
+    deleted = db.Column(db.Boolean, default=False, nullable=False)
+    
+    def __repr__(self):
+        return '<%s %d>' % (self.__class__.__name__, self.id)
+[% endif %]

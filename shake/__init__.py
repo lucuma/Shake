@@ -30,8 +30,7 @@ Used under the modified BSD license. See LEGAL.md for more details
 # Utilities we import from Jinja2 and Werkzeug that are unused
 # in the module but are exported as public interface.
 from jinja2 import escape, Markup
-from werkzeug.exceptions import (abort, HTTPException, Forbidden,
-    MethodNotAllowed, NotFound, RequestEntityTooLarge, UnsupportedMediaType)
+from werkzeug.exceptions import *
 NotAllowed = Forbidden
 from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
@@ -53,7 +52,7 @@ from .wrappers import Request, Response, SecureCookie, Settings
 # Aliases
 redirect_to = redirect
 
-__version__ = '0.35'
+__version__ = '1.01'
 
 
 import pyceo

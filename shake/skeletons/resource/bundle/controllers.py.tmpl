@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+"""
+import shake
+
+from main import app, render, db
+from . import models as m
+
+
+def index(request):
+    return render('[[ resource_plural ]]/index.html', locals())
+
+

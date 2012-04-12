@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+
+{% block content %}
+<h1>{{ self.title() }}</h1>
+
+<p>The server encountered an internal error and was unable to complete
+your request.</p>
+
+<p>Either the server is overloaded or there is an error in the
+application.</p>
+
+<!--
+WARNING:
+If this page is smaller than 512 bytes, then Internet Explorer and 
+Chrome|Chromium will display their own built-in 404 page.
+Hence, the following text.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sit amet elit ante. Nam eget sem felis, non varius lorem. Phasellus faucibus lacinia luctus. In faucibus sapien ac velit venenatis tempus. Sed non tortor nec tellus volutpat rutrum. Phasellus quis lacus est. Aenean hendrerit vulputate quam vitae varius. Vestibulum feugiat luctus erat quis dignissim. Suspendisse potenti. Cras vitae ullamcorper nunc. Proin vel risus diam, vitae interdum risus. Aenean neque quam, aliquam id commodo sed, consectetur at metus. Aenean malesuada eleifend lacus, in dignissim tellus sagittis eu. Duis venenatis faucibus purus, at viverra mauris ullamcorper porta. Pellentesque vel erat ac risus imperdiet varius.
+-->
+{% endblock %}
+
+
+{% block head %}
+{% endblock %}

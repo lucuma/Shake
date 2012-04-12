@@ -173,7 +173,8 @@ class BaseRender(object):
 class Render(BaseRender):
     
     default_tests = {
-        # Test for the mysterious Ellipsis object :P
+        # Test for the mysterious Ellipsis object.
+        # whose mystery is only exceeded by its power :P
         'ellipsis': (lambda obj: obj == Ellipsis),
         }
     
