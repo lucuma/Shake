@@ -52,7 +52,7 @@ from .wrappers import Request, Response, SecureCookie, Settings
 # Aliases
 redirect_to = redirect
 
-__version__ = '1.01'
+__version__ = '1.0.2'
 
 
 import pyceo

@@ -65,7 +65,8 @@ class Shake(object):
         if largs == 1:
             settings = args[0]
             if isinstance(settings, (list, tuple, Map)):
-                url_map = args[0]
+                url_map = settings
+                settings = {}
         elif largs > 1:
             url_map = args[0]
             settings = args[1]
@@ -337,7 +338,7 @@ class Shake(object):
                 '-' * wml,
                 ''])
     
-    def run(self, host=None, port=None, debug=None,
+    def run(self, host=None, port=None, debug=None, reloader=None, 
             threaded=True, processes=1, reloader_interval=2,
             ssl_context=None, **kwargs):
         """Runs the application on a local development server.
@@ -375,11 +376,13 @@ class Shake(object):
         port = port or self.settings.SERVER_PORT
         debug = bool(debug if (debug is not None) else
             self.settings.get('DEBUG', True))
+        reloader = bool(reloader if (reloader is not None) else
+            self.settings.get('RELOAD', True))
         
         self._welcome_msg()
         
         return run_simple(host, port, self,
-            use_reloader=debug,
+            use_reloader=reloader,
             use_debugger=debug,
             reloader_interval=reloader_interval,
             threaded=threaded,

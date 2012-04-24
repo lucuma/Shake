@@ -167,8 +167,7 @@ class Settings(object):
             return getattr(self.__dict__['custom'], key)
         elif hasattr(self.__dict__['default'], key):
             return getattr(self.__dict__['default'], key)
-        raise AttributeError('No %s was found in the custom nor'
-            ' in the default settings' % key)
+        raise AttributeError(key)
     
     def __setattr__(self, key, value):
         setattr(self.custom, key, value)
