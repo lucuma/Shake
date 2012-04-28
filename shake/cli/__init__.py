@@ -84,7 +84,7 @@ def add(name=None, *args, **options):
 
     bundle_src = os.path.join(g.RESOURCE_SKELETON, 'bundle')
     views_src = os.path.join(g.RESOURCE_SKELETON, 'views')
-    bundle_dst = plural
+    bundle_dst = os.path.join('bundles', plural)
     views_dst = os.path.join('views', plural)
 
     data = {
