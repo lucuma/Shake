@@ -23,3 +23,4 @@ render.set_global('IMAGES', app.settings.STATIC_URL_IMAGES)
 mailer = app.settings.MAILER_CLASS(app.settings.MAILER_SETTINGS)
 
 db = SQLAlchemy(app.settings.SQLALCHEMY_URI, app, echo=False)
+

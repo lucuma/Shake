@@ -18,8 +18,8 @@ manager = Manager()
 
 
 @manager.command
-def new(app_path, skeleton=g.APP_SKELETON, **options):
-    """APP_PATH [SKELETON_PATH]
+def new(app_path='.', skeleton=g.APP_SKELETON, **options):
+    """APP_PATH='.' [SKELETON_PATH]
     
     The 'shake new' command creates a new Shake application with a default
     directory structure at the path you specify.

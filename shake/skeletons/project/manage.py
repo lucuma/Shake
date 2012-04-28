@@ -7,10 +7,11 @@ import os
 import sys
 
 from shake import manager
-from pyceo import prompt
 
 lib_path = os.path.join(os.path.dirname(__file__), 'lib')
-sys.path.insert(1, lib_path)
+sys.path.insert(0, lib_path)
+bundles_path = os.path.join(os.path.dirname(__file__), 'bundles')
+sys.path.insert(0, bundles_path)
 
 from main import app
 import urls
@@ -29,22 +30,18 @@ def runserver(host='0.0.0.0', port=None, **kwargs):
 def syncdb():
     """Create the database tables (if they don't exist)"""
     from main import db
-    from users.models import User
+    from users.models import create_admin
 
     print 'Creating tables...'
     db.create_all()
     print 'Done.'
-    
-    u = db.query(User).filter(User.login=='admin').first()
-    if not u:
-        print 'Creating `admin` user…'
-        email = prompt('>>> Admin email? ')
-        users.manage.create_user(u'admin', '123456',
-            fullname=u'Admin', email=email)
+    create_admin()
 
 
+## Insert here the imports to the manage scripts of your bundles
 import users.manage
 
 
 if __name__ == "__main__":
     manager.run()
+

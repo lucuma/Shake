@@ -8,23 +8,57 @@ import shake
 from mailshake import ToConsoleMailer
 
 
-SECRET_KEY = '[[ SECRET1 ]]'
-
 BASE_DIR = join(dirname(__file__) , '..')
 VIEWS_DIR = join(BASE_DIR, 'views')
 STATIC_DIR = join(BASE_DIR, 'static')
 
+# Optional server name hint
+SERVER_NAME = '127.0.0.1'
+
+# The default subdomain for URLs without a subdomain defined.
+DEFAULT_SUBDOMAIN = ''
+
+# URL prefix for static files.
+# Example: "http://media.lucumalabs.com/static/"
 STATIC_URL = '/static'
+
+# URL shortcuts for static files -- styles, scripts and images.
 STATIC_URL_STYLES = STATIC_URL + '/styles'
 STATIC_URL_SCRIPTS = STATIC_URL + '/scripts'
 STATIC_URL_IMAGES = STATIC_URL + '/images'
 
+# The maximum size for uploaded files
+MAX_CONTENT_LENGTH = 1024 * 1024 * 16  # 16 MB
+
+# The maximum size for regular form data (not files)
+MAX_FORM_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB
+
+# This secret was generated automatically, so it should be unique.
+# Don't share it with anybody.
+SECRET_KEY = '[[ SECRET1 ]]'
+
+
+# Shake-Auth settings
 AUTH_SETTINGS = {
+    # A hardcoded system-wide secret 'salt'. Don't share it with anybody.
+    # If you change this value after creating users all of their passswords
+    # will become invalid.
     'pepper': '[[ SECRET2 ]]',
-    'password_change': True,
-    'password_reset': True,
-    'password_min_len': 6,
+
+    # Redirect the user there after signing in.
+    'sign_in_redirect': '/',
+
+    # Redirect the user there after she sign out.
+    'sign_out_redirect': '/',
+
+    # The "reset your password" links will be valid for this number of hours
+    # after generation.
+    'reset_expire': 3,
+
+    # minimum number of chars the password must have.
+    'password_minlen': 5,
 }
+
 
 MAILER_CLASS = ToConsoleMailer
 MAILER_SETTINGS = {}

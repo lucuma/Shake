@@ -64,8 +64,8 @@ class Shake(object):
         largs = len(args)
         if largs == 1:
             settings = args[0]
-            if isinstance(settings, (list, tuple, Map)):
-                url_map = settings
+            if isinstance(args[0], (list, tuple, Map)):
+                url_map = args[0]
                 settings = {}
         elif largs > 1:
             url_map = args[0]
@@ -90,7 +90,8 @@ class Shake(object):
         settings = ShakeSettings(settings)
         self.settings = settings
         if not isinstance(url_map, Map):
-            url_map = Map(url_map)
+            url_map = Map(url_map,
+                default_subdomain=settings.DEFAULT_SUBDOMAIN)
         self.url_map = url_map
         
         self.error_handlers = {

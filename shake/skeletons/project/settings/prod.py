@@ -13,6 +13,7 @@ PAGE_NOT_FOUND = 'web.controllers.not_found'
 PAGE_ERROR = 'web.controllers.critical_error'
 # PAGE_NOT_ALLOWED = 'web.controllers.not_allowed'
 
+
 # MAILER_CLASS = SMTPMailer
 # MAILER_SETTINGS = {
 #     'host': 'localhost',
@@ -21,4 +22,6 @@ PAGE_ERROR = 'web.controllers.critical_error'
 #     'use_tls': True
 # }
 
+
+# You might need to uncomment this line for deploying with FastCGI
 # FORCE_SCRIPT_NAME = ''

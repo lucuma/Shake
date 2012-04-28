@@ -22,6 +22,7 @@ def create_user(login, passw, **data):
     auth.create_user(login, passw, **data)
     print 'Created user `%s` with password `%s`.' % (login, passw)
     print 'To change the password use `manage.py change_password %s`' % login
+    print 'To change the email use `manage.py update_user %s email=mynew@email`' % login
 
 
 @manager.command
@@ -43,6 +44,24 @@ def change_password(login, passw=None):
 
 
 @manager.command
+def update_user(login, **data):
+    """[-login] LOGIN [key=value, ...]
+    Changes the password of an existing user."""
+    from main import db
+    from users.models import User
+
+    user = db.query(User).filter(User.login==login).first()
+    if not user:
+        print 'User `%s` not found.' % login
+        return
+    
+    for key, val in data.items():
+        setattr(user, key, val)
+    db.commit()
+    print 'User `%s` updated.' % login
+
+
+@manager.command
 def add_perms(login, *perms):
     """[-login] LOGIN [-perms] *PERMISSIONS
     Add permissions to the user
@@ -52,7 +71,8 @@ def add_perms(login, *perms):
     
     user = db.query(User).filter(User.login==login).first()
     if not user:
-        raise ValueError(login)
+        print 'User `%s` not found.' % login
+        return
     user.add_perms(perms)
     db.commit()
     print 'Changed the permissions of user `%s`.' % login

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-General controllers
 """
 import shake
 
-from main import render
+from main import app, render, db
+from . import models as m
 
 
 def index(request):

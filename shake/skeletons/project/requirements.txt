@@ -6,5 +6,5 @@
 
 Shake
 Solution
-Shake-Auth
+Shake-Auth>=1.0
 MailShake

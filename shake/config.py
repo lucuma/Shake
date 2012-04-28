@@ -9,6 +9,7 @@ from .wrappers import Settings
 DEFAULT_SETTINGS = {
     'SERVER_NAME': '127.0.0.1',
     'SERVER_PORT': 5000,
+    'DEFAULT_SUBDOMAIN': '',
     
     'FORCE_SCRIPT_NAME': False,
     
@@ -18,6 +19,7 @@ DEFAULT_SETTINGS = {
     'SESSION_COOKIE_NAME': 'shake_session',
     'SESSION_EXPIRES': 24 * 120,
     
+    # The maximum size for uploade files
     'MAX_CONTENT_LENGTH': 1024 * 1024 * 16,  # 16 MB
     # The maximum size for regular form data (not files)
     'MAX_FORM_MEMORY_SIZE': 1024 * 1024 * 2,  # 2 MB

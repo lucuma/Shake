@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-[[ resource_plural ]] URLs
-
 The priority is based upon order of creation:
 first created -> highest priority.
 """
@@ -12,10 +10,10 @@ from . import controllers
 
 urls = [
 
-    EndpointPrefix('[[ resource_plural ]].controllers', [
+    EndpointPrefix('common.controllers', [
 
-        Rule('/', 'index'),
-
+        Rule('/', 'index', name='index'),
+        
     ]),
-    
+
 ]

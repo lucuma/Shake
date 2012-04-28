@@ -1,40 +1,42 @@
 
-# [[ PNAME ]]
+# Welcome to Shake
 
-├── main.py
-├── manage.py
-├── requirements.txt
-├── urls.py
-├── common.py
+This is the initial structure of your project
 
-├── libs
-    └── README.txt
-├── settings
-    ├── __init__.py
-    ├── dev.py
-    └── prod.py
-├── static
-    ├── robots.txt
-    ├── images
-        └── favicon.ico
-    ├── scripts
-        ├── jquery-1.7.1.min.js
-        ├── main.js
-        ├── selectivizr.js
-        └── underscore-1.1.6.min.js
-    └── styles
-        └── main.css
-├── tests
-    └── __init__.py
-├── users
-    ├── __init__.py
-    ├── manage.py
-    └── models.py
-└── views
-    ├── base.html
-    ├── error_notfound.html
-    ├── error.html
-    └── index.html
+    ├── main.py
+    ├── manage.py
+    ├── requirements.txt
+    ├── urls.py
+    ├── common.py
+
+    ├── libs
+        └── README.txt
+    ├── settings
+        ├── __init__.py
+        ├── dev.py
+        └── prod.py
+    ├── static
+        ├── robots.txt
+        ├── images
+            └── favicon.ico
+        ├── scripts
+            ├── jquery-1.7.1.min.js
+            ├── main.js
+            ├── selectivizr.js
+            └── underscore-1.1.6.min.js
+        └── styles
+            └── main.css
+    ├── tests
+        └── __init__.py
+    ├── users
+        ├── __init__.py
+        ├── manage.py
+        └── models.py
+    └── views
+        ├── base.html
+        ├── error_notfound.html
+        ├── error.html
+        └── index.html
 
 
 main.py
