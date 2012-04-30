@@ -131,9 +131,9 @@ def main():
     """
 
 
-generator = manager.subcommand('generate',
-    description='shake generate GENERATOR [ARGS] [OPTIONS]',
-    item_name='generator')
+# generator = manager.subcommand('generate',
+#     description='shake generate GENERATOR [ARGS] [OPTIONS]',
+#     item_name='generator')
 
 
 if __name__ == "__main__":
