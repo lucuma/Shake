@@ -7,14 +7,27 @@ This is the initial structure of your project
     ├── manage.py
     ├── requirements.txt
     ├── urls.py
-    ├── common.py
 
+    ├── bundles
+        ├── common
+            ├── __init__.py
+            ├── controllers.py
+            └── models.py
+        └── users
+            ├── __init__.py
+            ├── manage.py
+            └── models.py
+
+    ├── docs
+        └── README.md
     ├── libs
-        └── README.txt
+        └── README.md
+
     ├── settings
         ├── __init__.py
         ├── dev.py
         └── prod.py
+
     ├── static
         ├── robots.txt
         ├── images
@@ -26,13 +39,12 @@ This is the initial structure of your project
             └── underscore-1.1.6.min.js
         └── styles
             └── main.css
+
     ├── tests
         └── __init__.py
-    ├── users
-        ├── __init__.py
-        ├── manage.py
-        └── models.py
+
     └── views
+        ├── users
         ├── base.html
         ├── error_notfound.html
         ├── error.html
@@ -59,12 +71,24 @@ urls.py
 :   List of URL routing rules to make the application call a
     specific controller for a given URL.
 
-common.py
-:   This file contains the code for the index page and other site-wide
-    pages, like `Not found`.
-    Instead of defining new pages and models here, you should create new bundles for the rest of your code using the `shake add xxxx` command. Eg:
+bundles
+:   This subdirectory will contain all your application code organized as
+    `bundles`. Bundles are related models, controllers, URLs, views and others.
+    Create one using the `shake add xxxx` command, inside your app root dir. Eg:
 
         shake add posts
+
+bundles/common
+:   This bundle contains the code for the index page and site-wide
+    pages, like `Not found`.
+    Instead of defining new pages and models here, you should create new 
+    bundles for the rest of your code.
+
+bundles/users
+:   This bundle contain the neccesary code to authenticate your users
+
+docs
+:   This directory is where your application documentation will be stored
 
 libs
 :   Application specific libraries. Basically, any kind of custom code
@@ -95,5 +119,3 @@ views
     other text-based format), and return to the user's browser.
     All templates uses the Jinja2 syntax by default.
 
-users
-:   This bundle containt the neccesary code to authenticate your users

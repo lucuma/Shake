@@ -12,7 +12,7 @@ def create_user(login, passw, **data):
     """[-login] LOGIN [-passw] PASSWORD
     Creates a new user.
     """
-    from users import auth
+    from bundles.users import auth
     
     password_minlen = auth.settings.password_minlen
     while len(passw) < password_minlen:
@@ -29,7 +29,7 @@ def create_user(login, passw, **data):
 def change_password(login, passw=None):
     """[-login] LOGIN [-passw] NEW_PASSWORD
     Changes the password of an existing user."""
-    from users import auth
+    from bundles.users import auth
     
     if passw is None:
         passw = prompt_pass('>>> Password? ')
@@ -48,7 +48,7 @@ def update_user(login, **data):
     """[-login] LOGIN [key=value, ...]
     Changes the password of an existing user."""
     from main import db
-    from users.models import User
+    from bundles.users.models import User
 
     user = db.query(User).filter(User.login==login).first()
     if not user:
@@ -67,7 +67,7 @@ def add_perms(login, *perms):
     Add permissions to the user
     """
     from main import db
-    from users.models import User
+    from bundles.users.models import User
     
     user = db.query(User).filter(User.login==login).first()
     if not user:

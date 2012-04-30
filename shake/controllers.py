@@ -16,7 +16,7 @@ def not_found_page(request, error):
     """Default "Not Found" page.
     """
     rules = local.urls.map._rules
-    return default_render('not_found.html', rules=rules)
+    return default_render('error_notfound.html', rules=rules)
 
 
 def error_page(request, error):
@@ -28,7 +28,7 @@ def error_page(request, error):
 def not_allowed_page(request, error):
     """A default "access denied" page.
     """
-    return default_render('not_allowed.html')
+    return default_render('error_notallowed.html')
 
 
 def render_view(request, render, view, **kwargs):

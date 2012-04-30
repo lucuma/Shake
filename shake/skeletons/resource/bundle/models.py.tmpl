@@ -6,7 +6,7 @@ from datetime import datetime
 import shake
 
 from main import app, db
-from common.models import BaseMixin
+from bundles.common.models import BaseMixin
 
 [% if fields %]
 class [[ table_name ]](db.Model, BaseMixin):

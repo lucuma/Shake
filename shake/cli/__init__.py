@@ -45,7 +45,7 @@ def new(app_path='.', skeleton=g.APP_SKELETON, **options):
         h.install_requirements(app_path, quiet)
 
     if not quiet:
-        print voodoo.formatm('Done!', '', color='white')
+        print voodoo.formatm('Done!', '', color='green')
 
 
 @manager.command
@@ -107,6 +107,16 @@ def add(name=None, *args, **options):
     views_dst = os.path.abspath(views_dst)
     voodoo.reanimate_skeleton(views_src, views_dst, data=data,
         filter_ext=g.FILTER, env_options=g.ENV_OPTIONS, **options)
+
+    # Insert bundle import in urls.py
+    if not quiet:
+        print voodoo.formatm('update', 'urls.py', color='green')
+    path = os.path.abspath('urls.py')
+    if not os.path.isfile(path):
+        if not quiet:
+            print voodoo.formatm('warning', 'urls.py not found', color='yellow')
+        return
+    h.insert_import(path, 'from bundles import ' + plural)
 
 
 def main():

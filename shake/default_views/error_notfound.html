@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="robots" content="NONE,NOARCHIVE" />
+  <title>Page not found</title>
+  <style>
+  {% include 'shake_default_view.css' %}
+  </style>
+</head>
+<body>
+  <div id="header" class="notfound">
+    <h1>Page not found</h1>
+    <p>
+    <span class="url">{{ request.url|e }}</span>
+    <span class="method">[{{ request.method }}]</span>
+    </p>
+    {% if request.form %}<p class="reqdata">{{ request.form }}</p>{% endif %}
+  </div>
+  <div id="content" class="notfound">
+  <p>We tried these URL rules in order, but the current URL didn’t match any of them.</p>
+  <ol>
+  {% for r in rules %}
+      {% if not r.build_only %}
+          <li class="item">
+          <span class="url">
+          {%- if r.subdomain %}{{ r.subdomain|e }}. {% endif -%}
+          {{ r.rule|e }}</span>
+          <span class="method">
+          {%- if r.methods %}[{{ r.methods|join(', ') }}]{% endif -%}
+          </span>
+          </li>
+      {% endif %}
+  {% endfor %}
+  </ol>
+  </div>
+  <!--
+  WARNING:
+  If a custom "HTTP 404: Not found" page like this is smaller than 512 bytes,
+  then Internet Explorer and Chrome|Chromium will display their own built-in
+  404 page and the robots will take over the world. You've been warned.
+  -->
+</body>
+</html>

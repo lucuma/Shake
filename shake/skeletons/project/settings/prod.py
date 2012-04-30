@@ -9,9 +9,9 @@ DEBUG = False
 
 # SQLALCHEMY_URI = 'postgresql://username:password@127.0.0.1/database'
 
-PAGE_NOT_FOUND = 'web.controllers.not_found'
-PAGE_ERROR = 'web.controllers.critical_error'
-# PAGE_NOT_ALLOWED = 'web.controllers.not_allowed'
+PAGE_NOT_FOUND = 'bundles.common.controllers.not_found'
+PAGE_ERROR = 'bundles.common.controllers.critical_error'
+# PAGE_NOT_ALLOWED = 'bundles.common.controllers.not_allowed'
 
 
 # MAILER_CLASS = SMTPMailer

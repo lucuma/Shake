@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 """
 """
+import os
+import sys
+
 import shake
 from solution import SQLAlchemy
 
 import settings
+
+
+# Add the content of `libs` to the PATH, so you can do
+# `import something` to everything inside libs, without install it first.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'libs'))
 
 
 app = shake.Shake(settings)
