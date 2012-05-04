@@ -84,5 +84,5 @@ def create_admin():
     if not u:
         print 'Creating `admin` user…'
         email = prompt('>>> Admin email?\n')
-        create_user(u'admin', '123456', fullname=u'Admin', email=email)
+        create_user(u'admin', 'admin', fullname=u'Admin', email=email)
 
