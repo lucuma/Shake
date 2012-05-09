@@ -14,7 +14,10 @@ class [[ class_name ]](db.Model, BaseMixin):
     __tablename__ = '[[ plural ]]'
     
     [% for fname, ftype, ffield in fields -%]
-    [[ fname ]] = db.Column(db.[[ ftype ]])
+    [[ fname ]] = db.Column(
+        db.[[ ftype ]],
+        nullable=False
+    )
     [% endfor %]
     @cached_property
     def show_url(self):

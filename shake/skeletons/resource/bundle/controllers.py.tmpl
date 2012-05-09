@@ -76,7 +76,7 @@ def delete(request, [[ singular ]]_id):
 
     if request.is_xhr:
         data = [[ singular ]].to_dict()
-        data.['restore_url'] = restore_url
+        data['restore_url'] = restore_url
         return data
     request.flash('DELETED', extra={'restore_url': restore_url})
     return redirect(url_for('[[ plural ]].index'))
