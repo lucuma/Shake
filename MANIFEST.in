@@ -1,4 +1,3 @@
-include *.py *.txt *.rst *.md
+include *.py *.txt *.md *.rst Makefile
 recursive-include shake *
 recursive-include tests *
-recursive-include docs *

@@ -15,6 +15,9 @@ from .helpers import local, StorageDict
 from .serializers import from_json
 
 
+LOCAL_FLASHES = '_fm'
+
+
 class SecureCookie(BaseSecureCookie):
     
     hash_method = hashlib.sha256
@@ -131,6 +134,11 @@ class Request(BaseRequest):
                 or request.user_agent.language or default
         lang_s = lang.replace('_', '-').split('-')[0]
         return lang_s, lang
+
+    def flash(self, msg, cat='info', extra=None, **kwargs):
+        session = self.session
+        msg = {'msg': msg, 'cat': cat, 'extra': extra}
+        session.setdefault(LOCAL_FLASHES, []).append(msg)
 
 
 class Response(BaseResponse):

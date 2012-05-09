@@ -17,7 +17,7 @@ from .globals import (FIELD_TYPES, DEFAULT_FIELD_TYPE,
 
 _FIRST_CAP_RE = re.compile('(.)([A-Z][a-z]+)')
 _ALL_CAP_RE = re.compile('([a-z0-9])([A-Z])')
-_IMPORTS_RE = re.compile(r'"(\n*\s*(from [a-zA-Z0-9_\.]+\s+)?import\s+.*)+')
+_IMPORTS_RE = re.compile(r'"(\n*\s*(#[^\n]*|(from [a-zA-Z0-9_\.]+\s+)?import\s+.*))+')
 
 
 def make_secret():

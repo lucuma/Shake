@@ -8,6 +8,90 @@ from . import models as m
 
 
 def index(request):
+    """/[[ plural ]]/  [GET]
+    """
+    [[ plural ]] = m.get_[[ plural ]]()
     return render('[[ plural ]]/index.html', locals())
 
+
+def new(request):
+    """/[[ plural ]]/new/
+    """
+    if request.is_get:
+        [[ singular ]] = {}
+        return render('[[ plural ]]/edit.html', locals())
+
+    data = request.form
+
+    ### Insert validation here
+
+    [[ singular ]] = m.[[ class_name ]](**data)
+    db.add([[ singular ]])
+    db.commit()
+
+    if request.is_xhr:
+        return [[ singular ]].to_json()
+
+    request.flash('CREATED')
+    return redirect(url_for('[[ plural ]].index'))
+
+
+def show(request, [[ singular ]]_id):
+    """/[[ plural ]]/1/  [GET]
+    """
+    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
+    return render('[[ plural ]]/show.html', locals())
+
+
+def edit(request, [[ singular ]]_id):
+    """/[[ plural ]]/1/edit/
+    """
+    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
+    if request.is_get:
+        return render('[[ plural ]]/edit.html', locals())
+    
+    data = request.form
+
+    ### Insert validation here
+
+    for key, value in data.items():
+        setattr([[ singular ]], key, value)
+    db.commit()
+
+    if request.is_xhr:
+        return [[ singular ]].to_json()
+    request.flash('UPDATED')
+    return redirect(url_for('[[ plural ]].index'))
+
+
+def delete(request, [[ singular ]]_id):
+    """/[[ plural ]]/1/delete/
+    """
+    [[ singular ]] = m.[[ class_name ]].get_or_notfound([[ singular ]]_id)
+    [[ singular ]].deleted = True
+    db.commit()
+
+    restore_url = url_for('[[ plural ]].restore',
+      [[ singular ]]_id=[[ singular ]]_id)    
+
+    if request.is_xhr:
+        data = [[ singular ]].to_dict()
+        data.['restore_url'] = restore_url
+        return data
+    request.flash('DELETED', extra={'restore_url': restore_url})
+    return redirect(url_for('[[ plural ]].index'))
+
+
+def restore(request, [[ singular ]]_id):
+    """/[[ plural ]]/1/restore/
+    """
+    [[ singular ]] = m.[[ class_name ]].get_or_notfound([[ singular ]]_id)
+    [[ singular ]].deleted = False
+    db.commit()
+    
+    if request.is_xhr:
+        return [[ singular ]].to_json()
+    
+    request.flash('RESTORED')
+    return redirect(url_for('[[ plural ]].index'))
 

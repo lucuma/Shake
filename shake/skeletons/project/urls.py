@@ -9,12 +9,13 @@ from shake import Rule, Submount
 
 from main import app
 
+# Import all your bundles here, even if they doesn't have URLs
 from bundles import common
 from bundles import users
 
 
 app.add_urls([
-
+    
     # Index and other common pages like not-found
     Submount('/', common.urls),
 

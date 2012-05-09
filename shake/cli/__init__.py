@@ -90,7 +90,7 @@ def add(name=None, *args, **options):
     data = {
         'singular': singular,
         'plural': plural,
-        'table_name': h.underscores_to_camelcase(singular),
+        'class_name': h.underscores_to_camelcase(singular),
         'fields': h.get_model_fields(args),
     }
     

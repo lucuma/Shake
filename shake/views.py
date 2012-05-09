@@ -16,11 +16,10 @@ from werkzeug.local import LocalProxy
 import yaml
 
 from .helpers import local, url_for, to64, plural, StorageDict
-from .wrappers import Response
+from .wrappers import Response, LOCAL_FLASHES
 
 
 VIEWS_DIR = 'views'
-LOCAL_FLASHES = '_fm'
 LOCAL_I18N_STRINGS = '_i18ns'
 
 
@@ -32,12 +31,7 @@ def flash(request, msg, cat='info', extra=None, **kwargs):
     :param message: the message to be flashed.
     :param category: optional classification of the message.
     """
-    session = request.session
-    ## 0.51: argument 'category' deprecated in favor of 'cat'
-    if 'category' in kwargs:
-        cat = kwargs['category']
-    msg = {'msg': msg, 'cat': cat, 'extra': extra}
-    session.setdefault(LOCAL_FLASHES, []).append(msg)
+    request.flash(msg=msg, cat=cat, extra=extra, kwargs=kwargs)
 
 
 def get_messages(request=None):
@@ -69,8 +63,8 @@ class CSRFToken(object):
     
     @property
     def input(self):
-        return '<input type="hidden" name="%s" value="%s">' \
-            % (self.name, self.value)
+        return jinja2.safe('<input type="hidden" name="%s" value="%s">'
+            % (self.name, self.value))
     
     @property
     def query(self):
@@ -104,7 +98,8 @@ class BaseRender(object):
 
         'url_for': url_for,
         'flash_messages': LocalProxy(get_messages),
-        'csrf_secret': LocalProxy(lambda: get_csrf_secret(local.request)),
+        'csrf_secret': LocalProxy(lambda: get_csrf_secret(local.request)), # Deprecated
+        'csrf': LocalProxy(lambda: get_csrf_secret(local.request)),
 
         'request': local('request'),
         'settings': LocalProxy(lambda: local.app.settings),
@@ -200,7 +195,7 @@ class Render(BaseRender):
         if views_path and not loader:
             loader = jinja2.FileSystemLoader(views_path)
         
-        kwargs.setdefault('autoescape', False)
+        kwargs.setdefault('autoescape', True)
         
         env = jinja2.Environment(loader=loader, **kwargs)
         

@@ -2,15 +2,15 @@
 """
 General settings
 """
-from os.path import join, dirname
+from os.path import dirname, join, realpath
 
 import shake
 from mailshake import ToConsoleMailer
 
 
-BASE_DIR = join(dirname(__file__) , '..')
-VIEWS_DIR = join(BASE_DIR, 'views')
-STATIC_DIR = join(BASE_DIR, 'static')
+BASE_DIR = realpath(join(dirname(__file__) , '..'))
+VIEWS_DIR = realpath(join(BASE_DIR, 'views'))
+STATIC_DIR = realpath(join(BASE_DIR, 'static'))
 
 # Optional server name hint
 SERVER_NAME = '127.0.0.1'
@@ -19,13 +19,21 @@ SERVER_NAME = '127.0.0.1'
 DEFAULT_SUBDOMAIN = ''
 
 # URL prefix for static files.
-# Example: "http://media.lucumalabs.com/static/"
+# Example: "http://media.lucumalabs.com/static/", "http://example.com/static/"
 STATIC_URL = '/static'
 
 # URL shortcuts for static files -- styles, scripts and images.
 STATIC_URL_STYLES = STATIC_URL + '/styles'
 STATIC_URL_SCRIPTS = STATIC_URL + '/scripts'
 STATIC_URL_IMAGES = STATIC_URL + '/images'
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/home/example.com/media/"
+MEDIA_DIR = realpath(join(STATIC_DIR, 'media'))
+
+# URL prefix that handles the media served from MEDIA_ROOT.
+# Examples: "http://media.lucumalabs.com/media/", "http://example.com/media/"
+MEDIA_URL = '/static/media'
 
 # The maximum size for uploaded files
 MAX_CONTENT_LENGTH = 1024 * 1024 * 16  # 16 MB

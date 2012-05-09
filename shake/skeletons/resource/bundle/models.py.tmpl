@@ -3,17 +3,39 @@
 """
 from datetime import datetime
 
-import shake
+from shake import cached_property, url_for
 
 from main import app, db
 from bundles.common.models import BaseMixin
 
-[% if fields %]
-class [[ table_name ]](db.Model, BaseMixin):
+
+class [[ class_name ]](db.Model, BaseMixin):
 
     __tablename__ = '[[ plural ]]'
     
     [% for fname, ftype, ffield in fields -%]
     [[ fname ]] = db.Column(db.[[ ftype ]])
     [% endfor %]
-[% endif %]
+    @cached_property
+    def show_url(self):
+        return url_for('[[ plural ]].show', [[ singular ]]_id=self.id)
+
+    @cached_property
+    def edit_url(self):
+        return url_for('[[ plural ]].edit', [[ singular ]]_id=self.id)
+
+
+def get_[[ plural ]]():
+    return db.query([[ class_name ]]) \
+        .filter([[ class_name ]].deleted == False)
+
+
+def get_[[ singular ]]([[ singular ]]_id):
+    [[ singular ]] = db.query([[ class_name ]]) \
+        .filter([[ class_name ]].deleted == False) \
+        .filter([[ class_name ]].id == [[ singular ]]_id) \
+        .first()
+    if not [[ singular ]]:
+        raise shake.NotFound
+    return [[ singular ]]
+

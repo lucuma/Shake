@@ -8,3 +8,4 @@ Shake
 Solution
 Shake-Auth>=1.0
 MailShake
+Shake-Files
