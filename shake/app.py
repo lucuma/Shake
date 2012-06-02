@@ -40,7 +40,7 @@ class Shake(object):
     in the `__init__.py` file of your package like this::
         
         from shake import Shake
-        app = Shake(urls, settings)
+        app = Shake(settings)
     
     For a small application, you can also do:
         

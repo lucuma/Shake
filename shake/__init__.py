@@ -45,14 +45,17 @@ from .routes import (Rule, RuleFactory, Subdomain, Submount, EndpointPrefix,
     RuleTemplate, Map, MapAdapter, BuildError, RequestRedirect, RequestSlash)
 from .serializers import json
 from .views import (BaseRender, Render, TemplateNotFound,
-    flash, get_messages, get_csrf_secret, new_csrf_secret)
+    flash, get_messages, get_csrf, new_csrf)
 ViewNotFound = TemplateNotFound
 from .wrappers import Request, Response, SecureCookie, Settings
 
-# Aliases
+## Deprecated
+from .views import (get_csrf_secret, new_csrf_secret)
+
+## Aliases
 redirect_to = redirect
 
-__version__ = '1.1.3'
+__version__ = '1.1.5'
 
 
 import pyceo

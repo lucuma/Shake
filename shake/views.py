@@ -11,6 +11,7 @@ import io
 import os
 
 import jinja2
+from jinja2 import Markup
 from jinja2.exceptions import TemplateNotFound
 from werkzeug.local import LocalProxy
 import yaml
@@ -60,33 +61,44 @@ class CSRFToken(object):
     def __init__(self):
         value = hashlib.md5(os.urandom(32)).hexdigest()[:16]
         self.value = to64(int(value, 16))
+
+    def get_input(self):
+        return Markup(u'<input type="hidden" name="%s" value="%s">' %
+            (self.name, self.value))
     
+    def get_query(self):
+        return Markup(u'%s=%s') % (self.name, self.value)
+
     @property
     def input(self):
-        return jinja2.safe('<input type="hidden" name="%s" value="%s">'
-            % (self.name, self.value))
+        return self.get_input()
     
     @property
     def query(self):
-        return '%s=%s' % (self.name, self.value)
+        return self.get_query()
     
     def __repr__(self):
         return '<CSRFToken %s = "%s">' % (self.name, self.value)
 
 
-def get_csrf_secret(request):
+def get_csrf(request=None):
     """Use it to prevent Cross Site Request Forgery (CSRF) attacks."""
-    csrf_secret = request.session.get(CSRF_SESSION_NAME)
-    if not csrf_secret:
-        csrf_secret = new_csrf_secret(request)
-    return csrf_secret
+    request = request or local.request
+    csrf = request.session.get(CSRF_SESSION_NAME)
+    if not csrf:
+        csrf = new_csrf(request)
+    return csrf
 
+# Deprecated
+get_csrf_secret = get_csrf
 
-def new_csrf_secret(request):
-    csrf_secret = CSRFToken()
-    
-    request.session[CSRF_SESSION_NAME] = csrf_secret
-    return csrf_secret
+def new_csrf(request):
+    csrf = CSRFToken()
+    request.session[CSRF_SESSION_NAME] = csrf
+    return csrf
+
+# Deprecated
+new_csrf_secret = new_csrf
 
 
 class BaseRender(object):
@@ -97,9 +109,9 @@ class BaseRender(object):
         'now': LocalProxy(datetime.utcnow),
 
         'url_for': url_for,
-        'flash_messages': LocalProxy(get_messages),
-        'csrf_secret': LocalProxy(lambda: get_csrf_secret(local.request)), # Deprecated
-        'csrf': LocalProxy(lambda: get_csrf_secret(local.request)),
+        'flash_messages': LocalProxy(get_messages), # Deprecated
+        'csrf_secret': LocalProxy(get_csrf), # Deprecated
+        'csrf': LocalProxy(get_csrf),
 
         'request': local('request'),
         'settings': LocalProxy(lambda: local.app.settings),
