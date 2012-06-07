@@ -62,29 +62,3 @@ SINGULAR_RULES = [
     ('s$', 's$', ''),
 ]
 
-
-FIELD_TYPES = {
-    # Generic
-    'biginteger': ('BigInteger', 'IntegerField'),
-    'bigint': ('BigInteger', 'IntegerField'),
-    'bool': ('Boolean', 'BooleanField'),
-    'boolean': ('Boolean', 'BooleanField'),
-    'date': ('Date', 'DateField'),
-    'datetime': ('DateTime', 'DateTimeField'),
-    'float': ('Float', 'FloatField'),
-    'integer': ('Integer', 'IntegerField'),
-    'int': ('Integer', 'IntegerField'),
-    'binary': ('LargeBinary', ''),
-    'decimal': ('Numeric', 'DecimalField'),
-    'numeric': ('Numeric', 'DecimalField'),
-    'smallinteger': ('SmallInteger', 'IntegerField'),
-    'smallint': ('SmallInteger', 'IntegerField'),
-    'string': ('Unicode(255)', 'TextField'),
-    'text': ('UnicodeText', 'TextAreaField'),
-    'unicode': ('Unicode(255)', 'TextField'),
-    'unicodetext': ('UnicodeText', 'TextAreaField'),
-    'time': ('Time', 'TextField'),
-}
-
-DEFAULT_FIELD_TYPE = ('Unicode(255)', 'TextField')
-

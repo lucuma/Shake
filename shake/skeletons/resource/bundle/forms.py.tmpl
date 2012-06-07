@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+"""
+"""
+from solution import forms as f
+
+from .models import [[ class_name ]]
+
+
+class [[ class_name ]]Form(f.Form):
+    _model = [[ class_name ]]
+
+    pass
+
+
+def get_[[ singular]]_form(request):
+    return [[ class_name ]]Form(request.form)
+

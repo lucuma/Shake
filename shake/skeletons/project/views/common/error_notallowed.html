@@ -1,0 +1,12 @@
+{% extends 'common/base.html' %}
+{% block title %}Access Denied{% endblock %}
+
+
+{% block content %}
+<div id="header" class="denied">
+  <h1>{{ self.title() }}</h1>
+</div>
+<div id="content" class="denied">
+  <p>You are not authorized to view this page.</p>
+</div>
+{% endblock %}

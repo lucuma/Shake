@@ -55,7 +55,7 @@ from .views import (get_csrf_secret, new_csrf_secret)
 ## Aliases
 redirect_to = redirect
 
-__version__ = '1.1.5'
+__version__ = '1.1.6'
 
 
 import pyceo

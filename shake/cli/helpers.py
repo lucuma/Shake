@@ -11,8 +11,7 @@ import re
 
 import voodoo
 
-from .globals import (FIELD_TYPES, DEFAULT_FIELD_TYPE,
-    SINGULAR_RULES, PLURAL_RULES)
+from .globals import SINGULAR_RULES, PLURAL_RULES
 
 
 _FIRST_CAP_RE = re.compile('(.)([A-Z][a-z]+)')
@@ -89,10 +88,7 @@ def get_model_fields(args):
         except ValueError:
             fname = f
             ftype = 'string'
-        ftype = re.sub(r'[^a-z0-9]', '', ftype.lower())
-        field = FIELD_TYPES.get(ftype, DEFAULT_FIELD_TYPE)
-        field = (fname, field[0], field[1])
-        fields.append(field)
+        fields.append((fname, ftype))
     return fields
 
 

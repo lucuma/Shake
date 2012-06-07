@@ -45,7 +45,6 @@ MAX_FORM_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB
 # Don't share it with anybody.
 SECRET_KEY = '[[ SECRET1 ]]'
 
-
 # Shake-Auth settings
 AUTH_SETTINGS = {
     # A hardcoded system-wide secret 'salt'. Don't share it with anybody.
@@ -67,8 +66,8 @@ AUTH_SETTINGS = {
     'password_minlen': 5,
 }
 
-
 MAILER_CLASS = ToConsoleMailer
+# Extra settings for the mailer class
 MAILER_SETTINGS = {}
 
 

@@ -12,12 +12,12 @@ def index(request):
 
 
 def not_found(request, error):
-    return render('error_notfound.html', locals())
+    return render('common/error_notfound.html', locals())
 
 
 def critical_error(request, error=None):
-    return render('error.html', locals())
+    return render('common/error.html', locals())
 
 
 def not_allowed(request, error):
-    return render('error_notallowed.html', locals())
+    return render('common/error_notallowed.html', locals())

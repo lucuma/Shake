@@ -9,11 +9,9 @@ from . import controllers
 
 
 urls = [
-
     EndpointPrefix('bundles.common.controllers', [
 
-        Rule('/', 'index', name='index'),
+        Rule('/', 'index', name='index'), 
         
     ]),
-
 ]

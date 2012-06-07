@@ -11,11 +11,9 @@ from . import controllers, models
 
 
 urls = [
-
     EndpointPrefix('bundles.[[ plural ]].controllers', [
 
-        Rule('/', 'index',
-            methods=['GET'],
+        Rule('/', 'index', methods=['GET'],
             name='[[ plural ]].index'
         ),
         Rule('/new/', 'new',
@@ -35,5 +33,4 @@ urls = [
         ),
 
     ]),
-    
 ]

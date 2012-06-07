@@ -14,7 +14,7 @@ class [[ class_name ]](db.Model, BaseMixin):
 
     __tablename__ = '[[ plural ]]'
     
-    [% for fname, ftype, ffield in fields -%]
+    [% for fname, ftype in fields -%]
     [[ fname ]] = db.Column(
         db.[[ ftype ]],
         nullable=False
@@ -28,18 +28,39 @@ class [[ class_name ]](db.Model, BaseMixin):
     def edit_url(self):
         return url_for('[[ plural ]].edit', [[ singular ]]_id=self.id)
 
+    @cached_property
+    def delete_url(self):
+        csfr = get_csrf()
+        data = {
+            '[[ singular ]]_id': self.id,
+            csfr.name: csfr.value,
+        }
+        return url_for('[[ plural ]].delete', **data)
 
-def get_[[ plural ]]():
-    return db.query([[ class_name ]]) \
-        .filter([[ class_name ]].deleted == False)
+    @cached_property
+    def restore_url(self):
+        csfr = get_csrf()
+        data = {
+            '[[ singular ]]_id': self.id,
+            csfr.name: csfr.value,
+        }
+        return url_for('[[ plural ]].restore', **data)
 
 
-def get_[[ singular ]]([[ singular ]]_id):
+def get_[[ plural ]](deleted=False, limit=None):
+    query = db.query([[ class_name ]])
+    if not deleted:
+        query = query.filter([[ class_name ]].deleted == False)
+    if limit:
+        query = query.limit(limit)
+    return query
+
+
+def get_[[ singular ]]([[ singular ]]_id, deleted=False):
     [[ singular ]] = db.query([[ class_name ]]) \
-        .filter([[ class_name ]].deleted == False) \
         .filter([[ class_name ]].id == [[ singular ]]_id) \
         .first()
-    if not [[ singular ]]:
+    if not [[ singular ]] or ([[ singular ]].deleted and not deleted):
         raise shake.NotFound
     return [[ singular ]]
 

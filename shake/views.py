@@ -29,8 +29,12 @@ def flash(request, msg, cat='info', extra=None, **kwargs):
     flashed message from the session and to display it to the user,
     the view has to call :func:`get_flashed_messages`.
     
-    :param message: the message to be flashed.
-    :param category: optional classification of the message.
+    :param message:
+        the message to be flashed.
+    :param category:
+        optional classification of the message.
+    :param extra:
+        eztra data passed along the message
     """
     request.flash(msg=msg, cat=cat, extra=extra, kwargs=kwargs)
 

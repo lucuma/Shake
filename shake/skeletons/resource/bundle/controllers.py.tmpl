@@ -3,9 +3,11 @@
 """
 import shake
 from shake import url_for, redirect
+from shake_auth import protected
 
 from main import app, render, db
 from . import models as m
+from .forms import [[ class_name ]]Form
 
 
 def index(request):
@@ -15,28 +17,6 @@ def index(request):
     return render('[[ plural ]]/index.html', locals())
 
 
-def new(request):
-    """/[[ plural ]]/new/
-    """
-    if request.is_get:
-        [[ singular ]] = {}
-        return render('[[ plural ]]/edit.html', locals())
-
-    data = request.form
-
-    ### Insert validation here
-
-    [[ singular ]] = m.[[ class_name ]](**data)
-    db.add([[ singular ]])
-    db.commit()
-
-    if request.is_xhr:
-        return [[ singular ]].to_json()
-
-    request.flash('CREATED')
-    return redirect(url_for('[[ plural ]].index'))
-
-
 def show(request, [[ singular ]]_id):
     """/[[ plural ]]/1/  [GET]
     """
@@ -44,55 +24,66 @@ def show(request, [[ singular ]]_id):
     return render('[[ plural ]]/show.html', locals())
 
 
+@protected()
+def new(request):
+    """/[[ plural ]]/new/
+    """
+    form = [[ class_name ]]Form(request.form, files=request.files)
+
+    if request.is_post and form.is_valid():
+        [[ singular ]] = form.save()
+        db.commit()
+        request.flash('CREATED', 'success', extra=[[ singular ]].show_url)
+        return redirect(url_for('[[ plural ]].index'))
+
+    return render('[[ plural ]]/edit.html', locals())
+
+
+@protected()
 def edit(request, [[ singular ]]_id):
     """/[[ plural ]]/1/edit/
     """
     [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
-    if request.is_get:
-        return render('[[ plural ]]/edit.html', locals())
-    
-    data = request.form
+    form = [[ class_name ]]Form(request.form, obj=program, files=request.files)
 
-    ### Insert validation here
+    if request.is_post and form.is_valid():
+        form.save()
+        db.commit()
+        request.flash('UPDATED', 'success', extra=[[ singular ]].show_url)
+        return redirect(url_for('[[ plural ]].index'))
 
-    for key, value in data.items():
-        setattr([[ singular ]], key, value)
-    db.commit()
-
-    if request.is_xhr:
-        return [[ singular ]].to_json()
-    request.flash('UPDATED')
-    return redirect(url_for('[[ plural ]].index'))
+    return render('[[ plural ]]/edit.html', locals())
 
 
+@protected()
 def delete(request, [[ singular ]]_id):
     """/[[ plural ]]/1/delete/
     """
-    [[ singular ]] = m.[[ class_name ]].get_or_notfound([[ singular ]]_id)
+    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
     [[ singular ]].deleted = True
     db.commit()
 
-    restore_url = url_for('[[ plural ]].restore',
-      [[ singular ]]_id=[[ singular ]]_id)    
-
+    restore_url = [[ singular ]].restore_url
     if request.is_xhr:
         data = [[ singular ]].to_dict()
         data['restore_url'] = restore_url
         return data
-    request.flash('DELETED', extra={'restore_url': restore_url})
+
+    request.flash('DELETED', 'danger', extra=restore_url)
     return redirect(url_for('[[ plural ]].index'))
 
 
+@protected()
 def restore(request, [[ singular ]]_id):
     """/[[ plural ]]/1/restore/
     """
-    [[ singular ]] = m.[[ class_name ]].get_or_notfound([[ singular ]]_id)
+    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
     [[ singular ]].deleted = False
     db.commit()
     
     if request.is_xhr:
-        return [[ singular ]].to_json()
+        return [[ singular ]].to_dict()
     
-    request.flash('RESTORED')
+    request.flash('RESTORED', 'success', extra=[[ singular ]].show_url)
     return redirect(url_for('[[ plural ]].index'))
 
