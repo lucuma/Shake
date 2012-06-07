@@ -9,7 +9,7 @@ import urls
 
 
 @manager.command
-def runserver(host='0.0.0.0', port=None, **kwargs):
+def server(host='0.0.0.0', port=None, **kwargs):
     """[-host HOST] [-port PORT]
     Runs the application on the local development server.
     """

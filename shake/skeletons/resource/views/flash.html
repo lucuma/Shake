@@ -1,0 +1,20 @@
+{% for m in get_messages() -%}
+<div class="alert alert-{{ m.cat }} clearfix">
+<a class="close" data-dismiss="alert" href="#">×</a>
+{%- if m.msg == 'CREATED' -%}
+    [[ singular|capitalize ]] created.
+    <a href="{{ m.extra }}" target="_blank">See [[ singular ]]</a>.
+{%- elif m.msg == 'UPDATED' -%}
+    [[ singular|capitalize ]] updated.
+    <a href="{{ m.extra }}" target="_blank">See [[ singular ]]</a>.
+{%- elif m.msg == 'DELETED' -%}
+    [[ singular|capitalize ]] deleted.
+    <a href="{{ m.extra }}">Undo?</a>
+{%- elif m.msg == 'RESTORED' -%}
+    [[ singular|capitalize ]] restored.
+    <a href="{{ m.extra }}" target="_blank">See [[ singular ]]</a>.
+{% else -%}
+    {{ m.msg }}
+{%- endif %}
+</div>
+{%- endfor %}

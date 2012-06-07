@@ -2,7 +2,8 @@
 {% block title %}[[ plural ]] | {{ super() }}{% endblock %}
 
 {% block content %}
-<h1>[[ plural ]]</h1>
+{% include '[[ plural ]]/flash.html' %}
+<h1>[[ plural|capitalize ]]</h1>
 
 {% for [[ singular ]] in [[ plural ]] %}
   <article></article>

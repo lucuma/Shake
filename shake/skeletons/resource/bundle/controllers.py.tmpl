@@ -59,7 +59,7 @@ def edit(request, [[ singular ]]_id):
 def delete(request, [[ singular ]]_id):
     """/[[ plural ]]/1/delete/
     """
-    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
+    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id, deleted=True)
     [[ singular ]].deleted = True
     db.commit()
 
@@ -77,7 +77,7 @@ def delete(request, [[ singular ]]_id):
 def restore(request, [[ singular ]]_id):
     """/[[ plural ]]/1/restore/
     """
-    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
+    [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id, deleted=True)
     [[ singular ]].deleted = False
     db.commit()
     
