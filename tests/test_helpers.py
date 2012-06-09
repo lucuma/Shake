@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-# shake.tests.test_helpers
-
-Helpers tests.
-
-Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-MIT License. (http://www.opensource.org/licenses/mit-license.php)
-"""
 import io
 import os
 import random
@@ -425,4 +417,18 @@ def test_safe_join_unsafe():
         safe_join('/static', '//foo/bar')
         safe_join('/static', '../etc/passwords')
         safe_join('/static', 'foo/../../etc/passwords')
+
+
+def test_storage_dict():
+    st = StorageDict({'a': 3, 'c': 'meh', 'd': 0})
+    assert st.a == st['a']
+    assert st.a == 3
+    st.b = 5
+    assert st.b == st['b']
+    assert st.b == 5
+    assert st.c
+    del st['b']
+    del st['c']
+    del st.d
+    assert st.keys() == ['a']
 

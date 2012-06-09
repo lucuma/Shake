@@ -17,6 +17,6 @@ A web framework mixed from the best ingredients:
 
 
 ---------------------------------------
-Copyright © 2011 by [Lúcuma labs] (http://lucumalabs.com).  
+© 2010 by [Lúcuma labs] (http://lucumalabs.com).  
 See `AUTHORS.md` for more details.  
 License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).

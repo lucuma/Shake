@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-# shake.tests.test_controllers
-
-Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-MIT License. (http://www.opensource.org/licenses/mit-license.php)
-"""
 import os
 
 import pytest
@@ -42,7 +36,7 @@ def test_default_not_found():
         Rule('/', index),
         ]
     settings = {
-        'PAGE_NOT_FOUND': not_found_page,
+        'page_not_found': not_found_page,
         }
     app = Shake(urls, settings)
     c = app.test_client()
@@ -57,8 +51,8 @@ def test_default_error():
         Rule('/', fail),
         ]
     settings = {
-        'DEBUG': False,
-        'PAGE_ERROR': error_page,
+        'debug': False,
+        'page_error': error_page,
         }
     app = Shake(urls, settings)
     c = app.test_client()
@@ -73,7 +67,7 @@ def test_default_not_allowed():
         Rule('/', no_pass),
         ]
     settings = {
-        'PAGE_NOT_ALLOWED': not_allowed_page,
+        'page_not_allowed': not_allowed_page,
         }
     app = Shake(urls, settings)
     c = app.test_client()

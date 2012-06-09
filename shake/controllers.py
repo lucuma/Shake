@@ -12,6 +12,11 @@ from .helpers import local, NotFound, safe_join, send_file
 from .views import default_render
 
 
+__all__ = (
+    'not_found_page', 'error_page', 'not_allowed_page', 'render_view',
+)
+
+
 def not_found_page(request, error):
     """Default "Not Found" page.
     """

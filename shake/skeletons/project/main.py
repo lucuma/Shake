@@ -8,7 +8,7 @@ import shake
 from shake_files import FileStorage, IMAGES
 from solution import SQLAlchemy
 
-import settings
+from settings import settings
 
 
 # Add the content of `libs` to the PATH, so you can do
@@ -21,20 +21,20 @@ app = shake.Shake(settings)
 # Used for the local development server.
 # In production, you'll have to define the static paths
 # in your server config.
-app.add_static(app.settings.STATIC_URL, app.settings.STATIC_DIR)
-app.add_static(app.settings.MEDIA_URL, app.settings.MEDIA_DIR)
+app.add_static(app.settings.static_url, app.settings.static_dir)
+app.add_static(app.settings.media_url, app.settings.media_dir)
 
-render = shake.Render(app.settings.VIEWS_DIR)
-render.set_global('STATIC', app.settings.STATIC_URL)
-render.set_global('STYLES', app.settings.STATIC_URL_STYLES)
-render.set_global('SCRIPTS', app.settings.STATIC_URL_SCRIPTS)
-render.set_global('IMAGES', app.settings.STATIC_URL_IMAGES)
-render.set_global('MEDIA', app.settings.MEDIA_URL)
+render = shake.Render(app.settings.views_dir)
+render.set_global('STATIC', app.settings.static_url)
+render.set_global('STYLES', app.settings.static_url_styles)
+render.set_global('SCRIPTS', app.settings.static_url_scripts)
+render.set_global('IMAGES', app.settings.static_url_images)
+render.set_global('MEDIA', app.settings.media_url)
 
-db = SQLAlchemy(app.settings.SQLALCHEMY_URI, app, echo=False)
+db = SQLAlchemy(app.settings.sqlalchemy_uri, app, echo=False)
 
-mailer = app.settings.MAILER_CLASS(app.settings.MAILER_SETTINGS)
+mailer = app.settings.mailer_class(**app.settings.mailer_settings)
 
-uploader = FileStorage(app.settings.MEDIA_DIR, app.settings.MEDIA_URL,
+uploader = FileStorage(app.settings.media_dir, app.settings.media_url,
     allowed=IMAGES)
 

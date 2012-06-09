@@ -129,6 +129,12 @@ from werkzeug.exceptions import HTTPException, NotFound, MethodNotAllowed
 from werkzeug.datastructures import ImmutableDict, MultiDict
 
 
+__all__ = (
+    'Rule', 'RuleFactory', 'Subdomain', 'Submount', 'EndpointPrefix',
+    'RuleTemplate', 'Map', 'MapAdapter', 'BuildError', 'RequestRedirect',
+    'RequestSlash',
+)
+
 _rule_re = re.compile(r'''
     (?P<static>[^<]*)                           # static rule data
     <

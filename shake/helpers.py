@@ -23,6 +23,12 @@ from werkzeug.wsgi import wrap_file
 from .routes import BuildError
 
 
+__all__ = (
+    'local', 'Local', 'LocalProxy', 'url_for',
+    'path_join', 'url_join', 'to64', 'from64', 'to36', 'from36',
+    'StorageDict', 'safe_join', 'send_file', 'to_unicode', 'to_bytestring',
+)
+
 local = Local()
 
 
@@ -168,8 +174,8 @@ def plural(num, plural='s', singular=''):
 
 
 class StorageDict(dict):
-    """A StorageDict object is like a dictionary except `obj.key` can be used
-    in addition to `obj['key']`.
+    """A StorageDict object is like a dictionary except than
+       `obj.key` can be used in addition to `obj['key']`.
     
     Basic Usage:
     
@@ -186,35 +192,17 @@ class StorageDict(dict):
         None
     
     """
-    def __init__(self, dd=None, _default_value=None, _case_insensitive=False,
-            **kwargs):
-        data = dd if dd else kwargs
-        self.__dict__['_default_value'] = _default_value
-        self.__dict__['_case_insensitive'] = _case_insensitive
-        if _case_insensitive:
-            dict.__init__(self, [(k.upper(), v) for k, v in data.items()])
-        else:
-            dict.__init__(self, **data)
     
     def __getattr__(self, key):
-        if self._case_insensitive:
-            key = key.upper()
         try:
             return self[key]
         except KeyError, error:
-            if self._default_value is not None:
-                return self._default_value
-            else:
-                raise AttributeError(error)
+            raise AttributeError(error)
     
     def __setattr__(self, key, value):
-        if self._case_insensitive:
-            key = key.upper()
         self[key] = value
     
     def __delattr__(self, key):
-        if self._case_insensitive:
-            key = key.upper()
         try:
             del self[key]
         except KeyError, error:
@@ -222,15 +210,6 @@ class StorageDict(dict):
     
     def __repr__(self):
         return '<StorageDict ' + dict.__repr__(self) + '>'
-    
-    def __getstate__(self):
-        return dict(self)
-    
-    def __setstate__(self, value):
-        if self._case_insensitive:
-            key = key.upper()
-        for (key, value) in value.items():
-            self[key] = value
 
 
 def safe_join(directory, filename):
@@ -420,7 +399,7 @@ def to_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     --------------------------------
     Copied almost unchanged from Django <https://www.djangoproject.com/>
-    Copyright © 2005-2011 Django Software Foundation.
+    Copyright © Django Software Foundation and individual contributors.
     Used under the modified BSD license.
     """
     # Handle the common case first, saves 30-40% in performance when s
@@ -474,7 +453,7 @@ def to_bytestring(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     --------------------------------
     Copied almost unchanged from Django <https://www.djangoproject.com/>
-    Copyright © 2005-2011 Django Software Foundation.
+    Copyright © Django Software Foundation and individual contributors.
     Used under the modified BSD license.
     """
     if strings_only and isinstance(s, (types.NoneType, int)):

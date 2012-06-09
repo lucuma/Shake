@@ -12,7 +12,7 @@ from .models import User
 
 auth = Auth(User, app,
     render=render, mailer=mailer,
-    **app.settings.AUTH_SETTINGS
+    **app.settings.auth_settings
 )
 
 

@@ -24,7 +24,8 @@ def make_secret():
 
 
 def install_requirements(app_path, quiet=False):
-    msg = 'pip install -r %s%srequirements.txt' % (app_path, os.path.sep)
+    args = {'app': app_path, 'sep': os.path.sep}
+    msg = 'pip install -r %(app)s%(sep)ssettings%(sep)sreq.txt' % args
     if not quiet:
         print voodoo.formatm('run', msg, color='green'), '\n'
 

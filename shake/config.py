@@ -3,47 +3,53 @@
     # Shake.config
 
 """
+import inspect
+
 from .wrappers import Settings
 
 
-DEFAULT_SETTINGS = {
-    'SERVER_NAME': '127.0.0.1',
-    'SERVER_PORT': 5000,
-    'DEFAULT_SUBDOMAIN': '',
+class DefaultSettings(object):
+
+    server_name = '127.0.0.1'
+    server_port = 5000
+    default_subdomain = ''
     
-    'FORCE_SCRIPT_NAME': False,
+    force_script_name = False
     
-    'DEBUG': True,
+    debug = True
+    reload = True
     
-    'SECRET_KEY': None,
-    'SESSION_COOKIE_NAME': 'shake_session',
-    'SESSION_EXPIRES': 24 * 120,
+    secret_key = None
+    session_cookie_name = 'shake_session'
+    session_expires = 24 * 120
     
     # The maximum size for uploade files
-    'MAX_CONTENT_LENGTH': 1024 * 1024 * 16,  # 16 MB
+    max_content_length = 1024 * 1024 * 16  # 16 MB
     # The maximum size for regular form data (not files)
-    'MAX_FORM_MEMORY_SIZE': 1024 * 1024 * 2,  # 2 MB
+    max_form_memory_size = 1024 * 1024 * 2  # 2 MB
     
-    'TIMEZONE': 'utc',
-    'LOCALE': 'en_US',
+    locale = 'en_US'
+
+    # URL prefix for static files.
+    # Examples: "http://media.lucumalabs.com/static/", "http://abc.org/static/"
+    static_url = '/static'
     
-    'PAGE_NOT_FOUND': 'shake.controllers.not_found_page',
-    'PAGE_ERROR': 'shake.controllers.error_page',
-    'PAGE_NOT_ALLOWED': 'shake.controllers.not_allowed_page',
-}
+    page_not_found = 'shake.controllers.not_found_page'
+    page_error = 'shake.controllers.error_page'
+    page_not_allowed = 'shake.controllers.not_allowed_page'
 
 
-class ShakeSettings(Settings):
-    
-    def __init__(self, custom):
-        Settings.__init__(self, DEFAULT_SETTINGS, custom)
+def get_settings_object(custom):
+    if inspect.isclass(custom):
+        custom = custom()
+    default = DefaultSettings()
+    return Settings(custom, default)
 
 
 QUOTES = [
     ('Shaken, not stirred', 'Bond, James Bond'),
     ('Shake it, baby!', 'Austin Powers'),
-    ('Shake your Ruby', 'Anonymous Coward'),
-    ('You\'re riding Shake on rails!', 'Former Rails user'),
+    ('You\'re riding Shake on rails!', 'Anonymous Coward'),
     ('Shake-it Shake-it Shake-it', 'Ray Charles'),
     ('Shake Shake Shake, Shake your booty', 'KC & The Sunshine Band')
-    ]
+]

@@ -15,6 +15,10 @@ from .helpers import local, StorageDict
 from .serializers import from_json
 
 
+__all__ = (
+    'Request', 'Response', 'SecureCookie', 'Settings'
+)
+
 LOCAL_FLASHES = '_fm'
 
 
@@ -116,14 +120,14 @@ class Request(BaseRequest):
         This requires that the :attr:`secret_key` setting is set.
         """
         settings = local.app.settings
-        SECRET_KEY = settings.SECRET_KEY
-        if not SECRET_KEY:
+        secret_key = settings.secret_key
+        if not secret_key:
             return _NullSession(secret_key='')
         
-        data = self.cookies.get(settings.SESSION_COOKIE_NAME)
+        data = self.cookies.get(settings.session_cookie_name)
         if not data:
-            return SecureCookie(secret_key=SECRET_KEY)
-        return SecureCookie.unserialize(data, SECRET_KEY)
+            return SecureCookie(secret_key=secret_key)
+        return SecureCookie.unserialize(data, secret_key)
     
     def get_language(self, default='en-US'):
         lang = None
@@ -159,43 +163,60 @@ class Settings(object):
     """A helper to manage custom and default settings
     """
     
-    def __init__(self, default, custom, case_insensitive=False):
-        if isinstance(default, dict):
-            default = StorageDict(default, _case_insensitive=case_insensitive)
+    def __init__(self, custom, default):
         if isinstance(custom, dict):
-            custom = StorageDict(custom, _case_insensitive=case_insensitive)
-        self.__dict__['default'] = default
+            custom = StorageDict(custom)
+        if isinstance(default, dict):
+            default = StorageDict(default)
         self.__dict__['custom'] = custom
+        self.__dict__['default'] = default
     
     def __contains__(self, key):
-        return hasattr(self.custom, key)
+        return hasattr(self.__dict__['custom'], key)
     
     def __getattr__(self, key):
-        if hasattr(self.__dict__['custom'], key):
-            return getattr(self.__dict__['custom'], key)
-        elif hasattr(self.__dict__['default'], key):
-            return getattr(self.__dict__['default'], key)
+        dcustom = self.__dict__['custom']
+        ddefault = self.__dict__['default']
+        if hasattr(dcustom, key):
+            return getattr(dcustom, key)
+        if hasattr(ddefault, key):
+            return getattr(ddefault, key)
+        # Deprecated: Case-insensitive search
+        if hasattr(dcustom, key.lower()):
+            return getattr(dcustom, key.lower())
         raise AttributeError(key)
     
     def __setattr__(self, key, value):
-        setattr(self.custom, key, value)
+        setattr(self.__dict__['custom'], key, value)
     
+    def __delattr__(self, key):
+        delattr(self.__dict__['custom'], key)
+
     __getitem__ = __getattr__
     __setitem__ = __setattr__
+    __delitem__ = __delattr__
     
     def get(self, key, default=None):
-        if hasattr(self.custom, key):
-            return getattr(self.custom, key)
-        return getattr(self.default, key, default)
+        dcustom = self.__dict__['custom']
+        ddefault = self.__dict__['default']
+        if hasattr(dcustom, key):
+            return getattr(dcustom, key)
+        if hasattr(ddefault, key):
+            return getattr(ddefault, key)
+        # Deprecated: Case-insensitive search
+        if hasattr(dcustom, key.lower()):
+            return getattr(dcustom, key.lower())
+        return default
     
     def setdefault(self, key, value):
-        if hasattr(self.custom, key):
-            return getattr(self.custom, key)
-        setattr(self.custom, key, value)
+        dcustom = self.__dict__['custom']
+        if hasattr(dcustom, key):
+            return getattr(dcustom, key)
+        setattr(dcustom, key, value)
         return value
     
     def update(self, dict_):
-        custom = self.custom
+        dcustom = self.__dict__['custom']
         for key, value in dict_.items():
-            setattr(custom, key, value)
+            setattr(dcustom, key, value)
 

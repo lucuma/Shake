@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-# shake.tests.test_routes
-
-Routing tests.
-
-Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-MIT License. (http://www.opensource.org/licenses/mit-license.php)
-"""
 import pytest
 from shake import routes as r
 from shake import Response

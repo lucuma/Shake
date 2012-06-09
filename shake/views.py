@@ -20,6 +20,13 @@ from .helpers import local, url_for, to64, plural, StorageDict
 from .wrappers import Response, LOCAL_FLASHES
 
 
+__all__ = (
+    'BaseRender', 'Render', 'TemplateNotFound', 'flash', 'get_messages',
+    'get_csrf', 'new_csrf',
+    # Deprecated
+    'get_csrf_secret', 'new_csrf_secret',
+)
+
 VIEWS_DIR = 'views'
 LOCAL_I18N_STRINGS = '_i18ns'
 
@@ -93,7 +100,7 @@ def get_csrf(request=None):
         csrf = new_csrf(request)
     return csrf
 
-# Deprecated
+# Deprecated!
 get_csrf_secret = get_csrf
 
 def new_csrf(request):
@@ -101,7 +108,7 @@ def new_csrf(request):
     request.session[CSRF_SESSION_NAME] = csrf
     return csrf
 
-# Deprecated
+# Deprecated!
 new_csrf_secret = new_csrf
 
 
@@ -275,3 +282,4 @@ class Render(BaseRender):
 
 default_loader = jinja2.PackageLoader('shake', 'default_views')
 default_render = Render(loader=default_loader)
+

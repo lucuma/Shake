@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-# shake.tests.test_app
-
-Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-MIT License. (http://www.opensource.org/licenses/mit-license.php)
-"""
 import os
 
 import pytest
@@ -189,7 +183,7 @@ def test_custom_not_found():
     urls = [
         Rule('/', index),
         ]
-    settings = {'PAGE_NOT_FOUND': not_found}
+    settings = {'page_not_found': not_found}
     app = Shake(urls, settings)
     
     c = app.test_client()
@@ -202,7 +196,7 @@ def test_custom_error():
     urls = [
         Rule('/', fail),
         ]
-    settings = {'PAGE_ERROR': error, 'DEBUG': False}
+    settings = {'page_error': error, 'debug': False}
     app = Shake(urls, settings)
     
     c = app.test_client()
@@ -215,7 +209,7 @@ def test_custom_not_allowed():
     urls = [
         Rule('/', no_pass),
         ]
-    settings = {'PAGE_NOT_ALLOWED': not_allowed}
+    settings = {'page_not_allowed': not_allowed}
     app = Shake(urls, settings)
     
     c = app.test_client()
@@ -244,7 +238,7 @@ def test_error_codes():
         502: BadGateway,
         503: ServiceUnavailable,
         }
-    settings = {'DEBUG': True}
+    settings = {'debug': True}
     
     def index(request, code):
         print code
@@ -284,7 +278,7 @@ def test_fallback_error_code():
         502: BadGateway,
         503: ServiceUnavailable,
         }
-    settings = {'PAGE_ERROR': error, 'DEBUG': False}
+    settings = {'page_error': error, 'debug': False}
     
     def index(request, code):
         print code
@@ -590,7 +584,7 @@ def test_processors_order_exception():
     urls = [
         Rule('/', index),
         ]
-    settings = {'PAGE_ERROR': econtroller, 'DEBUG': False}
+    settings = {'page_error': econtroller, 'debug': False}
     app = Shake(urls, settings)
     
     app.before_request(rq1)
@@ -664,7 +658,7 @@ def test_repeated_processors_exception():
     urls = [
         Rule('/', index),
         ]
-    settings = {'PAGE_ERROR': econtroller, 'DEBUG': False}
+    settings = {'page_error': econtroller, 'debug': False}
     app = Shake(urls, settings)
     
     app.before_request(rq1)
@@ -711,7 +705,7 @@ def test_session():
         Rule('/p1/', p1),
         Rule('/p2/', p2),
         ]
-    settings = {'SECRET_KEY': 'q'*22}
+    settings = {'secret_key': 'q'*22}
     app = Shake(urls, settings)
     c = app.test_client()
     

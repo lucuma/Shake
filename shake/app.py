@@ -7,25 +7,32 @@
 """
 from datetime import datetime, timedelta
 import os
-import sys
 
+from pyceo import Manager
 from werkzeug.exceptions import HTTPException, BadRequestKeyError
 from werkzeug.local import LocalManager
 from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
 
-from .config import ShakeSettings
+from .config import get_settings_object
 from .routes import Map, Rule
 from .helpers import local
 from .serializers import to_json
 from .wrappers import Request, Response
 
 
+__all__ = (
+    'Shake', 'set_env', 'env_is', 'get_env', 'manager'
+)
+
 local_manager = LocalManager([local])
+
 SECRET_KEY_MINLEN = 20
 STATIC_DIR = 'static'
-
 WELCOME_MESSAGE = "Welcome aboard. You're now using Shake!"
+ENV_ARG = 'env'
+ENV_KEY = 'SHAKE_ENV'
+DEFAULT_ENV = 'development'
 
 
 class Shake(object):
@@ -48,7 +55,7 @@ class Shake(object):
         ...
         app.add_url_rule(...)
         ...
-        app.settings.FOO = 'bar'
+        app.settings.foo = 'bar'
     
     """
     
@@ -87,27 +94,27 @@ class Shake(object):
         # `werkzeug.wsgi.SharedDataMiddleware` instance.
         self.static_dirs = {}
         
-        settings = ShakeSettings(settings)
+        settings = get_settings_object(settings)
         self.settings = settings
         if not isinstance(url_map, Map):
             url_map = Map(url_map,
-                default_subdomain=settings.DEFAULT_SUBDOMAIN)
+                default_subdomain=settings.default_subdomain)
         self.url_map = url_map
         
         self.error_handlers = {
-            403: settings.PAGE_NOT_ALLOWED,
-            404: settings.PAGE_NOT_FOUND,
-            500: settings.PAGE_ERROR,
+            403: settings.page_not_allowed,
+            404: settings.page_not_found,
+            500: settings.page_error,
             }
         
-        self.request_class.max_content_length = settings.MAX_CONTENT_LENGTH
-        self.request_class.max_form_memory_size = settings.MAX_FORM_MEMORY_SIZE
+        self.request_class.max_content_length = settings.max_content_length
+        self.request_class.max_form_memory_size = settings.max_form_memory_size
         
         self.assert_secret_key()
-        self.session_expires = timedelta(hours=settings.SESSION_EXPIRES)
+        self.session_expires = timedelta(hours=settings.session_expires)
     
     def assert_secret_key(self):
-        key = self.settings.SECRET_KEY
+        key = self.settings.secret_key
         if key and len(key) < SECRET_KEY_MINLEN:
             raise RuntimeError("Your 'SECRET_KEY' setting is too short to be"
                 " safe.  Make sure is *at least* %i chars long."
@@ -179,7 +186,7 @@ class Shake(object):
         if session.should_save:
             expires = datetime.utcnow() + self.session_expires
             session_data = session.serialize()
-            response.set_cookie(self.settings.SESSION_COOKIE_NAME,
+            response.set_cookie(self.settings.session_cookie_name,
                 session_data, httponly=True, expires=expires)
     
     def wsgi_app(self, environ, start_response):
@@ -230,9 +237,9 @@ class Shake(object):
             endpoint = None
             endpoint = self.error_handlers.get(code)
             if endpoint is None:
-                if self.settings.DEBUG:
+                if self.settings.debug:
                     if isinstance(error, BadRequestKeyError):
-                        reraise(error)
+                        raise
                     return error(environ, start_response)
                 # In production try to use the default error handler
                 endpoint = self.error_handlers.get(500)
@@ -247,8 +254,8 @@ class Shake(object):
             for handler in self.on_exception_funcs:
                 handler(error)
             endpoint = self.error_handlers.get(500)
-            if endpoint is None or self.settings.DEBUG:
-                reraise(error)
+            if endpoint is None or self.settings.debug:
+                raise
             
             if isinstance(endpoint, basestring):
                 endpoint = import_string(endpoint)
@@ -263,7 +270,7 @@ class Shake(object):
     
     def force_script_name(self, environ):
         script_name = environ.get('SCRIPT_NAME')
-        new_script_name = self.settings.FORCE_SCRIPT_NAME
+        new_script_name = self.settings.force_script_name
         
         if (new_script_name != False) and script_name:
             environ['SCRIPT_NAME'] = new_script_name
@@ -373,12 +380,12 @@ class Shake(object):
             `None` to disable SSL (which is the default).
         
         """
-        host = host or self.settings.SERVER_NAME
-        port = port or self.settings.SERVER_PORT
+        host = host or self.settings.server_name
+        port = port or self.settings.server_port
         debug = bool(debug if (debug is not None) else
-            self.settings.get('DEBUG', True))
+            self.settings.get('debug', True))
         reloader = bool(reloader if (reloader is not None) else
-            self.settings.get('RELOAD', True))
+            self.settings.get('reload', True))
         
         self._welcome_msg()
         
@@ -396,8 +403,8 @@ class Shake(object):
         """Creates a test client for this application.
         """
         from werkzeug.test import Client
-        if self.settings.SERVER_NAME == '127.0.0.1':
-            self.settings.SERVER_NAME = 'localhost'
+        if self.settings.server_name == '127.0.0.1':
+            self.settings.server_name = 'localhost'
         return Client(self, self.response_class, use_cookies=True)
     
     def __call__(self, environ, start_response):
@@ -405,9 +412,19 @@ class Shake(object):
         return self.wsgi_app(environ, start_response)
 
 
-def reraise(exception):
-    """Re-raise an exception.
-    """
-    # Re-raise and remove ourselves from the stack trace.
-    raise exception, None, sys.exc_info()[-1]
+def set_env(args, kwargs):
+    if ENV_ARG in kwargs:
+        os.environ[ENV_KEY] = kwargs.pop(ENV_ARG)
+
+
+def env_is(value, default=DEFAULT_ENV):
+    return os.environ.get(ENV_KEY, default) == value
+
+
+def get_env(default=DEFAULT_ENV):
+    return os.environ.get(ENV_KEY, default)
+
+
+# Automatically set the environment for each command
+manager = Manager(pre=set_env)
 

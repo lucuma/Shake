@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-# shake.tests.test_views
-
-Copyright © 2010-2011 by Lúcuma labs <info@lucumalabs.com>.
-MIT License. (http://www.opensource.org/licenses/mit-license.php)
-"""
 from datetime import datetime, timedelta
 import os
 
 import jinja2
 import pytest
 from shake import (Shake, Rule, Render, ViewNotFound, flash, get_messages,
-    get_csrf_secret, new_csrf_secret, local)
+    get_csrf, new_csrf, local)
 
 
 HTTP_OK = 200
@@ -195,7 +189,7 @@ def test_default_globals_flash_messages():
     urls = [
         Rule('/', foo),
         ]
-    settings = {'SECRET_KEY': 'abc'*20}
+    settings = {'secret_key': 'abc'*20}
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/')
@@ -238,7 +232,7 @@ def test_flash_messagesech():
         Rule('/t1', t1),
         Rule('/t2', t2),
         ]
-    settings = {'SECRET_KEY': 'abc'*20}
+    settings = {'secret_key': 'abc'*20}
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/t1')
@@ -249,16 +243,16 @@ def test_csrf_token():
     render = Render()
     
     def t(request):
-        csrf1 = get_csrf_secret(request).value
-        csrf2 = new_csrf_secret(request).value
-        csrf2_ = get_csrf_secret(request).value
+        csrf1 = get_csrf(request).value
+        csrf2 = new_csrf(request).value
+        csrf2_ = get_csrf(request).value
         assert csrf2 != csrf1
         assert csrf2_ == csrf2
     
     urls = [
         Rule('/', t),
         ]
-    settings = {'SECRET_KEY': 'abc'*20}
+    settings = {'secret_key': 'abc'*20}
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/')
@@ -268,14 +262,14 @@ def test_csrf_token_global():
     render = Render()
     
     def t(request):
-        csrf = get_csrf_secret(request)
+        csrf = get_csrf(request)
         tmpl = '{{ csrf_secret.name }} {{ csrf_secret.value }}'
         assert render.from_string(tmpl) == '%s %s' % (csrf.name, csrf.value)
     
     urls = [
         Rule('/', t),
         ]
-    settings = {'SECRET_KEY': 'abc'*20}
+    settings = {'secret_key': 'abc'*20}
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/')
@@ -285,7 +279,7 @@ def test_csrf_token_input():
     render = Render()
     
     def t(request):
-        csrf = get_csrf_secret(request)
+        csrf = get_csrf(request)
         tmpl = '{{ csrf_secret.input }}'
         expected = '<input type="hidden" name="%s" value="%s">' \
             % (csrf.name, csrf.value)
@@ -294,7 +288,7 @@ def test_csrf_token_input():
     urls = [
         Rule('/', t),
         ]
-    settings = {'SECRET_KEY': 'abc'*20}
+    settings = {'secret_key': 'abc'*20}
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/t')
@@ -304,7 +298,7 @@ def test_csrf_token_query():
     render = Render()
     
     def t(request):
-        csrf = get_csrf_secret(request)
+        csrf = get_csrf(request)
         tmpl = '{{ csrf_secret.query }}'
         expected = '%s=%s' % (csrf.name, csrf.value)
         assert render.from_string(tmpl) == expected
@@ -312,7 +306,7 @@ def test_csrf_token_query():
     urls = [
         Rule('/', t),
         ]
-    settings = {'SECRET_KEY': 'abc'*20}
+    settings = {'secret_key': 'abc'*20}
     app = Shake(urls, settings)
     c = app.test_client()
     c.get('/t')
