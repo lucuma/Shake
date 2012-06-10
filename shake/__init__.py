@@ -32,7 +32,6 @@ Used under the modified BSD license. See LEGAL.md for more details
 # in the module but are exported as public interface.
 from jinja2 import escape, Markup
 from werkzeug.exceptions import *
-NotAllowed = Forbidden
 from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
 
@@ -46,8 +45,9 @@ from .wrappers import *
 
 
 ## Aliases
+NotAllowed = Forbidden
 ViewNotFound = TemplateNotFound
 redirect_to = redirect
 
-__version__ = '1.1.7'
+__version__ = '1.1.8'
 

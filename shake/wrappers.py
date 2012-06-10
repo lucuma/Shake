@@ -182,8 +182,8 @@ class Settings(object):
         if hasattr(ddefault, key):
             return getattr(ddefault, key)
         # Deprecated: Case-insensitive search
-        if hasattr(dcustom, key.lower()):
-            return getattr(dcustom, key.lower())
+        if hasattr(ddefault, key.lower()):
+            return getattr(ddefault, key.lower())
         raise AttributeError(key)
     
     def __setattr__(self, key, value):
@@ -204,8 +204,8 @@ class Settings(object):
         if hasattr(ddefault, key):
             return getattr(ddefault, key)
         # Deprecated: Case-insensitive search
-        if hasattr(dcustom, key.lower()):
-            return getattr(dcustom, key.lower())
+        if hasattr(ddefault, key.lower()):
+            return getattr(ddefault, key.lower())
         return default
     
     def setdefault(self, key, value):

@@ -118,16 +118,14 @@ class BaseRender(object):
         'ellipsis': Ellipsis, # Easter egg?
         'plural': plural,
         'now': LocalProxy(datetime.utcnow),
-
         'url_for': url_for,
-        'flash_messages': LocalProxy(get_messages), # Deprecated
-        'csrf_secret': LocalProxy(get_csrf), # Deprecated
         'csrf': LocalProxy(get_csrf),
-
         'request': local('request'),
         'settings': LocalProxy(lambda: local.app.settings),
-
         'get_messages': get_messages,
+
+        'flash_messages': LocalProxy(get_messages), # Deprecated
+        'csrf_secret': LocalProxy(get_csrf), # Deprecated
         }
     
     # The class that is used for response objects.
