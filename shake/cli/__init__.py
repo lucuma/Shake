@@ -119,6 +119,13 @@ def add(name=None, *args, **options):
     h.insert_import(path, 'from bundles import ' + plural)
 
 
+@manager.command
+def version():
+    """Print the Shake current version."""
+    import shake
+    print shake.__version__
+
+
 def main():
     ok = manager.run()
     if not ok:
