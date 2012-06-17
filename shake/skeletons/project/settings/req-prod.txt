@@ -4,5 +4,5 @@
 # to run this project in production, but not in other environments.
 # Later you can install all these apps in a row using pip. Example:
 #
-#     pip install -r requirements_prod.txt
+#     pip install -r req-prod.txt
 

@@ -31,6 +31,33 @@ def syncdb():
     create_admin()
 
 
+@manager.command
+def load_data():
+    """Load the inital data"""
+    db.load_data(FIXTURES)
+    db.load_media(FIXTURES)
+
+
+@manager.command
+def dump_data():
+    """Serialize the current data to fixtures/xxx.json"""
+    db.dump_data(FIXTURES)
+
+
+@manager.command
+def set_env(env):
+    """Set the current environment.
+    """
+    print 'SHAKE_ENV is now %s' % shake.set_env(env)
+
+
+@manager.command
+def get_env():
+    """Print the current environment.
+    """
+    print 'SHAKE_ENV is %s' % shake.get_env()
+
+
 ## Insert here the imports to the manage scripts of your bundles
 import bundles.users.manage
 

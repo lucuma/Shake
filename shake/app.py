@@ -6,6 +6,7 @@
 
 """
 from datetime import datetime, timedelta
+import io
 import os
 
 from pyceo import Manager
@@ -22,7 +23,7 @@ from .wrappers import Request, Response
 
 
 __all__ = (
-    'Shake', 'set_env', 'env_is', 'get_env', 'manager'
+    'Shake', 'set_env', 'get_env', 'env_is', 'manager'
 )
 
 local_manager = LocalManager([local])
@@ -30,8 +31,7 @@ local_manager = LocalManager([local])
 SECRET_KEY_MINLEN = 20
 STATIC_DIR = 'static'
 WELCOME_MESSAGE = "Welcome aboard. You're now using Shake!"
-ENV_ARG = 'env'
-ENV_KEY = 'SHAKE_ENV'
+ENV_FILE = '.SHAKE_ENV'
 DEFAULT_ENV = 'development'
 
 
@@ -412,19 +412,24 @@ class Shake(object):
         return self.wsgi_app(environ, start_response)
 
 
-def set_env(args, kwargs):
-    if ENV_ARG in kwargs:
-        os.environ[ENV_KEY] = kwargs.pop(ENV_ARG)
-
-
-def env_is(value, default=DEFAULT_ENV):
-    return os.environ.get(ENV_KEY, default) == value
+def set_env(env):
+    with io.open(ENV_FILE, 'wt') as f:
+        f.write(unicode(env))
+    return env
 
 
 def get_env(default=DEFAULT_ENV):
-    return os.environ.get(ENV_KEY, default)
+    try:
+        with io.open(ENV_FILE, 'rt') as f:
+            env = f.read()
+    except IOError:
+        return default
+    return env or default
 
 
-# Automatically set the environment for each command
-manager = Manager(pre=set_env)
+def env_is(value):
+    return get_env() == value
+
+
+manager = Manager()
 

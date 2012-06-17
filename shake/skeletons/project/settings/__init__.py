@@ -6,20 +6,15 @@ import shake
 
 
 if shake.env_is('production'):
-    from production import Production
-    settings = Production()
-
+    import settings.production as settings
 elif shake.env_is('testing'):
-    from testing import Testing
-    settings = Testing()
-
+    import settings.testing as settings
 else:
-    from development import Development
-    settings = Development()
+    import settings.development as settings
+
 
 # # Import local settings
 # try:
-#     from local import Settings
-#     settings = Settings()
+#     import settings.local as settings
 # except ImportError:
 #     pass

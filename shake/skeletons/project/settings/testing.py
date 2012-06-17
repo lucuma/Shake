@@ -2,10 +2,6 @@
 """
 Testing environment settings
 """
-from .common import Common
+from .production import *
 
-
-class Testing(Common):
-
-    pass
 

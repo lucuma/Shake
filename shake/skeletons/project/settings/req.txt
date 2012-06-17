@@ -4,7 +4,7 @@
 # to run this project. Later you can install all these apps in a row
 # using pip. Example:
 #
-#     pip install -r requirements.txt
+#     pip install -r req.txt
 
 Shake
 Solution
