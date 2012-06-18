@@ -42,11 +42,10 @@ class User(db.Model):
 
     perms = db.Column(db.Text, default='')
 
-    def __init__(self, login, password=None, fullname=u'', email=None):
+    def __init__(self, login, password=None, **kwargs):
         self.login = login
         self.password = password
-        self.fullname = fullname
-        self.email = email
+        db.Model.__init__(self, **kwargs)
 
     @property
     def is_active(self):

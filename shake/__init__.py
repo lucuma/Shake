@@ -49,5 +49,5 @@ NotAllowed = Forbidden
 ViewNotFound = TemplateNotFound
 redirect_to = redirect
 
-__version__ = '1.1.11'
+__version__ = '1.1.12'
 

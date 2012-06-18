@@ -5,12 +5,9 @@ try:
     import simplejson as json
 except ImportError:
     try:
-        from django.utils import simplejson as json
+        import json
     except ImportError:
-        try:
-            import json
-        except ImportError:
-            raise ImportError('Unable to find a JSON implementation')
+        raise ImportError('Unable to find a JSON implementation')
 
 
 def to_json(value, **options):
@@ -42,24 +39,16 @@ class JSONEncoder(json.JSONEncoder):
 
 def json_decoder(d):
     if isinstance(d, list):
-        pairs = enumerate(d)
-    elif isinstance(d, dict):
-        pairs = d.items()
-    result = []
-    for k, v in pairs:
-        if isinstance(v, basestring):
+        return [json_decoder(item) for item in d]
+    for k, v in d.items():
+        if not isinstance(v, basestring):
+            continue
+        try:
+            d[k] = datetime.datetime.strptime(v, DATETIME_FORMAT)
+        except ValueError:
             try:
-                v = datetime.datetime.strptime(v, DATETIME_FORMAT)
+                d[k] = datetime.datetime.strptime(v, DATE_FORMAT).date()
             except ValueError:
-                try:
-                    v = datetime.datetime.strptime(v, DATE_FORMAT).date()
-                except ValueError:
-                    pass
-        elif isinstance(v, (dict, list)):
-            v = json_decoder(v)
-        result.append((k, v))
-    if isinstance(d, list):
-        return [x[1] for x in result]
-    elif isinstance(d, dict):
-        return dict(result)
+                pass
+    return d
 

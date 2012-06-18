@@ -20,6 +20,9 @@ class [[ class_name ]](db.Model, BaseMixin):
         nullable=False
     )
     [% endfor %]
+    def __init__(self, **kwargs):
+        db.Model.__init__(self, **kwargs)
+
     @cached_property
     def show_url(self):
         return url_for('[[ plural ]].show', [[ singular ]]_id=self.id)
