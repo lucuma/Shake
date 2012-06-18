@@ -17,7 +17,7 @@ class DefaultSettings(object):
     force_script_name = False
     
     debug = True
-    reload = True
+    reloader = True
     
     secret_key = None
     session_cookie_name = 'shake_session'

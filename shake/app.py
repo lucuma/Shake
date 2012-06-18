@@ -385,7 +385,7 @@ class Shake(object):
         debug = bool(debug if (debug is not None) else
             self.settings.get('debug', True))
         reloader = bool(reloader if (reloader is not None) else
-            self.settings.get('reload', True))
+            self.settings.get('reloader', True))
         
         self._welcome_msg()
         
