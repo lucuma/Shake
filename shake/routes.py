@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake.routes
+    Shake.routes
+    --------------------------
 
     When it comes to combining multiple controller or view functions (however
     you want to call them) you need a dispatcher.  A simple way would be

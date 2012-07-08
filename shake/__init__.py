@@ -1,36 +1,37 @@
 # -*- coding: utf-8 -*-
 """
-# Shake
+    Shake
+    --------------------------
 
-A web framework mixed from the best ingredients:
+    A web framework mixed from the best ingredients:
 
-    from shake import Shake, Rule
+        from shake import Shake
 
-    def hello(request):
-        return 'Hello World!'
+        app = Shake()
 
-    urls = [Rule('/', hello),]
+        def hello(request):
+            return 'Hello World!'
 
-    app = Shake(urls)
+        app.add_url('/', hello)
 
-    if __name__ == "__main__":
-        app.run()
+        if __name__ == "__main__":
+            app.run()
 
 
----------------------------------------
-Copyright © 2010-2012 by [Lúcuma labs] (http://lucumalabs.com).
-See `AUTHORS.md` for more details.
-License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).
+    ---------------------------------------
+    © 2010 by [Lúcuma labs] (http://lucumalabs.com).
+    See `AUTHORS.md` for more details.
+    License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).
 
-Portions of code and/or inspiration taken from:
-* Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
-* Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
-Used under the modified BSD license. See LEGAL.md for more details
+    Portions of code and/or inspiration taken from:
+    * Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
+    * Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
+    Used under the modified BSD license. See LEGAL.md for more details
 
 """
-# Utilities we import from Jinja2 and Werkzeug that are unused
+# Utilities we import from Jinja and Werkzeug that are unused
 # in the module but are exported as public interface.
-from jinja2 import escape, Markup
+from jinja2.exceptions import TemplateNotFound
 from werkzeug.exceptions import *
 from werkzeug.urls import url_quote, url_unquote
 from werkzeug.utils import cached_property, import_string, redirect
@@ -40,6 +41,8 @@ from .controllers import *
 from .helpers import *
 from .routes import *
 from .serializers import json
+from .session import *
+from .templates import *
 from .views import *
 from .wrappers import *
 
@@ -49,5 +52,5 @@ NotAllowed = Forbidden
 ViewNotFound = TemplateNotFound
 redirect_to = redirect
 
-__version__ = '1.1.13'
+__version__ = '1.2.0'
 

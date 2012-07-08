@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-# Shake.cli.globals
+    Shake.cli.globals
+    --------------------------
 
 """
 import os

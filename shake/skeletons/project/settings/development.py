@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-Development environment settings
+    Development settings
+    -------------------------------
+    
 """
 from mailshake import ToConsoleMailer
 
 from .base import *
 
 
-debug = True
-reload = True
+DEBUG = True
+RELOAD = True
 
 # Optional server name hint
-server_name = '127.0.0.1'
+SERVER_NAME = '127.0.0.1'
 
-sqlalchemy_uri = 'sqlite:///db.sqlite'
+SQLALCHEMY_URI = 'sqlite:///db.sqlite'
 
-mailer_class = ToConsoleMailer
+MAILER_CLASS = ToConsoleMailer
 # Extra settings for the mailer class
-mailer_settings = {}
+MAILER_SETTINGS = {}
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-# Shake.cli.utils
+    Shake.cli.utils
+    --------------------------
 
 """
 import hashlib

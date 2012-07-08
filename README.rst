@@ -2,15 +2,17 @@
 Shake
 ========
 
+A web framework mixed from the best ingredients (Werkzeug, Jinja and maybe SQLAlchemy, babel, etc.)
+
 ::
-    from shake import Shake, Rule
+    from shake import Shake
+
+    app = Shake()
 
     def hello(request):
         return 'Hello World!'
 
-    urls = [Rule('/', hello),]
-
-    app = Shake(urls)
+    app.add_url('/', hello)
 
     if __name__ == "__main__":
         app.run()

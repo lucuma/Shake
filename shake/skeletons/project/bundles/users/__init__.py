@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-The priority is based upon order of creation:
-first created -> highest priority.
+    Users URLs.
+    -------------------------------
+
+    The priority is based upon order of creation:
+    first created -> highest priority.
+
 """
 from shake import Rule
 from shake_auth import Auth
@@ -12,7 +16,7 @@ from .models import User
 
 auth = Auth(User, app,
     render=render, mailer=mailer,
-    **app.settings.auth_settings
+    **app.settings.AUTH_SETTINGS
 )
 
 

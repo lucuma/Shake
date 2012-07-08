@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Administration scripts
+    Administration scripts
+    -------------------------------
 
-To activate, import this module from your main manage.py file
+    To activate, import this module from your main manage.py file
+    
 """
 from shake import manager
 

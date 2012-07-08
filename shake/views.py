@@ -1,281 +1,160 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake.views
+    Shake.views
+    --------------------------
 
     Implements the bridge to Jinja2.
 
 """
+from collections import defaultdict
 from datetime import datetime
-import hashlib
 import io
 import os
 
 import jinja2
-from jinja2 import Markup
-from jinja2.exceptions import TemplateNotFound
 from werkzeug.local import LocalProxy
-import yaml
 
-from .helpers import local, url_for, to64, plural, StorageDict
-from .wrappers import Response, LOCAL_FLASHES
+from .babel import (get_translations,
+    format_datetime, format_date, format_time, format_timedelta,
+    format_number, format_decimal, format_currency, format_percent,
+    format_scientific)
+from .helpers import local, url_for
+from .session import get_csrf, get_messages
+from .templates import plural, link_to
 
 
 __all__ = (
-    'BaseRender', 'Render', 'TemplateNotFound', 'flash', 'get_messages',
-    'get_csrf', 'new_csrf',
-    # Deprecated
-    'get_csrf_secret', 'new_csrf_secret',
+    'Render',
 )
 
+
 VIEWS_DIR = 'views'
-LOCAL_I18N_STRINGS = '_i18ns'
 
 
-def flash(request, msg, cat='info', extra=None, **kwargs):
-    """Flashes a message to the next request.  In order to remove the
-    flashed message from the session and to display it to the user,
-    the view has to call :func:`get_flashed_messages`.
-    
-    :param message:
-        the message to be flashed.
-    :param category:
-        optional classification of the message.
-    :param extra:
-        eztra data passed along the message
+class Render(object):
+    """A thin wrapper arround Jinja2.
+
     """
-    request.flash(msg=msg, cat=cat, extra=extra, kwargs=kwargs)
 
-
-def get_messages(request=None):
-    """Pulls all flashed messages from the session and returns them.
-    Further calls in the same request to the function will return
-    the same messages.
-    """
-    flashes = getattr(local, LOCAL_FLASHES, None)
-    if not flashes:
-        request = request or local.request
-        flashes = request.session.get(LOCAL_FLASHES) or []
-        setattr(local, LOCAL_FLASHES, flashes)
-        if flashes:
-            del request.session[LOCAL_FLASHES]
-    return flashes or []
-
-
-CSRF_FORM_NAME = '_csrf'
-CSRF_SESSION_NAME = '_c'
-
-
-class CSRFToken(object):
-    
-    name = CSRF_FORM_NAME
-    
-    def __init__(self):
-        value = hashlib.md5(os.urandom(32)).hexdigest()[:16]
-        self.value = to64(int(value, 16))
-
-    def get_input(self):
-        return Markup(u'<input type="hidden" name="%s" value="%s">' %
-            (self.name, self.value))
-    
-    def get_query(self):
-        return Markup(u'%s=%s') % (self.name, self.value)
-
-    @property
-    def input(self):
-        return self.get_input()
-    
-    @property
-    def query(self):
-        return self.get_query()
-    
-    def __repr__(self):
-        return '<CSRFToken %s = "%s">' % (self.name, self.value)
-
-
-def get_csrf(request=None):
-    """Use it to prevent Cross Site Request Forgery (CSRF) attacks."""
-    request = request or local.request
-    csrf = request.session.get(CSRF_SESSION_NAME)
-    if not csrf:
-        csrf = new_csrf(request)
-    return csrf
-
-# Deprecated!
-get_csrf_secret = get_csrf
-
-def new_csrf(request):
-    csrf = CSRFToken()
-    request.session[CSRF_SESSION_NAME] = csrf
-    return csrf
-
-# Deprecated!
-new_csrf_secret = new_csrf
-
-
-class BaseRender(object):
-    
     default_globals = {
-        'ellipsis': Ellipsis, # Easter egg?
-        'plural': plural,
-        'now': LocalProxy(datetime.utcnow),
-        'url_for': url_for,
-        'csrf': LocalProxy(get_csrf),
         'request': local('request'),
-        'settings': LocalProxy(lambda: local.app.settings),
+        'settings': local('app.settings'),
+        'now': LocalProxy(datetime.utcnow),
+        'csrf': LocalProxy(get_csrf),
+        'url_for': url_for,
         'get_messages': get_messages,
+        'plural': plural,
+        'link_to': link_to,
+    }
 
-        'flash_messages': LocalProxy(get_messages), # Deprecated
-        'csrf_secret': LocalProxy(get_csrf), # Deprecated
-        }
-    
-    # The class that is used for response objects.
-    response_class = Response
-
-    def __init__(self, default_mimetype='text/html', i18n=None,
-            default_language='es-US'):
-        self.default_mimetype = default_mimetype
-        self.i18n_dir = i18n
-        self.default_language = default_language
-        self.default_globals['i18n'] = LocalProxy(self.get_18n_strings)
-    
-    def _get_template(self, filename):
-        raise NotImplementedError
-    
-    def _render(self, tmpl, context):
-        raise NotImplementedError
-    
-    def __call__(self, filename, dcontext=None, mimetype=None,
-            headers=None, **context):
-        tmpl = self._get_template(filename)
-        if not context and isinstance(dcontext, dict):
-            context = dcontext
-        result = self._render(tmpl, context)
-        mimetype = mimetype or self.default_mimetype
-        response_class = self.response_class
-        resp = response_class(result, mimetype=mimetype)
-        headers = headers or {}
-        for key, val in headers.items():
-            resp.headers[key] = val
-        return resp
-    
-    def load_i18n_strings(self, lang_s, lang):
-        if not self.i18n_dir:
-            return None
-        lang = lang.replace('-', '_')
-        filename = os.path.join(self.i18n_dir, lang + '.yml')
-        if not os.path.isfile(filename):
-            if lang == lang_s:
-                return
-            filename = os.path.join(self.i18n_dir, lang_s + '.yml')
-        
-        try:
-            with io.open(filename) as f:
-                strings = yaml.safe_load(f)
-            return StorageDict(strings, _default_value=u'',
-                _case_insensitive=True)
-        except (IOError, AttributeError):
-            return
-    
-    def get_18n_strings(self):
-        lang_s, lang = local.request.get_language(self.default_language)
-        strings = getattr(local, LOCAL_I18N_STRINGS, None)
-        if not strings:
-            strings = self.load_i18n_strings(lang_s, lang)
-            if strings:
-                setattr(local, LOCAL_I18N_STRINGS, strings)
-        return strings
-
-
-class Render(BaseRender):
+    default_filters = {
+        'datetimeformat': format_datetime,
+        'dateformat': format_date,
+        'timeformat': format_time,
+        'timedeltaformat': format_timedelta,
+        'numberformat': format_number,
+        'decimalformat': format_decimal,
+        'currencyformat': format_currency,
+        'percentformat': format_percent,
+        'scientificformat': format_scientific,
+    }
     
     default_tests = {
-        # Test for the mysterious Ellipsis object.
-        # whose mystery is only exceeded by its power :P
         'ellipsis': (lambda obj: obj == Ellipsis),
-        }
-    
-    default_filters = {}
+    }
+
+    default_extensions = [
+        'jinja2.ext.i18n',
+    ]
     
     def __init__(self, views_path=None, loader=None,
-            default_mimetype='text/html',
-            i18n=None, default_language='es-US', **kwargs):
+            default_mimetype='text/html', **kwargs):
+        """
+
+        views_path
+        :   Optional path to the folder from where the templates will be loaded.
+            Internally a `jinja2.FileSystemLoader` will be constructed.
+            You can ignore this parameter and provide a `loader` instead.
+        loader
+        :   Optional replacement loader for the templates.  If provided,
+            `views_path` will be ignored.
+        default_mimetype
+        ;   Used when making a response, if a `mimetype` parameter is not used
+            when rendering.
+        kwargs
+        :   Extra parameters passed directly to the `jinja2.Environment`
+            constructor.
+
+        """
         
-        BaseRender.__init__(self, default_mimetype=default_mimetype,
-            i18n=i18n, default_language=default_language)
-        filters = kwargs.pop('filters', {})
-        tests = kwargs.pop('tests', {})
-        tglobals = kwargs.pop('globals', {})
-        
-        if views_path:
+        self.default_mimetype = default_mimetype
+
+        if not loader:
+            views_path = views_path or '.'
             views_path = os.path.normpath(os.path.realpath(views_path))
             # Instead of a path, we've probably recieved the value of __file__
             if not os.path.isdir(views_path):
                 views_path = os.path.join(os.path.dirname(views_path), 
                     VIEWS_DIR)
-        
-        if views_path and not loader:
             loader = jinja2.FileSystemLoader(views_path)
         
-        kwargs.setdefault('autoescape', True)
+        tglobals = kwargs.pop('globals', {})
+        tfilters = kwargs.pop('filters', {})
+        ttests = kwargs.pop('tests', {})
         
-        env = jinja2.Environment(loader=loader, **kwargs)
+        kwargs.setdefault('extensions', self.default_extensions)
+        kwargs.setdefault('autoescape', True)
+
+        self.env = env = jinja2.Environment(loader=loader, **kwargs)
         
         env.globals.update(self.default_globals)
         env.globals.update(tglobals)
-        
         env.globals.update(self.default_filters)
-        env.filters.update(filters)
-        
+        env.filters.update(tfilters)
         env.tests.update(self.default_tests)
-        env.tests.update(tests)
+        env.tests.update(ttests)
         
-        self.env = env
-        self._loader = None
-    
-    def _get_template(self, filename):
-        return self.env.get_template(filename)
-    
-    def _render(self, tmpl, context):
-        return tmpl.render(context)
-    
-    def to_string(self, filename, dcontext=None, **context):
-        if not context and isinstance(dcontext, dict):
-            context = dcontext
-        tmpl = self._get_template(filename)
-        return self._render(tmpl, context)
-    
-    def from_string(self, source, dcontext=None, **context):
-        if not context and isinstance(dcontext, dict):
-            context = dcontext
+        env.install_gettext_callables(
+            lambda x: get_translations().ugettext(x),
+            lambda s, p, n: get_translations().ungettext(s, p, n),
+            newstyle=True
+        )
+
+    def render(self, tmpl, context=None, to_string=False, **kwargs):
+        """Render a template `tmpl` using the given `context`.
+        If `to_string` is True, the result is returned as is.
+        If not, is used to build a response along with the other parameters.
+
+        """
+        context = context or {}
+        result = tmpl.render(context)
+        if to_string:
+            return result
+        kwargs.setdefault('mimetype', self.default_mimetype)
+        return local.app.make_response(result, **kwargs)
+
+    def __call__(self, filename, context=None, to_string=False, **kwargs):
+        """Load a template from `<views_path>/<filename>` and passes it to
+        `render` along with the other parameters.
+
+        Depending of the value of `to_string`, returns the rendered template as
+        a string or as a response_class instance.
+
+        """
+        tmpl = self.env.get_template(filename)
+        return self.render(tmpl, context=context, to_string=to_string, **kwargs)
+
+    def from_string(self, source, context=None, to_string=False, **kwargs):
+        """Parses the `source` given and build a Template from it.
+        The template and the other parameters are passed to `Render.render`
+        along with the other parameters.
+
+        Depending of the value of `to_string`, returns the rendered template as
+        a string or as a response_class instance.
+
+        """
         tmpl = self.env.from_string(source)
-        return self._render(tmpl, context)
-    
-    def to_stream(self, filename, dcontext=None, **context):
-        if not context and isinstance(dcontext, dict):
-            context = dcontext
-        tmpl = self._get_template(filename)
-        return tmpl.stream(context)
-    
-    def get_global(self, name):
-        return self.env.globals[name]
-    
-    def set_global(self, name, value):
-        self.env.globals[name] = value
-    
-    def get_filter(self, name):
-        return self.env.filters[name]
-    
-    def set_filter(self, name, value):
-        self.env.filters[name] = value
-    
-    def get_test(self, name):
-        return self.env.tests[name]
-    
-    def set_test(self, name, value):
-        self.env.tests[name] = value
-    
-    def add_extension(self, ext):
-        self.env.add_extension(ext)
+        return self.render(tmpl, context=context, to_string=to_string, **kwargs)
 
 
 default_loader = jinja2.PackageLoader('shake', 'default_views')

@@ -1,69 +1,42 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake.wrappers
+    Shake.wrappers
+    --------------------------
 
 """
-import hashlib
-
 from werkzeug.utils import cached_property
 from werkzeug.wrappers import Request as BaseRequest
 from werkzeug.wrappers import Response as BaseResponse
-from werkzeug.contrib.securecookie import SecureCookie as BaseSecureCookie
 from werkzeug.datastructures import ImmutableMultiDict
 
 from .helpers import local, StorageDict
+from .session import SecureCookie, _NullSession
 from .serializers import from_json
 
 
 __all__ = (
-    'Request', 'Response', 'SecureCookie', 'Settings'
+    'Request', 'Response', 'Settings',
 )
-
-LOCAL_FLASHES = '_fm'
-
-
-class SecureCookie(BaseSecureCookie):
-    
-    hash_method = hashlib.sha256
-    
-    def invalidate(self):
-        for key in self.keys():
-            del self[key]
-
-
-class _NullSession(SecureCookie):
-    """Class used to generate nicer error messages if sessions are not
-    available.  Will still allow read-only access to the empty session
-    but fail on setting.
-    """
-    
-    def _fail(self, *args, **kwargs):
-        raise RuntimeError('The session is unavailable because no secret'
-            ' key was set.  Set the SECRET_KEY in your settings to something'
-            ' unique and secret')
-    
-    __setitem__ = __delitem__ = _fail
-    clear = pop = popitem = update = setdefault = _fail
-    del _fail
 
 
 class Request(BaseRequest):
     """The request object used by default in shake.
     Remembers the route rule, the matched endpoint and the view arguments.
     
-    It is what ends up as :class:`~shake.request`.  If you want to replace
-    the request object used you can subclass this and set
-    :attr:`~shake.Shake.request_class` to your subclass.
+    It is what ends up passed to the controllers as the `request` argument.
+    If you want to replace this class set `shake.Shake.request_class`
+    to your own subclass.
+
     """
     
     # The internal route rule that matched the request.  This can be
     # useful to inspect which methods are allowed for the route from
-    # a before/after handler (``request.url_rule.methods``) etc.
+    # a before/after handler (`request.url_rule.methods`) etc.
     url_rule = None
     
     # The real endpoint that matched the request
     # (request.endpoint could be a string).  This in combination with
-    # :attr:`kwargs` can be used to reconstruct the same or a
+    # `kwargs` can be used to reconstruct the same or a
     # modified URL.  If an exception happened when matching, this will
     # be `None`.
     endpoint = None
@@ -73,10 +46,10 @@ class Request(BaseRequest):
     kwargs = None
     
     # The class to use for `args` and `form`.  The default is an
-    # :class:`ImmutableMultiDict` which supports multiple values per key.
+    # `ImmutableMultiDict` which supports multiple values per key.
     # alternatively it makes sense to use an 
-    # :class:`ImmutableOrderedMultiDict` which preserves order or a
-    # :class:`ImmutableDict` which is the fastest but only remembers the
+    # `ImmutableOrderedMultiDict` which preserves order or a
+    # `ImmutableDict` which is the fastest but only remembers the
     # last key. It is also possible to use mutable structures, but this is
     # not recommended.
     parameter_storage_class = ImmutableMultiDict
@@ -109,40 +82,35 @@ class Request(BaseRequest):
     def json(self):
         """If the mimetype is `application/json` this will contain the
         parsed JSON data.
+
         """
         if self.mimetype == 'application/json':
             return from_json(self.data)
     
     @cached_property
     def session(self):
-        """Creates or opens a new session.
+        """Creates or open a new session.
         Default implementation stores all session data in a signed cookie.
-        This requires that the :attr:`secret_key` setting is set.
+        This requires that the `secret_key` setting is set.
+
         """
         settings = local.app.settings
-        secret_key = settings.secret_key
+        secret_key = settings.SECRET_KEY
         if not secret_key:
             return _NullSession(secret_key='')
         
-        data = self.cookies.get(settings.session_cookie_name)
+        data = self.cookies.get(settings.SESSION_COOKIE_NAME)
         if not data:
             return SecureCookie(secret_key=secret_key)
         return SecureCookie.unserialize(data, secret_key)
     
-    def get_language(self, default='en-US'):
-        lang = None
-        if self.args:
-            lang = self.args.get('lang', '')
-        if not lang:
-            lang = request.accept_languages.best \
-                or request.user_agent.language or default
-        lang_s = lang.replace('_', '-').split('-')[0]
-        return lang_s, lang
+    def get_language(self, default='en'):
+        """Try to guess the 
 
-    def flash(self, msg, cat='info', extra=None, **kwargs):
-        session = self.session
-        msg = {'msg': msg, 'cat': cat, 'extra': extra}
-        session.setdefault(LOCAL_FLASHES, []).append(msg)
+        """
+        lang = self.args.get('lang') if self.args else \
+            self.accept_languages.best or self.user_agent.language or default
+        return lang.replace('_', '-')
 
 
 class Response(BaseResponse):
@@ -150,10 +118,10 @@ class Response(BaseResponse):
     Works like the response object from Werkzeug but is set to have a plain
     text mimetype by default.
     Quite often you don't have to create this object yourself because
-    :meth:`~shake.render` will take care of that for you.
+    `shake.render` will take care of that for you.
     
     If you want to replace the response object used you can subclass this and
-    set :attr:`~shake.Shake.response_class` to your subclass.
+    set `shake.Shake.response_class` to your subclass.
     
     """
     default_mimetype = 'text/plain'

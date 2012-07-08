@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Administration scripts
+    Administration scripts
+    --------------------------
 
 """
 from shake import manager

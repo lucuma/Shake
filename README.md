@@ -1,22 +1,24 @@
 
 # Shake
 
-A web framework mixed from the best ingredients:
+A web framework mixed from the best ingredients (Werkzeug, Jinja and maybe SQLAlchemy, babel, etc.)
 
-    from shake import Shake, Rule
+```python
+from shake import Shake
 
-    def hello(request):
-        return 'Hello World!'
+app = Shake()
 
-    urls = [Rule('/', hello),]
+def hello(request):
+    return 'Hello World!'
 
-    app = Shake(urls)
+app.add_url('/', hello)
 
-    if __name__ == "__main__":
-        app.run()
+if __name__ == "__main__":
+    app.run()
+```
 
 
 ---------------------------------------
 © 2010 by [Lúcuma labs] (http://lucumalabs.com).  
-See `AUTHORS.md` for more details.  
+See `AUTHORS.md` for more details.
 License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).

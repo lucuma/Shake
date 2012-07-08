@@ -32,13 +32,11 @@ def no_pass(request):
     
 
 def test_default_not_found():
-    urls = [
-        Rule('/', index),
-        ]
     settings = {
-        'page_not_found': not_found_page,
-        }
-    app = Shake(urls, settings)
+        'PAGE_NOT_FOUND': not_found_page,
+    }
+    app = Shake(settings)
+    app.add_url('/', index)
     c = app.test_client()
     
     resp = c.get('/bla')
@@ -47,14 +45,12 @@ def test_default_not_found():
 
 
 def test_default_error():
-    urls = [
-        Rule('/', fail),
-        ]
     settings = {
-        'debug': False,
-        'page_error': error_page,
-        }
-    app = Shake(urls, settings)
+        'DEBUG': False,
+        'PAGE_ERROR': error_page,
+    }
+    app = Shake(settings)
+    app.add_url('/', fail)
     c = app.test_client()
     
     resp = c.get('/')
@@ -63,47 +59,46 @@ def test_default_error():
 
 
 def test_default_not_allowed():
-    urls = [
-        Rule('/', no_pass),
-        ]
     settings = {
-        'page_not_allowed': not_allowed_page,
-        }
-    app = Shake(urls, settings)
+        'PAGE_NOT_ALLOWED': not_allowed_page,
+    }
+    app = Shake(settings)
+    app.add_url('/', no_pass)
     c = app.test_client()
+
     resp = c.get('/')
     assert resp.status_code == HTTP_FORBIDDEN
     assert '<title>Access Denied</title>' in resp.data
 
 
 def test_render_view_controller():
-    urls = [
-        Rule('/', render_view,
-            defaults={'render': render, 'view': 'view.html'}),
-        ]
-    app = Shake(urls)
-    
+    app = Shake()
     c = app.test_client()
+    app.add_url('/', render_view, 
+        defaults={'render': render, 'view': 'view.html'})
+    
     resp = c.get('/')
     assert resp.data == '<h1>Hello World</h1>'
     assert resp.mimetype == 'text/html'
 
 
 def test_render_view_controller_args():
-    urls = [
-        Rule('/', render_view,
-            defaults={
-                'render': render,
-                'view': 'view.txt',
-                'mimetype': 'foo/bar',
+    app = Shake()
+    app.add_url('/', render_view,
+        defaults={
+            'render': render,
+            'view': 'view.txt',
+            'context': {
                 'who': 'You',
                 'action': 'are',
                 'where': 'here',
-            }),
-        ]
-    app = Shake(urls)
-    
+            },
+            'mimetype': 'foo/bar',
+        }
+    )
     c = app.test_client()
+
     resp = c.get('/')
     assert resp.data == 'You are here'
     assert resp.mimetype == 'foo/bar'
+

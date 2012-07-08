@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-# Shake.cli
+    Shake.cli
+    --------------------------
 
-Command-line scripts
+    Command-line scripts
 
 """
 import os

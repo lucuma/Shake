@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake.controllers
+    Shake.controllers
+    --------------------------
 
     Generic controllers
 
 """
 from random import choice
 
-from .config import QUOTES
 from .helpers import local, NotFound, safe_join, send_file
 from .views import default_render
 
@@ -19,33 +19,38 @@ __all__ = (
 
 def not_found_page(request, error):
     """Default "Not Found" page.
+
     """
     rules = local.urls.map._rules
-    return default_render('error_notfound.html', rules=rules)
+    return default_render('error_notfound.html', locals())
 
 
 def error_page(request, error):
     """A generic error page.
+
     """
     return default_render('error.html')
 
 
 def not_allowed_page(request, error):
     """A default "access denied" page.
+
     """
     return default_render('error_notallowed.html')
 
 
-def render_view(request, render, view, **kwargs):
+def render_view(request, render, view, context=None, **kwargs):
     """A really simple controller who render directly a view.
     
-    param render:
-        The views renderer to use.
-    
-    param kwargs:
-        Values to add to the view context.
+    render
+    :   the renderer to use.
+    view
+    :   the view to render.
+    context
+    :   values to add to the view context.
+
     """
-    return render(view, **kwargs)
+    return render(view, context, **kwargs)
 
 
 def send_from_directory(request, directory, filename, **options):
@@ -53,7 +58,7 @@ def send_from_directory(request, directory, filename, **options):
     is a secure way to quickly expose static files from an upload folder
     or something similar.
 
-    Example usage::
+    Example usage:
 
         @app.route('/uploads/<path:filename>')
         def download_file(filename):
@@ -65,14 +70,12 @@ def send_from_directory(request, directory, filename, **options):
     to serve files for the given path on its own without calling into the
     web application for improved performance.
     
-    param directory:
-        The directory where all the files are stored.
-    
-    param filename:
-        The filepath relative to that directory to download.
-    
-    param options:
-        Optional keyword arguments that are directly forwarded to `send_file`.
+    directory
+    :   the directory where all the files are stored.
+    filename
+    :   the filepath relative to that directory to download.
+    options
+    :   optional keyword arguments that are directly forwarded to `send_file`.
     
     --------------------------------
     Copied almost unchanged from Flask <http://flask.pocoo.org/>

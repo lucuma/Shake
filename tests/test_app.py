@@ -2,6 +2,7 @@
 import os
 
 import pytest
+import shake
 from shake import (Shake, redirect, Response, Rule, json,
     NotAllowed, BadRequest,
     Unauthorized, Forbidden, NotFound, MethodNotAllowed,
@@ -17,7 +18,7 @@ HTTP_FORBIDDEN = 403
 HTTP_NOT_FOUND = 404
 HTTP_ERROR = 500
 
-#### Views
+#### Controllers #####
 
 def index(request):
     return 'hello'
@@ -46,54 +47,11 @@ def fail(request):
     assert False
 
 
-##### Tests
-
-def test_add_url():
-    
-    def number(request, num):
-        return str(num)
-    
-    app = Shake()
-    app.add_url('/', index)
-    app.add_url('/<int:num>/', number)
-    c = app.test_client()
-    
-    resp = c.get('/')
-    assert resp.status_code == HTTP_OK
-    assert resp.data == 'hello'
-    
-    resp = c.get('/3/')
-    assert resp.status_code == HTTP_OK
-    assert resp.data == '3'
-
-
-def test_add_urls():
-    
-    def number(request, num):
-        return str(num)
-    
-    urls = [
-        Rule('/', index),
-        Rule('/<int:num>/', number),
-        ]
-    app = Shake()
-    app.add_urls(urls)
-    c = app.test_client()
-    
-    resp = c.get('/')
-    assert resp.status_code == HTTP_OK
-    assert resp.data == 'hello'
-    
-    resp = c.get('/3/')
-    assert resp.status_code == HTTP_OK
-    assert resp.data == '3'
-
+##### Tests #####
 
 def test_callable_endpoint():
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
+    app = Shake()
+    app.add_url('/', index)
     
     c = app.test_client()
     resp = c.get('/')
@@ -102,11 +60,9 @@ def test_callable_endpoint():
 
 
 def test_string_endpoint():
-    urls = [
-        Rule('/', 'tests.test_app.index'),
-        ]
-    app = Shake(urls)
-    
+    app = Shake()
+    app.add_url('/', 'tests.test_app.index')
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -114,14 +70,11 @@ def test_string_endpoint():
 
 
 def test_default_response():
+    app = Shake()
     
+    @app.route('/')
     def index(request):
         pass
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     
     c = app.test_client()
     resp = c.get('/')
@@ -130,10 +83,8 @@ def test_default_response():
 
 
 def test_default_not_found():
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
+    app = Shake()
+    app.add_url('/', index)
     
     c = app.test_client()
     resp = c.get('/bla')
@@ -142,10 +93,8 @@ def test_default_not_found():
 
 
 def test_default_error():
-    urls = [
-        Rule('/', fail),
-        ]
-    app = Shake(urls)
+    app = Shake()
+    app.add_url('/', fail)
     
     c = app.test_client()
     with pytest.raises(AssertionError):
@@ -153,10 +102,8 @@ def test_default_error():
 
 
 def test_default_not_allowed():
-    urls = [
-        Rule('/', no_pass),
-        ]
-    app = Shake(urls)
+    app = Shake()
+    app.add_url('/', no_pass)
     
     c = app.test_client()
     resp = c.get('/')
@@ -165,14 +112,11 @@ def test_default_not_allowed():
 
 
 def test_redirect():
-    
+    app = Shake()
+
+    @app.route('/')
     def redir(request):
         return redirect('/bla')
-    
-    urls = [
-        Rule('/', redir),
-        ]
-    app = Shake(urls)
     
     c = app.test_client()
     resp = c.get('/')
@@ -180,11 +124,9 @@ def test_redirect():
 
 
 def test_custom_not_found():
-    urls = [
-        Rule('/', index),
-        ]
-    settings = {'page_not_found': not_found}
-    app = Shake(urls, settings)
+    settings = {'PAGE_NOT_FOUND': not_found, 'DEBUG': True}
+    app = Shake(settings)
+    app.add_url('/', index)
     
     c = app.test_client()
     resp = c.get('/bla')
@@ -193,11 +135,9 @@ def test_custom_not_found():
 
 
 def test_custom_error():
-    urls = [
-        Rule('/', fail),
-        ]
-    settings = {'page_error': error, 'debug': False}
-    app = Shake(urls, settings)
+    settings = {'PAGE_ERROR': error, 'DEBUG': False}
+    app = Shake(settings)
+    app.add_url('/', fail)
     
     c = app.test_client()
     resp = c.get('/')
@@ -206,16 +146,28 @@ def test_custom_error():
 
 
 def test_custom_not_allowed():
-    urls = [
-        Rule('/', no_pass),
-        ]
-    settings = {'page_not_allowed': not_allowed}
-    app = Shake(urls, settings)
+    settings = {'PAGE_NOT_ALLOWED': not_allowed}
+    app = Shake(settings)
+    app.add_url('/', no_pass)
     
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_FORBIDDEN
     assert resp.data == 'access denied'
+
+
+def test_data_not_found():
+    settings = {'DEBUG': True}
+    app = Shake(settings)
+
+    @app.route('/')
+    def data_not_found(request):
+        raise NotFound
+    
+    c = app.test_client()
+    resp = c.get('/')
+    assert resp.status_code == HTTP_NOT_FOUND
+    assert resp.data
 
 
 def test_error_codes():
@@ -238,16 +190,14 @@ def test_error_codes():
         502: BadGateway,
         503: ServiceUnavailable,
         }
-    settings = {'debug': True}
+    settings = {'DEBUG': False}
+    app = Shake(settings)
     
+    @app.route('/<int:code>/')
     def index(request, code):
         print code
         raise errors[code]
-    
-    urls = [
-        Rule('/<int:code>/', index),
-        ]
-    app = Shake(urls, settings)
+
     c = app.test_client()
     
     for code in errors:
@@ -277,19 +227,16 @@ def test_fallback_error_code():
         501: NotImplemented,
         502: BadGateway,
         503: ServiceUnavailable,
-        }
-    settings = {'page_error': error, 'debug': False}
-    
+    }
+    settings = {'PAGE_ERROR': error, 'DEBUG': False}
+    app = Shake(settings)
+
+    @app.route('/<int:code>/')
     def index(request, code):
         print code
         raise errors[code]
-    
-    urls = [
-        Rule('/<int:code>/', index),
-        ]
-    app = Shake(urls, settings)
+
     c = app.test_client()
-    
     for code in errors:
         if code in app.error_handlers:
             continue
@@ -299,16 +246,13 @@ def test_fallback_error_code():
 
 
 def test_is_get():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return str(request.is_get)
     
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     c = app.test_client()
-    
     resp = c.get('/')
     assert resp.data == 'True'
     resp = c.post('/')
@@ -320,16 +264,13 @@ def test_is_get():
 
 
 def test_is_post():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return str(request.is_post)
     
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     c = app.test_client()
-    
     resp = c.get('/')
     assert resp.data == 'False'
     resp = c.post('/')
@@ -341,16 +282,13 @@ def test_is_post():
 
 
 def test_is_put():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return str(request.is_put)
     
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     c = app.test_client()
-    
     resp = c.get('/')
     assert resp.data == 'False'
     resp = c.post('/')
@@ -362,16 +300,13 @@ def test_is_put():
 
 
 def test_is_delete():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return str(request.is_delete)
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
+
     c = app.test_client()
-    
     resp = c.get('/')
     assert resp.data == 'False'
     resp = c.post('/')
@@ -383,17 +318,14 @@ def test_is_delete():
 
 
 def test_is_json():
+    app = Shake()
     data = {'foo': 'bar', 'num': 3}
-    
+
+    @app.route('/')
     def index(request):
         return str(request.json)
     
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     c = app.test_client()
-    
     resp = c.post('/', content_type='application/json',
         data=json.dumps(data))
     assert eval(resp.data) == data
@@ -403,15 +335,12 @@ def test_is_json():
 
 
 def test_response_response():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return Response('hello world')
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -420,14 +349,11 @@ def test_response_response():
 
 
 def test_response_string():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return 'hello world'
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     
     c = app.test_client()
     resp = c.get('/')
@@ -437,14 +363,11 @@ def test_response_string():
 
 
 def test_response_none():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return None
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     
     c = app.test_client()
     resp = c.get('/')
@@ -454,15 +377,12 @@ def test_response_none():
 
 
 def test_response_json():
+    app = Shake()
     data = {'foo': 'bar', 'num': 3}
-    
+
+    @app.route('/')
     def index(request):
         return data
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
     
     c = app.test_client()
     resp = c.get('/')
@@ -471,42 +391,32 @@ def test_response_json():
     assert eval(resp.data) == data
 
 
-def test_response_invalid():
+def test_bad_responses():
     
-    class A:
-        pass
-    
-    invalid_responses = [
+    bad_responses = [
         42,
         [], (),
         [1, 2, 3],
         ('a', 'b', 'c'),
-        lambda x: 2 * x,
         os.path,
         Ellipsis,
-        A,
-        A(),
-        ]
+    ]
     
-    for r in invalid_responses:
-        urls = [Rule('/', lambda request: r)]
-        app = Shake(urls)
-        
+    for r in bad_responses:
+        app = Shake()
+        app.add_url('/', lambda request: r)
         c = app.test_client()
-        with pytest.raises(Exception):
-            c.get('/')
+        print '\nr is:', r
+        resp = c.get('/')
 
 
 def test_response_mimetype():
-    
+    app = Shake()
+
+    @app.route('/')
     def index(request):
         return Response('hello world', mimetype='foo/bar')
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-    
+        
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -515,218 +425,125 @@ def test_response_mimetype():
 
 
 def test_processors_order():
+    app = Shake()
     r = []
     
+    @app.route('/')
     def index(request):
         r.append('controller')
     
-    def rq1(request):
-        r.append('rq1')
+    @app.before_request
+    def br1(request):
+        r.append('br1')
     
-    def rq2(request):
-        r.append('rq2')
+    @app.before_request
+    def br2(request):
+        r.append('br2')
     
-    def rs1(response):
-        r.append('rs1')
+    @app.after_request
+    def ar1(response):
+        r.append('ar1')
         return response
     
-    def rs2(response):
-        r.append('rs2')
+    @app.after_request
+    def ar2(response):
+        r.append('ar2')
         return response
     
+    @app.on_exception
     def error(e):
         r.append('error')
     
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-    
-    app.before_request(rq1)
-    app.before_request(rq2)
-    app.before_response(rs1)
-    app.before_response(rs2)
-    app.on_exception(error)
-    
     c = app.test_client()
     c.get('/')
-    
-    assert r == ['rq1', 'rq2', 'controller', 'rs1', 'rs2']
+    assert r == 'br1 br2 controller ar1 ar2'.split()
 
 
 def test_processors_order_exception():
+    
+    def econtroller(request, error):
+        r.append('econtroller')
+
+    settings = {'PAGE_ERROR': econtroller, 'DEBUG': False}
+    app = Shake(settings)
     r = []
     
+    @app.route('/')
     def index(request):
         r.append('controller')
         assert False
     
-    def econtroller(request, error):
-        r.append('econtroller')
+    @app.before_request
+    def br1(request):
+        r.append('br1')
     
-    def rq1(request):
-        r.append('rq1')
+    @app.before_request
+    def br2(request):
+        r.append('br2')
     
-    def rq2(request):
-        r.append('rq2')
-    
-    def rs1(response):
-        r.append('rs1')
+    @app.after_request
+    def ar1(response):
+        r.append('ar1')
         return response
     
-    def rs2(response):
-        r.append('rs2')
+    @app.after_request
+    def ar2(response):
+        r.append('ar2')
         return response
     
+    @app.on_exception
     def on_error(e):
         r.append('error')
     
-    urls = [
-        Rule('/', index),
-        ]
-    settings = {'page_error': econtroller, 'debug': False}
-    app = Shake(urls, settings)
-    
-    app.before_request(rq1)
-    app.before_request(rq2)
-    app.before_response(rs1)
-    app.before_response(rs2)
-    app.on_exception(on_error)
-    
     c = app.test_client()
     c.get('/')
-    
-    assert r == ['rq1', 'rq2', 'controller', 'error', 'econtroller']
+    assert r == 'br1 br2 controller error econtroller ar1 ar2'.split()
 
 
-def test_repeated_processors():
-    r = []
-    
-    def index(request):
-        r.append('controller')
-    
-    def rq1(request):
-        r.append('rq1')
-    
-    def rs1(response):
-        r.append('rs1')
-        return response
-    
-    def on_error(e):
-        r.append('error')
-    
-    urls = [
-        Rule('/', index),
-        ]
-    app = Shake(urls)
-    
-    app.before_request(rq1)
-    app.before_request(rq1)
-    app.before_response(rs1)
-    app.before_response(rs1)
-    app.on_exception(on_error)
-    app.before_request(rq1)
-    app.before_response(rs1)
-    app.before_request(rq1)
-    app.on_exception(on_error)
-    c = app.test_client()
-    
-    c.get('/')
-    assert r == ['rq1', 'controller', 'rs1']
+def test_after_request_return():
+    app = Shake()
 
-
-def test_repeated_processors_exception():
-    r = []
-    
-    def index(request):
-        r.append('controller')
-        assert False
-    
-    def econtroller(request, error):
-        r.append('econtroller')
-    
-    def rq1(request):
-        r.append('rq1')
-    
-    def rs1(response):
-        r.append('rs1')
-        return response
-    
-    def on_error(e):
-        r.append('error')
-    
-    urls = [
-        Rule('/', index),
-        ]
-    settings = {'page_error': econtroller, 'debug': False}
-    app = Shake(urls, settings)
-    
-    app.before_request(rq1)
-    app.before_request(rq1)
-    app.before_response(rs1)
-    app.before_response(rs1)
-    app.on_exception(on_error)
-    app.before_request(rq1)
-    app.before_response(rs1)
-    app.before_request(rq1)
-    app.on_exception(on_error)
-    c = app.test_client()
-    
-    c.get('/')
-    assert r == ['rq1', 'controller', 'error', 'econtroller']
-
-
-def test_before_response_return():
-    
+    @app.route('/')
     def index(request):
         return 'ok'
     
+    @app.after_request
     def brs(response):
         pass
     
-    urls = [Rule('/', index)]
-    app = Shake(urls)
-    app.before_response(brs)
-    
     c = app.test_client()
     with pytest.raises(Exception):
-        c.get('/')
+        print c.get('/')
 
 
 def test_session():
-    
+    settings = {'SECRET_KEY': 'q'*22}
+    app = Shake(settings)
+
+    @app.route('/p1/')
     def p1(request):
         request.session['foo'] = 'bar'
     
+    @app.route('/p2/')
     def p2(request):
         assert 'bar' == request.session['foo']
     
-    urls = [
-        Rule('/p1/', p1),
-        Rule('/p2/', p2),
-        ]
-    settings = {'secret_key': 'q'*22}
-    app = Shake(urls, settings)
     c = app.test_client()
-    
     resp = c.get('/p1/')
     resp = c.get('/p2/')
     assert resp.status_code == HTTP_OK
 
 
 def test_session_nosecret():
-    
+    app = Shake()
+
+    @app.route('/')
     def p1(request):
         request.session['foo'] = 'bar'
     
-    urls = [
-        Rule('/', p1),
-        ]
-    app = Shake(urls)
     c = app.test_client()
-    
     with pytest.raises(RuntimeError):
-        c.get('/')
+        print c.get('/')
 
 
 def test_postdata_keyerror():
@@ -734,20 +551,18 @@ def test_postdata_keyerror():
     `KeyError` raised in a controller when doing `request.form['foo']` and
     `foo` isn't in request.form.
     """
+    app = Shake()
 
+    @app.route('/')
     def p1(request):
         foo = request.form['bar']
-    
-    urls = [
-        Rule('/', p1),
-        ]
-    app = Shake(urls)
+
     c = app.test_client()
 
     with pytest.raises(KeyError):
-        resp = c.get('/')
-    
+        print c.get('/')
+
     with pytest.raises(KeyError):
-        resp = c.post('/', data={'a':123})
+        print c.post('/', data={'a':123})
 
 

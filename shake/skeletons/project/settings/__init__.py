@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Project settings
+    Project settings
+    -------------------------------
+    
 """
 import shake
 

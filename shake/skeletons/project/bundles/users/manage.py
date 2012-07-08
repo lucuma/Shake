@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Administration scripts
+    Administration scripts
+    -------------------------------
 
+    To activate, import this module from your main manage.py file
+    
 """
 from shake import manager
 from pyceo import prompt_pass
@@ -14,7 +17,7 @@ def create_user(login, passw, **data):
     """
     from bundles.users import auth
     
-    password_minlen = auth.settings.password_minlen
+    password_minlen = auth.settings.PASSWORD_MINLEN
     while len(passw) < password_minlen:
         print 'Password is too short (min %i chars).' % password_minlen
         passw = prompt_pass('>>> Password? ')
@@ -34,7 +37,7 @@ def change_password(login, passw=None):
     if passw is None:
         passw = prompt_pass('>>> Password? ')
     
-    password_minlen = auth.settings.password_minlen
+    password_minlen = auth.settings.PASSWORD_MINLEN
     while len(passw) < password_minlen:
         print 'Password is too short (min %i chars).' % password_minlen
         passw = prompt_pass('>>> Password? ')

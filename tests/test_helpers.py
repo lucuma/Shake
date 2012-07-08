@@ -20,13 +20,15 @@ def endpoint(request, name=None):
 
 
 def test_url_for():
-    
+    app = Shake()
+    c = app.test_client()
+
     def index(request):
         expected = '/hello/world/'
         url = url_for(endpoint, name='world')
         assert url == expected
 
-        expected = 'http://localhost/hello/world/'
+        expected = 'http://0.0.0.0/hello/world/'
         url = url_for(endpoint, name='world', external=True)
         assert url == expected
 
@@ -34,20 +36,37 @@ def test_url_for():
         url = url_for(endpoint, name='world', anchor='awesome')
         assert url == expected
 
-        expected = 'http://localhost/hello/world/#awesome'
+        expected = 'http://0.0.0.0/hello/world/#awesome'
         url = url_for(endpoint, name='world', anchor='awesome', external=True)
         assert url == expected
     
-    urls = [
+    app.add_urls([
         Rule('/', index),
         Rule('/hello/<name>/', endpoint),
-        ]
-    app = Shake(urls)
+    ])
+     
+    resp = c.get('/')
+
+
+def test_url_for_server_name():
+    app = Shake({
+        'SERVER_NAME': 'example.com',
+        'DEFAULT_SUBDOMAIN': 'www',
+    })
     c = app.test_client()
+
+    @app.route('/hello/<name>/')
+    def index(request):
+        expected = 'http://www.example.com/hello/world/'
+        url = url_for(endpoint, name='world', external=True)
+        assert url == expected
+    
     resp = c.get('/')
 
 
 def test_url_for_method():
+    app = Shake()
+    c = app.test_client()
     
     def index(request):
         expected = '/get/resource/'
@@ -62,30 +81,29 @@ def test_url_for_method():
         url = url_for(endpoint, name='resource', method='POST')
         assert url == expected
     
-    urls = [
+    app.add_urls([
         Rule('/', index),
         Rule('/get/<name>/', endpoint, methods=['GET']),
         Rule('/update/<name>/', endpoint, methods=['POST']),
-        ]
-    app = Shake(urls)
-    c = app.test_client()
+    ])
+    
     resp = c.get('/')
 
 
 def test_named_url_for():
-    
+    app = Shake()
+    c = app.test_client()
+
     def test(request):
         result = [url_for('a'), url_for('b'), url_for('c')]
         return ' '.join(result)
     
-    urls = [
+    app.add_urls([
         Rule('/', test),
         Rule('/home1/', endpoint, name='a'),
         Rule('/home2/', endpoint, name='b'),
         Rule('/home3/', endpoint, name='c'),
-        ]
-    app = Shake(urls)
-    c = app.test_client()
+    ])
     
     resp = c.get('/')
     assert resp.status_code == 200
@@ -272,7 +290,10 @@ def test_storagedict_update():
 
 
 def test_send_file_regular():
+    app = Shake()
+    c = app.test_client()
 
+    @app.route('/')
     def index(request):
         filename = path_join(__file__, 'static/index.html')
         resp = send_file(request, filename)
@@ -285,15 +306,15 @@ def test_send_file_regular():
         resp = send_file(request, filename)
         assert resp.direct_passthrough
         assert resp.mimetype == 'image/x-icon'
-    
-    app = Shake()
-    app.add_url('/', index)
-    c = app.test_client()
+
     resp = c.get('/')
 
 
 def test_send_file_xsendfile():
+    app = Shake()
+    c = app.test_client()
 
+    @app.route('/')
     def index(request):
         filename = path_join(__file__, 'static/index.html')
         resp = send_file(request, filename, use_x_sendfile=True)
@@ -302,14 +323,14 @@ def test_send_file_xsendfile():
         assert resp.headers['x-sendfile'] == filename
         assert resp.mimetype == 'text/html'
     
-    app = Shake()
-    app.add_url('/', index)
-    c = app.test_client()
     resp = c.get('/')
 
 
 def test_send_file_object():
+    app = Shake()
+    c = app.test_client()
 
+    @app.route('/')
     def index(request):
         filename = path_join(__file__, 'static/index.html')
 
@@ -342,14 +363,14 @@ def test_send_file_object():
         assert resp.mimetype == 'text/plain'
         assert resp.data == 'Test'
     
-    app = Shake()
-    app.add_url('/', index)
-    c = app.test_client()
     resp = c.get('/')
 
 
 def test_send_file_object_xsendfile():
+    app = Shake()
+    c = app.test_client()
 
+    @app.route('/')
     def index(request):
         filename = path_join(__file__, 'static/index.html')
         
@@ -364,15 +385,15 @@ def test_send_file_object_xsendfile():
         resp = send_file(request, f, mimetype='text/plain',
             use_x_sendfile=True)
         assert 'x-sendfile' not in resp.headers
-    
-    app = Shake()
-    app.add_url('/', index)
-    c = app.test_client()
+
     resp = c.get('/')
 
 
 def test_send_file_attachment():
+    app = Shake()
+    c = app.test_client()
 
+    @app.route('/')
     def index(request):
         filename = path_join(__file__, 'static/index.html')
         
@@ -397,10 +418,7 @@ def test_send_file_attachment():
         value, options = parse_options_header(cd_header)
         assert value == 'attachment'
         assert options['filename'] == 'readme.txt'
-    
-    app = Shake()
-    app.add_url('/', index)
-    c = app.test_client()
+
     resp = c.get('/')
 
 

@@ -1,7 +1,7 @@
 
-# Welcome to Shake
+# Your Project
 
-This is the initial structure of your project
+This is the initial structure of the project
 
     ├── main.py
     ├── manage.py
@@ -28,9 +28,9 @@ This is the initial structure of your project
         ├── development.py
         ├── production.py
         ├── testing.py
-		    ├── req.txt
-			  ├── req-dev.txt
-				└── req-prod.txt
+	    ├── req.txt
+		  ├── req-dev.txt
+			└── req-prod.txt
 
     ├── static
         ├── images
@@ -59,8 +59,7 @@ This is the initial structure of your project
 
 
 main.py
-:   The file where your main application object is created. 
-    A few helper objects (like `render`) are created here as well.
+:   The file where your main application object is created. A few helper objects (like `render`) are created here as well.
 
 manage.py
 :   A command line program for managment tasks. You can add your own commands to this file.
@@ -70,7 +69,8 @@ urls.py
 
 bundles
 :   This subdirectory will contain all your application code organized as `bundles`. Bundles are related models, controllers, URLs, views and others.
-    Create one using the `shake add xxxx` command, inside your app root dir. Eg:
+    Create one using the `shake add xxxx` command, inside your app root dir.
+    Example:
 
         shake add posts
 
@@ -99,17 +99,14 @@ settings
 :   `req-dev.txt` and `req-prod.txt` are also lists of required python modules `req.txt` but only those used specifically only in development or production environments.
 
 static
-:   This directory has web files that don't change, such as
-    JavaScript files (`static/scripts), images 
-    (`static/images`), stylesheets (`static/styles`),
-    and others.
+:   This directory has web files that don't change, such as JavaScript files (`static/scripts), images  (`static/images`), stylesheets (`static/styles`), and others.
 
 tests
 :   The tests you'll write. Yes, you should write tests.
 
 views
-:   The views subdirectory holds the display templates to fill
-    in with data from our application, convert to HTML (or any
-    other text-based format), and return to the user's browser.
-    All templates uses the Jinja2 syntax by default.
+:   The views subdirectory holds the display templates to fill in with data from our application, convert to HTML (or any other text-based format), and return to the user's browser. All templates uses the Jinja2 syntax by default.
 
+
+-----
+Powered by Shake

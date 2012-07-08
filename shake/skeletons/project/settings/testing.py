@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Testing environment settings
+    Testing settings
+    -------------------------------
+    
 """
 from .production import *
 

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+    Shake.serializers
+    --------------------------
+    
+"""
 import datetime
 # Get the fastest json available
 try:

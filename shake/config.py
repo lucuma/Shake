@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake.config
+    Shake.config
+    --------------------------
 
 """
 import inspect
@@ -10,33 +11,43 @@ from .wrappers import Settings
 
 class DefaultSettings(object):
 
-    server_name = '127.0.0.1'
-    server_port = 5000
-    default_subdomain = ''
+    SERVER_NAME = '0.0.0.0'
+    SERVER_PORT = 5000
+    DEFAULT_SUBDOMAIN = ''
     
-    force_script_name = False
+    FORCE_SCRIPT_NAME = False
     
-    debug = True
-    reloader = True
+    DEBUG = True
+    RELOADER = True
     
-    secret_key = None
-    session_cookie_name = 'shake_session'
-    session_expires = 24 * 120
+    SECRET_KEY = None
+    SESSION_COOKIE_NAME = 'shake_session'
+    SESSION_EXPIRES = 24 * 120
     
     # The maximum size for uploade files
-    max_content_length = 1024 * 1024 * 16  # 16 MB
+    MAX_CONTENT_LENGTH = 1024 * 1024 * 16  # 16 MB
     # The maximum size for regular form data (not files)
-    max_form_memory_size = 1024 * 1024 * 2  # 2 MB
+    MAX_FORM_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB
     
-    locale = 'en_US'
+    DEFAULT_LOCALE = 'en'
+    DEFAULT_TIMEZONE = 'UTC'
 
     # URL prefix for static files.
     # Examples: "http://media.lucumalabs.com/static/", "http://abc.org/static/"
-    static_url = '/static'
+    STATIC_URL = '/static'
     
-    page_not_found = 'shake.controllers.not_found_page'
-    page_error = 'shake.controllers.error_page'
-    page_not_allowed = 'shake.controllers.not_allowed_page'
+    PAGE_NOT_FOUND = 'shake.controllers.not_found_page'
+    PAGE_ERROR = 'shake.controllers.error_page'
+    PAGE_NOT_ALLOWED = 'shake.controllers.not_allowed_page'
+
+    QUOTES = [
+        # quote, by
+        ('Shaken, not stirred', 'Bond, James Bond'),
+        ('Shake it, baby!', 'Austin Powers'),
+        ('You\'re riding Shake on rails!', 'Anonymous Coward'),
+        ('Shake-it Shake-it Shake-it', 'Ray Charles'),
+        ('Shake Shake Shake, Shake your booty', 'KC & The Sunshine Band')
+    ]
 
 
 def get_settings_object(custom):
@@ -45,11 +56,3 @@ def get_settings_object(custom):
     default = DefaultSettings()
     return Settings(custom, default)
 
-
-QUOTES = [
-    ('Shaken, not stirred', 'Bond, James Bond'),
-    ('Shake it, baby!', 'Austin Powers'),
-    ('You\'re riding Shake on rails!', 'Anonymous Coward'),
-    ('Shake-it Shake-it Shake-it', 'Ray Charles'),
-    ('Shake Shake Shake, Shake your booty', 'KC & The Sunshine Band')
-]

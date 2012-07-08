@@ -8,22 +8,24 @@
 from datetime import datetime, timedelta
 import io
 import os
+import socket
 
 from pyceo import Manager
-from werkzeug.exceptions import HTTPException, BadRequestKeyError
+from werkzeug.exceptions import HTTPException, NotFound, BadRequest
 from werkzeug.local import LocalManager
 from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
+from werkzeug.wrappers import BaseResponse
 
 from .config import get_settings_object
+from .helpers import local, to_unicode
 from .routes import Map, Rule
-from .helpers import local
 from .serializers import to_json
 from .wrappers import Request, Response
 
 
 __all__ = (
-    'Shake', 'set_env', 'get_env', 'env_is', 'manager'
+   'DataNotFound', 'Shake', 'set_env', 'get_env', 'env_is', 'manager'
 )
 
 local_manager = LocalManager([local])
@@ -35,27 +37,27 @@ ENV_FILE = '.SHAKE_ENV'
 DEFAULT_ENV = 'development'
 
 
+class DataNotFound(NotFound):
+    """A "data not found" exception, to differentiate it from a real
+    `HTTP 404: NOT FOUND` while debugging.
+    """
+    pass
+
+NotFound = DataNotFound
+
+
 class Shake(object):
     """Implements a WSGI application and acts as the central
     object.
     
-    :param url_map: Sequence of url rules.
+    settings
+    :   A module or dict with the custom settings.
     
-    :param settings: A module or dict with the custom settings.
-    
-    Usually you create a :class:Shake instance in your main module or
-    in the `__init__.py` file of your package like this::
+    Usually you create a `Shake` instance in your main module or
+    in the `__init__.py` file of your package like this:
         
         from shake import Shake
         app = Shake(settings)
-    
-    For a small application, you can also do:
-        
-        app = Shake()
-        ...
-        app.add_url_rule(...)
-        ...
-        app.settings.foo = 'bar'
     
     """
     
@@ -77,51 +79,54 @@ class Shake(object):
         elif largs > 1:
             url_map = args[0]
             settings = args[1]
-        local.app = self
         
         # Functions to run before each request and response
         self.before_request_funcs = []
         # Functions to run before each response
-        self.before_response_funcs = []
+        self.after_request_funcs = []
         # Functions to run if an exception occurs
         self.on_exception_funcs = []
         
-        # Registered database objects
-        self.databases = []
-        
-        # A dict of static url:path to be used during development.
-        # If not empty, it'll be passed to a
-        # `werkzeug.wsgi.SharedDataMiddleware` instance.
+        # A dict of static `url, path` pairs to be used during development.
         self.static_dirs = {}
         
         settings = get_settings_object(settings)
         self.settings = settings
         if not isinstance(url_map, Map):
-            url_map = Map(url_map,
-                default_subdomain=settings.default_subdomain)
+            url_map = Map(url_map, default_subdomain=settings.DEFAULT_SUBDOMAIN)
         self.url_map = url_map
         
         self.error_handlers = {
-            403: settings.page_not_allowed,
-            404: settings.page_not_found,
-            500: settings.page_error,
-            }
+            403: settings.PAGE_NOT_ALLOWED,
+            404: settings.PAGE_NOT_FOUND,
+            500: settings.PAGE_ERROR,
+        }
         
-        self.request_class.max_content_length = settings.max_content_length
-        self.request_class.max_form_memory_size = settings.max_form_memory_size
+        self.request_class.max_content_length = settings.MAX_CONTENT_LENGTH
+        self.request_class.max_form_memory_size = settings.MAX_FORM_MEMORY_SIZE
         
         self.assert_secret_key()
-        self.session_expires = timedelta(hours=settings.session_expires)
+        self.session_expires = timedelta(hours=settings.SESSION_EXPIRES)
     
     def assert_secret_key(self):
-        key = self.settings.secret_key
+        """Make sure the SECRET_KEY (if there's one defined in the settings)
+        is long enough.
+
+        """
+        key = self.settings.SECRET_KEY
         if key and len(key) < SECRET_KEY_MINLEN:
             raise RuntimeError("Your 'SECRET_KEY' setting is too short to be"
                 " safe.  Make sure is *at least* %i chars long."
                 % SECRET_KEY_MINLEN)
     
     def route(self, url, *args, **kwargs):
-        """Decorator for mounting a function in a URL route.
+        """A decorator for mounting an endpoint in a URL.
+        Example:
+
+            @app.route('/')
+            def example():
+                return 'example'
+
         """
         def real_decorator(target):
             self.url_map.add(Rule(url, target, *args, **kwargs))
@@ -129,13 +134,31 @@ class Shake(object):
         return real_decorator
     
     def add_url(self, rule, *args, **kwargs):
+        """Adds an URL rule.
+        Example:
+
+            def example():
+                return 'example'
+
+            app.add_url('/', example, name='myexample')
+
+        """
         self.url_map.add(Rule(rule, *args, **kwargs))
     
     def add_urls(self, urls):
+        """Adds all the URL rules from a list (or iterable).
+
+        """
         for url in urls:
             self.url_map.add(url)
     
     def add_static(self, url, path):
+        """Can be used to specify an URL for static files on the web and
+        the folder with static files that should be served at that URL.
+        Used only for the local development server.  In production, you'll have
+        to define the static paths in your server config.
+
+        """
         url = '/' + url.strip('/')
         path = os.path.normpath(os.path.realpath(path))
         # Instead of a path, we've probably recieved the value of __file__
@@ -145,21 +168,29 @@ class Shake(object):
     
     def before_request(self, function):
         """Register a function to run before each request.
-        Can be used as a decorator."""
+        Can be used as a decorator.  See `preprocess_request()`.
+
+        """
         if function not in self.before_request_funcs:
             self.before_request_funcs.append(function)
         return function
     
-    def before_response(self, function):
-        """Register a function to be run before each response.
-        Can be used as a decorator."""
-        if function not in self.before_response_funcs:
-            self.before_response_funcs.append(function)
+    def after_request(self, function):
+        """Register a function to be run after each request.
+        Your function must take one parameter, a response_class object and
+        return a new response object or the same.  Can be used as a decorator.
+        See `process_response()`.
+
+        """
+        if function not in self.after_request_funcs:
+            self.after_request_funcs.append(function)
         return function
     
     def on_exception(self, function):
         """Register a function to be run if an exception
-        occurs."""
+        occurs.  Can be used as a decorator.
+
+        """
         if function not in self.on_exception_funcs:
             self.on_exception_funcs.append(function)
         return function
@@ -171,28 +202,29 @@ class Shake(object):
                 return resp_value
     
     def process_response(self, response):
-        for handler in self.before_response_funcs:
+        for handler in self.after_request_funcs:
             response = handler(response)
         return response
     
     def save_session(self, session, response):
         """Saves the session if it needs updates.  For the default
-        implementation, check :meth:`Request.session`.
+        implementation, check `Request.session`.
         
-        :param session: the session to be saved (a :class:`~SecureCookie`
-            object)
-        :param response: an instance of :attr:`response_class`
+        session
+        :   the session to be saved (a `SecureCookie` object)
+        response
+        :   a `response_class` instance.
         """
         if session.should_save:
             expires = datetime.utcnow() + self.session_expires
             session_data = session.serialize()
-            response.set_cookie(self.settings.session_cookie_name,
+            response.set_cookie(self.settings.SESSION_COOKIE_NAME,
                 session_data, httponly=True, expires=expires)
     
     def wsgi_app(self, environ, start_response):
         """The actual WSGI application.  This is not implemented in
         `__call__` so that middlewares can be applied without losing a
-        reference to the class.  So instead of doing this::
+        reference to the class.  So instead of doing this:
             
             app = MyMiddleware(app)
         
@@ -203,74 +235,32 @@ class Shake(object):
         Then you still have the original application object around and
         can continue to call methods on it.
         
-        :param environ:
-            a WSGI environment
-        
-        :param start_response: a callable accepting a status code,
-            a list of headers and an optional exception context to start
-            the response.
+        environ
+        :   a WSGI environment
+        start_response
+        :   a callable accepting a status code, a list of headers and an
+            optional exception context to start the response.
+
         """
+        local.app = self
         self.force_script_name(environ)
-        
         request = self.request_class(environ)
-        local.request = request  # ##
+        local.request = request
         
-        try:
-            endpoint, kwargs = self.match_url(request, environ)
-            
-            resp_value = self.preprocess_request(request)
-            if resp_value is None:
-                resp_value = endpoint(request, **kwargs)
-            response = self.make_response(resp_value, environ)
-            self.save_session(request.session, response)
-            response = self.process_response(response)
-        
-        except (HTTPException), error:
-            code = error.code
-            # If less than 400 is not an error
-            if code < 400:
-                return error(environ, start_response)
-            
-            for handler in self.on_exception_funcs:
-                handler(error)
-            
-            endpoint = None
-            endpoint = self.error_handlers.get(code)
-            if endpoint is None:
-                if self.settings.debug:
-                    if isinstance(error, BadRequestKeyError):
-                        raise
-                    return error(environ, start_response)
-                # In production try to use the default error handler
-                endpoint = self.error_handlers.get(500)
-            
-            if isinstance(endpoint, basestring):
-                endpoint = import_string(endpoint)
-            resp_value = endpoint(request, error)
-            response = self.make_response(resp_value, environ)
-            response.status_code = code
-        
-        except (Exception), error:
-            for handler in self.on_exception_funcs:
-                handler(error)
-            endpoint = self.error_handlers.get(500)
-            if endpoint is None or self.settings.debug:
-                raise
-            
-            if isinstance(endpoint, basestring):
-                endpoint = import_string(endpoint)
-            resp_value = endpoint(request, error)
-            response = self.make_response(resp_value, environ)
-            response.status_code = 500
-        
-        finally:
-            local_manager.cleanup()
-        
+        response = self.dispatch(request)
+        self.save_session(request.session, response)
+        response = self.process_response(response)
+        local_manager.cleanup()
         return response(environ, start_response)
-    
+
     def force_script_name(self, environ):
+        """In some servers (like Lighttpd), when deploying using FastCGI
+        and you want the application to work in the URL root you have to work
+        around a bug by setting `FORCE_SCRIPT_NAME = ''`.
+
+        """
         script_name = environ.get('SCRIPT_NAME')
-        new_script_name = self.settings.force_script_name
+        new_script_name = self.settings.FORCE_SCRIPT_NAME
         
         if (new_script_name != False) and script_name:
             environ['SCRIPT_NAME'] = new_script_name
@@ -279,10 +269,38 @@ class Shake(object):
             if redirect_uri:
                 environ['REDIRECT_URI'] = redirect_uri.replace(
                     script_name, new_script_name)
-    
-    def match_url(self, request, environ):
-        local.urls = urls = self.url_map.bind_to_environ(environ)  # ##
-        
+
+    def dispatch(self, request):
+        """Does the request dispatching.  Matches the URL and returns the
+        return value of the controller or error handler.  This does not have to
+        be a response object.  In order to convert the return value to a
+        proper response object, call `make_response`.
+
+        If DEBUG=True, a `NotFound` exception emitted by your code is treated
+        like a regular exception without error handlers, so iy's easy
+        to differetiate it from a real `HTTP 404: NOT FOUND`.
+
+        """
+        try:
+            endpoint, kwargs = self.match_url(request)
+            resp_value = self.preprocess_request(request)
+            if resp_value is None:
+                resp_value = endpoint(request, **kwargs)
+            response = self.make_response(resp_value)
+
+        except (HTTPException), exception:
+            if self.settings.DEBUG and isinstance(exception, DataNotFound):
+                response = self.handle_exception(request, error)
+            else:
+                response = self.handle_http_exception(request, exception)
+
+        except (Exception), error:
+            response = self.handle_exception(request, error)
+
+        return response
+
+    def match_url(self, request):
+        local.urls = urls = self.create_url_adapter(request)
         rule, kwargs = urls.match(return_rule=True)
         endpoint = rule.endpoint
         if isinstance(endpoint, basestring):
@@ -292,51 +310,128 @@ class Shake(object):
         request.endpoint = endpoint
         request.kwargs = kwargs
         return endpoint, kwargs
-    
-    def make_response(self, resp_value, environ):
+
+    def create_url_adapter(self, request):
+        """Creates a URL adapter for the given request.
+
+        """
+        return self.url_map.bind_to_environ(request.environ,
+            server_name=self.settings.SERVER_NAME)
+
+    def make_response(self, resp='', status=None, headers=None, **kwargs):
         """Converts the return value from a view function to a real
-        response object that is an instance of :attr:`response_class`.
+        response object that is an instance of `response_class`.
         
         The following types are allowed for `resp_value`:
             
-            :attr:`response_class`: the object is returned unchanged.
-            
-            :class:`str`: a response object is created with the string as body.
-            
-            :class:`unicode`: a response object is created with the string
-                encoded to utf-8 as body.
-            
-            :class:`dict`: creates a response object with the JSON
-                representation of the dictionary and the mimetype of
-                `application/json`. This can be very useful when making
-                client-intensive web apps.
-            
-            :class:`None`: an empty response object is created.
-            
-            a WSGI function: the function is called as WSGI application
-                and buffered as response object.
+        `None`
+        :   an empty response object is created.
+        `response`
+        :   the object is returned unchanged.
+        `str`
+        :   a response object is created with the string as body.
+        `unicode`
+        :   a response object is created with the string encoded to utf-8
+            as body.
+        `dict`
+        :   creates a response object with the JSON representation of the
+            dictionary and the mimetype of `application/json`.
+        WSGI function
+        :   the function is called as WSGI application and buffered as
+            response object.
         
-        :param resp_value:
-            the return value from the view function
+        Parameters:
+
+        resp_value
+        :   the return value from the controller function.
+        status
+        :   An optional status code.
+        headers
+        :   A dictionary with custom headers.
         
-        :return: an instance of :attr:`response_class`
+        return: an instance of `response_class`
         
         """
-        if isinstance(resp_value, self.response_class):
-            return resp_value
-        if isinstance(resp_value, basestring):
-            return self.response_class(resp_value)
-        if isinstance(resp_value, dict):
-            return self.response_class(
-                to_json(resp_value, indent=None),
-                mimetype='application/json')
-        if resp_value is None:
-            return self.response_class('')
-        return self.response_class.force_type(resp_value, environ)
-    
-    def _welcome_msg(self):
-        """Prints a welcome message, if you run an application
-        without URLs."""
+        if resp is None:
+            resp = ''
+
+        if isinstance(resp, dict):
+            kwargs['mimetype'] = 'application/json'
+            resp = to_json(resp, indent=None)
+
+        if not isinstance(resp, BaseResponse):
+            if isinstance(resp, basestring):
+                resp = self.response_class(resp, status=status, headers=headers,
+                    **kwargs)
+                headers = status = None
+            elif not callable(resp):
+                resp = to_unicode(resp)
+                resp = self.response_class(resp, status=status, headers=headers,
+                    **kwargs)
+                headers = status = None
+            else:
+                resp = self.response_class.force_type(resp, local.request.environ)
+
+        if status is not None:
+            if isinstance(status, basestring):
+                resp.status = status
+            else:
+                resp.status_code = status
+        if headers:
+            resp.headers.extend(headers)
+
+        return resp
+
+    def handle_http_exception(self, request, exception):
+        """Handles an HTTP exception.  By default try to use the handler
+        for that exception code.  If no such handler exists, in DEBUG mode
+        the exception is re-raised, otherwise a default 500 internal
+        server error message will be displayed.
+
+        """
+        status = exception.code
+        # If less than 400 is not an error but flow control (eg. redirect)
+        if status < 400:
+            return exception
+
+        for handler in self.on_exception_funcs:
+            handler(exception)
+        endpoint = self.error_handlers.get(status)
+        if endpoint is None:
+            if self.settings.DEBUG:
+                raise
+            endpoint = self.error_handlers.get(500)
+        
+        if isinstance(endpoint, basestring):
+            endpoint = import_string(endpoint)
+        resp_value = endpoint(request, exception)
+        response = self.make_response(resp_value, status)
+        return response
+
+    def handle_exception(self, request, error):
+        """Default exception handling that kicks in when an exception
+        occours that is not caught.  In debug mode the exception is
+        re-raised immediately, otherwise it is logged and the handler
+        for a 500 internal server error is used.  If no such handler
+        exists, a default 500 internal server error message is displayed.
+
+        """
+        for handler in self.on_exception_funcs:
+            handler(error)
+        if self.settings.DEBUG:
+            raise
+        endpoint = self.error_handlers.get(500)
+        if isinstance(endpoint, basestring):
+            endpoint = import_string(endpoint)
+        resp_value = endpoint(request, error)
+        response = self.make_response(resp_value, 500)
+        return response
+
+    def print_welcome_msg(self):
+        """Prints a welcome message, if you run this application
+        without declaring URLs first.
+
+        """
         if os.environ.get('WERKZEUG_RUN_MAIN') != 'true' \
                 and len(self.url_map._rules) == 0:
             wml = len(WELCOME_MESSAGE) + 2
@@ -345,50 +440,62 @@ class Shake(object):
                 ' %s ' % WELCOME_MESSAGE,
                 '-' * wml,
                 ''])
+
+    def print_help_msg(self, host, port):
+        """Prints a help message.
+
+        """
+        if host == '0.0.0.0':
+            # local IP address for easy debugging.
+            ips = [ip 
+                for ip in socket.gethostbyname_ex(socket.gethostname())[2]
+                if not ip.startswith("127.")
+            ][:1]
+            if ips:
+                print ' * Running on http://%s:%s' % (ips[0], port)
+        print '-- Quit the server with Ctrl+C --'
     
     def run(self, host=None, port=None, debug=None, reloader=None, 
-            threaded=True, processes=1, reloader_interval=2,
+            reloader_interval=2, threaded=True, processes=1,
             ssl_context=None, **kwargs):
         """Runs the application on a local development server.
         
         The development server is not intended to be used on production
-        systems. It was designed especially for development purposes and
+        systems.  It was designed especially for development purposes and
         performs poorly under high load.
         
-        :param host:
-            The host for the application. eg: 'localhost'.
-        
-        :param port:
-            The port for the server. eg: 8080
-        
-        :param debug:
-            Run in debug mode? The default is the value of settings.DEBUG.
-        
-        :param threaded:
-            Should the process handle each request in a separate thread?
-            Default `false`.
-        
-        :param processes:
-            Number of processes to spawn. Default `1`.
-        
-        :param reloader_interval:
-            The interval for the reloader in seconds. Default `2`.
-        
-        :param ssl_context:
-            An SSL context for the connection. Either an OpenSSL context, the
+        host
+        :   the host for the application. eg: 'localhost' or '0.0.0.0'.
+        port
+        :   the port for the server. eg: 8080.
+        debug
+        :   run in debug mode?  The default is the value of settings.DEBUG.
+        reloader
+        :   use the automatic reloader?  The default is the value of
+            settings.RELOADER.
+        reloader_interval
+        :   the interval for the reloader in seconds.  Default `2`.
+        threaded
+        :   should the process handle each request in a separate thread?
+            Default `False`.
+        processes
+        :   number of processes to spawn.  Default `1`.
+        ssl_context
+        :   an SSL context for the connection.  Either an OpenSSL context, the
             string 'adhoc' if the server should automatically create one, or
             `None` to disable SSL (which is the default).
         
         """
-        host = host or self.settings.server_name
-        port = port or self.settings.server_port
-        debug = bool(debug if (debug is not None) else
-            self.settings.get('debug', True))
+        host = host or self.settings.SERVER_NAME
+        port = port or self.settings.SERVER_PORT
+        debug = bool(debug if debug is not None else
+            self.settings.DEBUG)
         reloader = bool(reloader if (reloader is not None) else
-            self.settings.get('reloader', True))
+            self.settings.RELOADER)
         
-        self._welcome_msg()
-        
+        self.print_welcome_msg()
+        self.print_help_msg(host, port)
+
         return run_simple(host, port, self,
             use_reloader=reloader,
             use_debugger=debug,
@@ -400,25 +507,43 @@ class Shake(object):
             **kwargs)
     
     def test_client(self):
-        """Creates a test client for this application.
+        """Creates a test client which you can use to send virtual requests
+        to the application.
+        For general information refer to `werkzeug.test.Client`.
+
         """
         from werkzeug.test import Client
-        if self.settings.server_name == '127.0.0.1':
-            self.settings.server_name = 'localhost'
+        if self.settings.SERVER_NAME == '127.0.0.1':
+            self.settings.SERVER_NAME = 'localhost'
         return Client(self, self.response_class, use_cookies=True)
     
     def __call__(self, environ, start_response):
-        local.app = self
+        """Shortcut for `wsgi_app`.
+
+        """
         return self.wsgi_app(environ, start_response)
 
 
 def set_env(env):
+    """Set the working environment to `env` saving it in `ENV_FILE`.
+    `env` is the name of the new environment eg: 'development' or 'production'.
+
+    You use environments to load different settings for development,
+    production, testing, etc.
+
+    """
     with io.open(ENV_FILE, 'wt') as f:
-        f.write(unicode(env))
+        f.write(to_unicode(env))
     return env
 
 
 def get_env(default=DEFAULT_ENV):
+    """Read the current working environment from `ENV_FILE`.
+
+    You use environments to load different settings for development,
+    production, testing, etc.
+
+    """
     try:
         with io.open(ENV_FILE, 'rt') as f:
             env = f.read()
@@ -427,8 +552,20 @@ def get_env(default=DEFAULT_ENV):
     return env or default
 
 
-def env_is(value):
-    return get_env() == value
+def env_is(env):
+    """Check if the current working environment is the same as `env`.
+
+    You use environments to load different settings for development,
+    production, testing, etc.
+    Example:
+
+        if shake.env_is('production'):
+            import production as settings
+        else:
+            import development as settings
+
+    """
+    return get_env() == env
 
 
 manager = Manager()

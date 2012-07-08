@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Production environment settings
+    Production settings
+    -------------------------------
+    
 """
 from mailshake import SMTPMailer
 
 from .base import *
 
 
-debug = False
-reload = False
+DEBUG = False
+RELOAD = False
 
-sqlalchemy_uri = 'postgresql://username:password@127.0.0.1/database'
+SQLALCHEMY_URI = 'postgresql://username:password@127.0.0.1/database'
 
-page_not_found = 'bundles.common.controllers.not_found'
-page_error = 'bundles.common.controllers.critical_error'
-page_not_allowed = 'bundles.common.controllers.not_allowed'
+PAGE_NOT_FOUND = 'bundles.common.controllers.not_found'
+PAGE_ERROR = 'bundles.common.controllers.critical_error'
+PAGE_NOT_ALLOWED = 'bundles.common.controllers.not_allowed'
 
-mailer_class = SMTPMailer
-mailer_settings = {
+MAILER_CLASS = SMTPMailer
+MAILER_SETTINGS = {
     'host': 'localhost',
     'username': 'xxxxxx',
     'password': 'xxxxx',

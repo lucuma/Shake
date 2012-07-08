@@ -4,8 +4,9 @@
 #
 #     pip install -r requirements.txt
 
-Werkzeug>=0.7
+Babel
 Jinja2>=2.4
 pyCEO>=1.0.3
-pyYAML
+pytz
 Voodoo>=0.7
+Werkzeug>=0.7

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake.helpers
+    Shake.helpers
+    --------------------------
 
 """
 import datetime
@@ -35,20 +36,17 @@ local = Local()
 def url_for(endpoint, anchor=None, method=None, external=False, **values):
     """Generates a URL to the given endpoint with the method provided.
     
-    param endpoint:
-        The endpoint of the URL (name of the function).
-    
-    param anchor:
-        If provided this is added as anchor to the URL.
-    
-    param method:
-        If provided this explicitly specifies an HTTP method.
-    
-    param external:
-        Set to `True`, to generate an absolute URL.
+    endpoint
+    :   The endpoint of the URL (name of the function).
+    anchor
+    :   If provided this is added as anchor to the URL.
+    method
+    :   If provided this explicitly specifies an HTTP method.
+    external
+    :   Set to `True`, to generate an absolute URL.
+    values
+    :   The variable arguments of the URL rule
 
-    param values:
-        The variable arguments of the URL rule
     """
     try:
         urls = local.urls
@@ -167,10 +165,6 @@ def from36(snum, alphabet=None):
     except KeyError:
         raise ValueError('The string is not a valid base 36 encoded integer')
     return num
-
-
-def plural(num, plural='s', singular=''):
-    return plural if num != 1 else singular
 
 
 class StorageDict(dict):
@@ -344,8 +338,7 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
             mtime = os.path.getmtime(filepath)
         data = wrap_file(request.environ, file)
     
-    if response_class is None:
-        response_class = Response
+    response_class = response_class or Response
     resp = response_class(data, mimetype=mimetype, headers=headers,
         direct_passthrough=True)
 

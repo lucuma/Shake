@@ -1,27 +1,48 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
-import os
+from os.path import join, dirname
 
 import jinja2
 import pytest
-from shake import (Shake, Rule, Render, ViewNotFound, flash, get_messages,
-    get_csrf, new_csrf, local)
+from shake import (Shake, Request, Response, Render, local, ViewNotFound)
+from shake import (flash, get_messages, get_csrf, new_csrf, link_to)
+from werkzeug.test import EnvironBuilder
 
 
 HTTP_OK = 200
 
-views_dir = os.path.join(os.path.dirname(__file__), 'res')
-static_dir = os.path.join(os.path.dirname(__file__), 'static')
+views_dir = join(dirname(__file__), 'res')
+static_dir = join(dirname(__file__), 'static')
 
 
 def test_render():
     render = Render(views_dir)
+    local.app = Shake()
     
-    resp = render.to_string('view.html')
-    assert resp == '<h1>Hello World</h1>'
-    resp = render.to_string('view.txt',
-        who='E.T.', action='phone', where='home')
+    resp = render('view.html')
+    assert isinstance(resp, Response)
+    assert resp.data == '<h1>Hello World</h1>'
+
+
+def test_to_string():
+    render = Render(views_dir)
+
+    resp = render('view.txt',
+        {'who': 'E.T.', 'action': 'phone', 'where':'home'},
+        to_string=True
+    )
     assert resp == 'E.T. phone home'
+
+
+def test_from_string():
+    render = Render()
+
+    resp = render.from_string(
+        'Testing, {{ a }} {{ b }} {{ c }}...',
+        {'a': 1, 'b': '2', 'c': '3'},
+        to_string=True
+    )
+    assert resp == 'Testing, 1 2 3...'
 
 
 def test_view_not_found():
@@ -31,43 +52,24 @@ def test_view_not_found():
         render('x_x')
 
 
-def test_from_to_string():
-    render = Render()
-    tmpl = 'Testing, {{ a }} {{ b }} {{ c }}...'
-    resp = render.from_string(tmpl, a=1, b='2', c='3')
-    assert resp == 'Testing, 1 2 3...'
-
-
-def test_mimetype():
+def test_default_mimetype():
     render1 = Render(views_dir)
     render2 = Render(views_dir, default_mimetype='foo/bar')
+    local.app = Shake()
     
-    def t1(request):
-        resp = render1('view.html')
-        assert isinstance(resp, local.app.response_class)
-        assert resp.mimetype == 'text/html'
-    
-    def t2(request):
-        resp = render2('view.html')
-        assert isinstance(resp, local.app.response_class)
-        assert resp.mimetype == 'foo/bar'
-    
-    urls = [
-        Rule('/t1', t1),
-        Rule('/t2', t2),
-        ]
-    app = Shake(urls)
-    local.app = app
-    c = app.test_client()
-    c.get('/t1')
-    c.get('/t2')
+    resp = render1('view.html')
+    assert resp.mimetype == 'text/html'
+
+    resp = render2('view.html')
+    assert resp.mimetype == 'foo/bar'
 
 
 def test_globals():
     gg = {'who': 'E.T.', 'action': 'phone', 'where': 'home'}
     render = Render(globals=gg)
+
     tmpl = '{{ who }} {{ action }} {{ where }}'
-    resp = render.from_string(tmpl)
+    resp = render.from_string(tmpl, to_string=True)
     assert resp == 'E.T. phone home'
 
 
@@ -81,8 +83,9 @@ def test_filters():
     
     ff = {'double': double, 'cut': cut}
     render = Render(filters=ff)
+
     tmpl = '{{ 45|double }} {{ "abcytfugj"|cut }}'
-    resp = render.from_string(tmpl)
+    resp = render.from_string(tmpl, to_string=True)
     assert resp == '90 abc'
 
 
@@ -93,252 +96,112 @@ def test_tests():
     
     tt = {'gt_3': gt_3}
     render = Render(tests=tt)
+
     tmpl = '{% if 6 is gt_3 %}ok{% endif %}{% if 1 is gt_3 %} FAIL{% endif %}'
-    resp = render.from_string(tmpl)
+    resp = render.from_string(tmpl, to_string=True)
     assert resp == 'ok'
-
-
-def test_set_get_globals():
-    gg = {'who': 'E.T.', 'action': 'phone', 'where': 'home'}
-    render = Render()
-    render.set_global('who', 'E.T.')
-    render.set_global('action', 'phone')
-    render.set_global('where', 'home')
-    
-    tmpl = '{{ who }} {{ action }} {{ where }}'
-    resp = render.from_string(tmpl)
-    assert resp == 'E.T. phone home'
-    
-    assert render.get_global('who') == 'E.T.'
-    assert render.get_global('action') == 'phone'
-    assert render.get_global('where') == 'home'
-
-
-def test_set_get_filters():
-    
-    def double(val):
-        return val * 2
-    
-    def cut(text):
-        return text[:3]
-    
-    render = Render()
-    render.set_filter('double', double)
-    render.set_filter('cut', cut)
-    
-    tmpl = '{{ 45|double }} {{ "abcytfugj"|cut }}'
-    resp = render.from_string(tmpl)
-    assert resp == '90 abc'
-    
-    assert render.get_filter('double') == double
-    assert render.get_filter('cut') == cut
-
-
-def test_set_get_tests():
-    
-    def gt_3(val):
-        return val > 3
-    
-    render = Render()
-    render.set_test('gt_3', gt_3)
-    
-    tmpl = '{% if 6 is gt_3 %}ok{% endif %}{% if 1 is gt_3 %} FAIL{% endif %}'
-    resp = render.from_string(tmpl)
-    assert resp == 'ok'
-    
-    assert render.get_test('gt_3') == gt_3
-
-
-def test_default_tests():
-    render = Render()
-    tmpl = '{% if value is ellipsis %}ok{% endif %}'
-    resp = render.from_string(tmpl, value=Ellipsis)
-    assert resp == 'ok'
-
-
-def test_default_globals():
-    render = Render()
-    
-    def foo(request):
-        tmpl = '{{ media }}{{ request }}{{ settings }}'
-        render.from_string(tmpl)
-    
-    urls = [
-        Rule('/', foo),
-        ]
-    app = Shake(urls)
-    c = app.test_client()
-    c.get('/')
-
-
-def test_default_globals_now():
-    render = Render()
-    tmpl = '{{ now }}'
-    snow = str(datetime.utcnow())[:-10]
-    assert render.from_string(tmpl).startswith(snow)
-
-
-def test_default_globals_flash_messages():
-    render = Render()
-    
-    def foo(request):
-        flash(request, 'foo')
-        tmpl = '{% for fm in get_messages() %}{{ fm.msg }}{% endfor %}'
-        assert render.from_string(tmpl) == 'foo'
-    
-    urls = [
-        Rule('/', foo),
-        ]
-    settings = {'secret_key': 'abc'*20}
-    app = Shake(urls, settings)
-    c = app.test_client()
-    c.get('/')
-
-
-def test_default_globals_url_for():
-    render = Render()
-    
-    def foo(request):
-        tmpl = "{{ url_for('foo') }}"
-        assert render.from_string(tmpl) == '/'
-    
-    urls = [
-        Rule('/', foo, name='foo'),
-        ]
-    app = Shake(urls)
-    c = app.test_client()
-    c.get('/')
-
-
-def test_flash_messagesech():
-    
-    def t1(request):
-        msgs = get_messages()
-        assert msgs == []
-    
-    def t2(request):
-        flash(request, 'foo')
-        flash(request, 'bar', 'error', extra='blub')
-        msgs = get_messages()
-        assert len(msgs) == 2
-        assert (msgs[0]['msg'], msgs[0]['cat'], msgs[0]['extra']) == \
-            ('foo', 'info', None)
-        assert (msgs[1]['msg'], msgs[1]['cat'], msgs[1]['extra']) == \
-            ('bar', 'error', 'blub')
-        msgs2 = get_messages()
-        assert msgs2 == msgs
-    
-    urls = [
-        Rule('/t1', t1),
-        Rule('/t2', t2),
-        ]
-    settings = {'secret_key': 'abc'*20}
-    app = Shake(urls, settings)
-    c = app.test_client()
-    c.get('/t1')
-    c.get('/t2')
 
 
 def test_csrf_token():
     render = Render()
-    
-    def t(request):
-        csrf1 = get_csrf(request).value
-        csrf2 = new_csrf(request).value
-        csrf2_ = get_csrf(request).value
-        assert csrf2 != csrf1
-        assert csrf2_ == csrf2
-    
-    urls = [
-        Rule('/', t),
-        ]
-    settings = {'secret_key': 'abc'*20}
-    app = Shake(urls, settings)
-    c = app.test_client()
-    c.get('/')
+    settings = {'SECRET_KEY': 'abc'*20}
+    local.app = Shake(settings)
+    request = get_test_request()
+
+    csrf1 = get_csrf(request).value
+    csrf2 = new_csrf(request).value
+    csrf2_ = get_csrf(request).value
+    assert csrf2 != csrf1
+    assert csrf2_ == csrf2
 
 
 def test_csrf_token_global():
     render = Render()
+    settings = {'SECRET_KEY': 'abc'*20}
+    local.app = Shake(settings)
+    local.request = get_test_request()
     
-    def t(request):
-        csrf = get_csrf(request)
-        tmpl = '{{ csrf_secret.name }} {{ csrf_secret.value }}'
-        assert render.from_string(tmpl) == '%s %s' % (csrf.name, csrf.value)
-    
-    urls = [
-        Rule('/', t),
-        ]
-    settings = {'secret_key': 'abc'*20}
-    app = Shake(urls, settings)
-    c = app.test_client()
-    c.get('/')
+    csrf = get_csrf()
+    tmpl = '{{ csrf.name }} {{ csrf.value }}'
+    resp = render.from_string(tmpl, to_string=True)
+    expected = '%s %s' % (csrf.name, csrf.value)
+    assert resp == expected
 
 
 def test_csrf_token_input():
     render = Render()
+    settings = {'SECRET_KEY': 'abc'*20}
+    local.app = Shake(settings)
+    local.request = get_test_request()
     
-    def t(request):
-        csrf = get_csrf(request)
-        tmpl = '{{ csrf_secret.input }}'
-        expected = '<input type="hidden" name="%s" value="%s">' \
+    csrf = get_csrf()
+    tmpl = '{{ csrf.input }}'
+    resp = render.from_string(tmpl, to_string=True)
+    expected = '<input type="hidden" name="%s" value="%s">' \
             % (csrf.name, csrf.value)
-        assert render.from_string(tmpl) == expected
-    
-    urls = [
-        Rule('/', t),
-        ]
-    settings = {'secret_key': 'abc'*20}
-    app = Shake(urls, settings)
-    c = app.test_client()
-    c.get('/t')
+    assert resp == expected
 
 
 def test_csrf_token_query():
     render = Render()
+    settings = {'SECRET_KEY': 'abc'*20}
+    local.app = Shake(settings)
+    local.request = get_test_request()
     
-    def t(request):
-        csrf = get_csrf(request)
-        tmpl = '{{ csrf_secret.query }}'
-        expected = '%s=%s' % (csrf.name, csrf.value)
-        assert render.from_string(tmpl) == expected
+    csrf = get_csrf()
+    tmpl = '{{ csrf.query }}'
+    resp = render.from_string(tmpl, to_string=True)
+    expected = '%s=%s' % (csrf.name, csrf.value)
+    assert resp == expected
+
+
+def test_render_load_strings():
+    render = Render(strings=views_dir)
     
-    urls = [
-        Rule('/', t),
-        ]
-    settings = {'secret_key': 'abc'*20}
-    app = Shake(urls, settings)
-    c = app.test_client()
-    c.get('/t')
+    s = render.load_strings('en')
+    assert s['HELLO'] == 'Hello World'
+
+    s = render.load_strings('en-US')
+    assert s['HELLO'] == 'Hi'
+
+    s = render.load_strings('es-AR')
+    assert s['HELLO'] == 'Hola mundo'
+    s2 = render.load_strings('es')
+    assert s == s2
+
+    s = render.load_strings('en')
+    assert s['FOOBAR'] == ''
 
 
-def test_i18n():
-    render = Render(i18n=views_dir)
-    
-    def ok(request):
-        return render.from_string('{{ i18n.HELLO }}')
-    
-    def fail(request):
-        return render.from_string('{{ i18n.FOOBAR }}')
-    
-    urls = [
-        Rule('/ok/', ok),
-        Rule('/fail/', fail),
-    ]
-    app = Shake(urls)
-    c = app.test_client()
+def test_link_to():
+    path = '/foo/bar/'
+    local.request = get_test_request(path)
 
-    resp = c.get('/ok/?lang=en-US')
-    assert resp.status_code == HTTP_OK
-    assert resp.data == 'Hello World'
+    html = link_to('Hello', '/hello/', title='click me')
+    expected = u'<a href="/hello/" title="click me">Hello</a>'
+    assert expected == html
 
-    resp = c.get('/ok/?lang=en_US')
-    assert resp.status_code == HTTP_OK
-    assert resp.data == 'Hello World'
+    html = link_to('Bar', path)
+    expected = u'<a href="/foo/bar/" class="active">Bar</a>'
+    assert expected == html
 
-    resp = c.get('/ok/?lang=es-AR')
-    assert resp.data == 'Hola mundo'
+    html = link_to('Bar', '/foo/')
+    expected = u'<a href="/foo/" class="active">Bar</a>'
+    assert expected == html
 
-    resp = c.get('/fail/?lang=en-US')
-    assert resp.data == ''
+
+# -----------------------------------------------------------------------------
+
+def get_test_env(path, **kwargs):
+    builder = EnvironBuilder(path=path, **kwargs)
+    return builder.get_environ()
+
+
+def get_test_request(path='/', **kwargs):
+    env = get_test_env(path, **kwargs)
+    return Request(env)
+
+
+# def pytest_funcarg__render(request):
+
 
