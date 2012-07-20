@@ -6,20 +6,35 @@
     Command-line scripts
 
 """
-import os
+from os.path import sep, dirname, isfile, join, abspath, normpath, realpath
 
+import inflector
 from pyceo import Manager, format_title
 import voodoo
 
-from . import globals as g
 from . import helpers as h
+
+
+ROOTDIR = normpath(abspath(realpath(join(dirname(__file__), '..', 'skeletons'))))
+APP_SKELETON = join(ROOTDIR, 'project')
+RESOURCE_SKELETON = join(ROOTDIR, 'resource')
+
+ENV_OPTIONS = {
+    'autoescape': False,
+    'block_start_string': '[%',
+    'block_end_string': '%]',
+    'variable_start_string': '[[',
+    'variable_end_string': ']]',
+}
+
+FILTER = ('.pyc', '.DS_Store', '.pyo')
 
 
 manager = Manager()
 
 
 @manager.command
-def new(app_path='.', skeleton=g.APP_SKELETON, **options):
+def new(app_path='.', skeleton=APP_SKELETON, **options):
     """APP_PATH='.' [SKELETON_PATH]
     
     The 'shake new' command creates a new Shake application with a default
@@ -34,13 +49,13 @@ def new(app_path='.', skeleton=g.APP_SKELETON, **options):
     quiet = options.get('quiet', options.get('q', False))
     pretend = options.get('pretend', options.get('p', False))
 
-    app_path = app_path.rstrip(os.path.sep)
+    app_path = app_path.rstrip(sep)
     data = {
         'SECRET1': h.make_secret(),
         'SECRET2': h.make_secret(),
     }
     voodoo.reanimate_skeleton(skeleton, app_path, data=data,
-        filter_ext=g.FILTER, env_options=g.ENV_OPTIONS, **options)
+        filter_ext=FILTER, env_options=ENV_OPTIONS, **options)
     
     if not pretend:
         h.install_requirements(app_path, quiet)
@@ -53,7 +68,7 @@ def new(app_path='.', skeleton=g.APP_SKELETON, **options):
 def add(name=None, *args, **options):
     """NAME [field:type, ...] [options]
 
-    Generates the model, views and controller of a resource.
+    Generates the model, templates and view of a resource.
     The resource is ready to use as a starting point for your RESTful,
     resource-oriented application.
 
@@ -80,40 +95,40 @@ def add(name=None, *args, **options):
 
     quiet = options.get('quiet', options.get('q', False))
     pretend = options.get('pretend', options.get('p', False))
-    name = name.rstrip(os.path.sep)
-    singular, plural = h.sanitize_name(name)
+    name = name.rstrip(sep)
+    singular, plural, class_name = h.sanitize_name(name)
 
-    bundle_src = os.path.join(g.RESOURCE_SKELETON, 'bundle')
-    views_src = os.path.join(g.RESOURCE_SKELETON, 'views')
-    bundle_dst = os.path.join('bundles', plural)
-    views_dst = os.path.join('views', plural)
+    bundle_src = join(RESOURCE_SKELETON, 'bundle')
+    templates_src = join(RESOURCE_SKELETON, 'templates')
+    bundle_dst = join('bundles', plural)
+    templates_dst = join('templates', plural)
 
     data = {
         'singular': singular,
         'plural': plural,
-        'class_name': h.underscores_to_camelcase(singular),
+        'class_name': class_name,
         'fields': h.get_model_fields(args),
     }
     
     # Bundle
     if not quiet:
         print voodoo.formatm('invoke', bundle_dst, color='white')
-    bundle_dst = os.path.abspath(bundle_dst)
+    bundle_dst = abspath(bundle_dst)
     voodoo.reanimate_skeleton(bundle_src, bundle_dst, data=data,
-        filter_ext=g.FILTER, env_options=g.ENV_OPTIONS, **options)
+        filter_ext=FILTER, env_options=ENV_OPTIONS, **options)
 
-    # Views
+    # templates
     if not quiet:
-        print voodoo.formatm('invoke', views_dst, color='white')
-    views_dst = os.path.abspath(views_dst)
-    voodoo.reanimate_skeleton(views_src, views_dst, data=data,
-        filter_ext=g.FILTER, env_options=g.ENV_OPTIONS, **options)
+        print voodoo.formatm('invoke', templates_dst, color='white')
+    templates_dst = abspath(templates_dst)
+    voodoo.reanimate_skeleton(templates_src, templates_dst, data=data,
+        filter_ext=FILTER, env_options=ENV_OPTIONS, **options)
 
     # Insert bundle import in urls.py
     if not quiet:
         print voodoo.formatm('update', 'urls.py', color='green')
-    path = os.path.abspath('urls.py')
-    if not os.path.isfile(path):
+    path = abspath('urls.py')
+    if not isfile(path):
         if not quiet:
             print voodoo.formatm('warning', 'urls.py not found', color='yellow')
         return

@@ -10,32 +10,28 @@
 from shake import Rule
 from shake_auth import Auth
 
-from main import app, render, mailer
+from main import app, mailer
 from .models import User
 
 
-auth = Auth(User, app,
-    render=render, mailer=mailer,
-    **app.settings.AUTH_SETTINGS
-)
-
+auth = Auth(User, app, mailer=mailer, **app.settings.AUTH_SETTINGS)
 
 urls = [
 
-    Rule('/sign-in/', auth.sign_in_controller,
+    Rule('/sign-in/', auth.sign_in_view,
         name='auth.sign_in'),
 
-    Rule('/sign-out/', auth.sign_out_controller,
+    Rule('/sign-out/', auth.sign_out_view,
         name='auth.sign_out'),
 
-    Rule('/change-password/', auth.change_password_controller,
-        name='auth.change_password'),
-
-    Rule('/reset-password/', auth.reset_password_controller,
+    Rule('/reset-password/', auth.reset_password_view,
         name='auth.reset_password'),
 
-    Rule('/reset-password/<token>/',auth.reset_password_controller,
+    Rule('/reset-password/<token>/',auth.reset_password_view,
         name='auth.check_token'),
+
+    Rule('/change-password/', auth.change_password_view,
+        name='auth.change_password'),
 
 ]
 

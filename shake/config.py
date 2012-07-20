@@ -13,7 +13,7 @@ class DefaultSettings(object):
 
     SERVER_NAME = '0.0.0.0'
     SERVER_PORT = 5000
-    DEFAULT_SUBDOMAIN = ''
+    DEFAULT_SUBDOMAIN = None
     
     FORCE_SCRIPT_NAME = False
     
@@ -29,16 +29,14 @@ class DefaultSettings(object):
     # The maximum size for regular form data (not files)
     MAX_FORM_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB
     
+    DEFAULT_MIMETYPE = 'text/html'
+
     DEFAULT_LOCALE = 'en'
     DEFAULT_TIMEZONE = 'UTC'
-
-    # URL prefix for static files.
-    # Examples: "http://media.lucumalabs.com/static/", "http://abc.org/static/"
-    STATIC_URL = '/static'
     
-    PAGE_NOT_FOUND = 'shake.controllers.not_found_page'
-    PAGE_ERROR = 'shake.controllers.error_page'
-    PAGE_NOT_ALLOWED = 'shake.controllers.not_allowed_page'
+    PAGE_NOT_FOUND = 'shake.views.not_found_page'
+    PAGE_ERROR = 'shake.views.error_page'
+    PAGE_NOT_ALLOWED = 'shake.views.not_allowed_page'
 
     QUOTES = [
         # quote, by

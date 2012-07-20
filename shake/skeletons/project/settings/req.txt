@@ -7,7 +7,7 @@
 #     pip install -r req.txt
 
 Shake
-Solution
-Shake-Auth>=1.0
+Solution>=1.1.16
+Shake-Auth>=1.1.4
 MailShake
 Shake-Files

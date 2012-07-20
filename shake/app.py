@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    # Shake.app
+    Shake.app
+    --------------------------
 
     This module implements the central WSGI application object.
 
@@ -8,6 +9,7 @@
 from datetime import datetime, timedelta
 import io
 import os
+from os.path import isdir, dirname, join, abspath, normpath, realpath
 import socket
 
 from pyceo import Manager
@@ -15,13 +17,13 @@ from werkzeug.exceptions import HTTPException, NotFound, BadRequest
 from werkzeug.local import LocalManager
 from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
-from werkzeug.wrappers import BaseResponse
 
 from .config import get_settings_object
 from .helpers import local, to_unicode
+from .i18n import I18n, LOCALES_DIR
+from .render import Render, TEMPLATES_DIR
 from .routes import Map, Rule
-from .serializers import to_json
-from .wrappers import Request, Response
+from .wrappers import Request, Response, make_response
 
 
 __all__ = (
@@ -50,14 +52,17 @@ class Shake(object):
     """Implements a WSGI application and acts as the central
     object.
     
+    root_path
+    :   the root path of the application.  The `locales` and `templates` dirs
+        will be based on this value.
     settings
-    :   A module or dict with the custom settings.
+    :   a module or dict with the custom settings.
     
     Usually you create a `Shake` instance in your main module or
     in the `__init__.py` file of your package like this:
         
         from shake import Shake
-        app = Shake(settings)
+        app = Shake(__file__, settings)
     
     """
     
@@ -66,51 +71,44 @@ class Shake(object):
     
     # The class that is used for response objects.
     response_class = Response
+
     
-    def __init__(self, *args):
-        url_map = []
-        settings = {}
-        largs = len(args)
-        if largs == 1:
-            settings = args[0]
-            if isinstance(args[0], (list, tuple, Map)):
-                url_map = args[0]
-                settings = {}
-        elif largs > 1:
-            url_map = args[0]
-            settings = args[1]
-        
+    def __init__(self, root_path=None, settings=None):
         # Functions to run before each request and response
         self.before_request_funcs = []
         # Functions to run before each response
         self.after_request_funcs = []
         # Functions to run if an exception occurs
         self.on_exception_funcs = []
-        
         # A dict of static `url, path` pairs to be used during development.
         self.static_dirs = {}
         
-        settings = get_settings_object(settings)
+        root_path = root_path or '.'
+        root_path = normpath(abspath(realpath(root_path)))
+        # Instead of a path, we've probably recieved the value of __file__
+        if not isdir(root_path):
+            root_path = dirname(root_path)
+        self.root_path = root_path
+
+        settings = get_settings_object(settings or {})
         self.settings = settings
-        if not isinstance(url_map, Map):
-            url_map = Map(url_map, default_subdomain=settings.DEFAULT_SUBDOMAIN)
-        self.url_map = url_map
-        
+        self.assert_secret_key()
+
+        self.url_map = Map([], default_subdomain=settings.DEFAULT_SUBDOMAIN)
         self.error_handlers = {
             403: settings.PAGE_NOT_ALLOWED,
             404: settings.PAGE_NOT_FOUND,
             500: settings.PAGE_ERROR,
         }
-        
         self.request_class.max_content_length = settings.MAX_CONTENT_LENGTH
         self.request_class.max_form_memory_size = settings.MAX_FORM_MEMORY_SIZE
-        
-        self.assert_secret_key()
         self.session_expires = timedelta(hours=settings.SESSION_EXPIRES)
+        self.create_default_services()
+
     
     def assert_secret_key(self):
-        """Make sure the SECRET_KEY (if there's one defined in the settings)
-        is long enough.
+        """Make sure the SECRET_KEY is long enough (only if there's one
+        defined in the settings).
 
         """
         key = self.settings.SECRET_KEY
@@ -118,6 +116,24 @@ class Shake(object):
             raise RuntimeError("Your 'SECRET_KEY' setting is too short to be"
                 " safe.  Make sure is *at least* %i chars long."
                 % SECRET_KEY_MINLEN)
+
+
+    def create_default_services(self):
+        """Creates the default `render` and `i18n` services using the
+        `root_path` as the base path for the `'templates'` and `'locales'` dirs.
+
+        """
+        locales_dir = (self.settings.get('LOCALES_DIR') or
+            join(self.root_path, LOCALES_DIR))
+        if isinstance(locales_dir, basestring):
+            locales_dir = [locales_dir]
+        self.i18n = I18n(locales_dir, app=self)
+
+        templates_dir = join(self.root_path, TEMPLATES_DIR)
+        self.render = Render(templates_dir, i18n=self.i18n,
+            default_mimetype=self.settings.get('DEFAULT_MIMETYPE'),
+            response_class=self.response_class)
+
     
     def route(self, url, *args, **kwargs):
         """A decorator for mounting an endpoint in a URL.
@@ -132,10 +148,12 @@ class Shake(object):
             self.url_map.add(Rule(url, target, *args, **kwargs))
             return target
         return real_decorator
+
     
     def add_url(self, rule, *args, **kwargs):
         """Adds an URL rule.
         Example:
+
 
             def example():
                 return 'example'
@@ -144,6 +162,7 @@ class Shake(object):
 
         """
         self.url_map.add(Rule(rule, *args, **kwargs))
+
     
     def add_urls(self, urls):
         """Adds all the URL rules from a list (or iterable).
@@ -151,6 +170,7 @@ class Shake(object):
         """
         for url in urls:
             self.url_map.add(url)
+
     
     def add_static(self, url, path):
         """Can be used to specify an URL for static files on the web and
@@ -160,11 +180,12 @@ class Shake(object):
 
         """
         url = '/' + url.strip('/')
-        path = os.path.normpath(os.path.realpath(path))
+        path = normpath(abspath(realpath(path)))
         # Instead of a path, we've probably recieved the value of __file__
-        if os.path.isfile(path):
-            path = os.path.join(os.path.dirname(path), STATIC_DIR)
+        if not isdir(path):
+            path = join(dirname(path), STATIC_DIR)
         self.static_dirs[url] = path
+
     
     def before_request(self, function):
         """Register a function to run before each request.
@@ -174,6 +195,7 @@ class Shake(object):
         if function not in self.before_request_funcs:
             self.before_request_funcs.append(function)
         return function
+
     
     def after_request(self, function):
         """Register a function to be run after each request.
@@ -185,6 +207,10 @@ class Shake(object):
         if function not in self.after_request_funcs:
             self.after_request_funcs.append(function)
         return function
+
+    # Backwards compatibilty.  Will go away in v1.3
+    before_response = after_request
+    
     
     def on_exception(self, function):
         """Register a function to be run if an exception
@@ -194,17 +220,20 @@ class Shake(object):
         if function not in self.on_exception_funcs:
             self.on_exception_funcs.append(function)
         return function
+
     
     def preprocess_request(self, request):
         for handler in self.before_request_funcs:
             resp_value = handler(request)
             if resp_value is not None:
                 return resp_value
+
     
     def process_response(self, response):
         for handler in self.after_request_funcs:
             response = handler(response)
         return response
+
     
     def save_session(self, session, response):
         """Saves the session if it needs updates.  For the default
@@ -220,6 +249,7 @@ class Shake(object):
             session_data = session.serialize()
             response.set_cookie(self.settings.SESSION_COOKIE_NAME,
                 session_data, httponly=True, expires=expires)
+
     
     def wsgi_app(self, environ, start_response):
         """The actual WSGI application.  This is not implemented in
@@ -253,6 +283,7 @@ class Shake(object):
         local_manager.cleanup()
         return response(environ, start_response)
 
+
     def force_script_name(self, environ):
         """In some servers (like Lighttpd), when deploying using FastCGI
         and you want the application to work in the URL root you have to work
@@ -270,14 +301,15 @@ class Shake(object):
                 environ['REDIRECT_URI'] = redirect_uri.replace(
                     script_name, new_script_name)
 
+
     def dispatch(self, request):
         """Does the request dispatching.  Matches the URL and returns the
-        return value of the controller or error handler.  This does not have to
+        return value of the view or error handler.  This does not have to
         be a response object.  In order to convert the return value to a
         proper response object, call `make_response`.
 
         If DEBUG=True, a `NotFound` exception emitted by your code is treated
-        like a regular exception without error handlers, so iy's easy
+        like a regular exception without error handlers, so it's easy
         to differetiate it from a real `HTTP 404: NOT FOUND`.
 
         """
@@ -299,6 +331,7 @@ class Shake(object):
 
         return response
 
+
     def match_url(self, request):
         local.urls = urls = self.create_url_adapter(request)
         rule, kwargs = urls.match(return_rule=True)
@@ -311,16 +344,21 @@ class Shake(object):
         request.kwargs = kwargs
         return endpoint, kwargs
 
+
     def create_url_adapter(self, request):
         """Creates a URL adapter for the given request.
 
         """
-        return self.url_map.bind_to_environ(request.environ,
-            server_name=self.settings.SERVER_NAME)
+        server_name = self.settings.SERVER_NAME
+        port = self.settings.SERVER_PORT
+        if port:
+            server_name = '%s:%s' % (server_name, port)
+        return self.url_map.bind_to_environ(request, server_name=server_name)
+
 
     def make_response(self, resp='', status=None, headers=None, **kwargs):
         """Converts the return value from a view function to a real
-        response object that is an instance of `response_class`.
+        response object that is an instance of `Shake.response_class`.
         
         The following types are allowed for `resp_value`:
             
@@ -343,7 +381,7 @@ class Shake(object):
         Parameters:
 
         resp_value
-        :   the return value from the controller function.
+        :   the return value from the view function.
         status
         :   An optional status code.
         headers
@@ -352,35 +390,9 @@ class Shake(object):
         return: an instance of `response_class`
         
         """
-        if resp is None:
-            resp = ''
+        return make_response(resp, status=status, headers=headers,
+            response_class=self.response_class, **kwargs)
 
-        if isinstance(resp, dict):
-            kwargs['mimetype'] = 'application/json'
-            resp = to_json(resp, indent=None)
-
-        if not isinstance(resp, BaseResponse):
-            if isinstance(resp, basestring):
-                resp = self.response_class(resp, status=status, headers=headers,
-                    **kwargs)
-                headers = status = None
-            elif not callable(resp):
-                resp = to_unicode(resp)
-                resp = self.response_class(resp, status=status, headers=headers,
-                    **kwargs)
-                headers = status = None
-            else:
-                resp = self.response_class.force_type(resp, local.request.environ)
-
-        if status is not None:
-            if isinstance(status, basestring):
-                resp.status = status
-            else:
-                resp.status_code = status
-        if headers:
-            resp.headers.extend(headers)
-
-        return resp
 
     def handle_http_exception(self, request, exception):
         """Handles an HTTP exception.  By default try to use the handler
@@ -408,6 +420,7 @@ class Shake(object):
         response = self.make_response(resp_value, status)
         return response
 
+
     def handle_exception(self, request, error):
         """Default exception handling that kicks in when an exception
         occours that is not caught.  In debug mode the exception is
@@ -427,6 +440,7 @@ class Shake(object):
         response = self.make_response(resp_value, 500)
         return response
 
+
     def print_welcome_msg(self):
         """Prints a welcome message, if you run this application
         without declaring URLs first.
@@ -441,6 +455,7 @@ class Shake(object):
                 '-' * wml,
                 ''])
 
+
     def print_help_msg(self, host, port):
         """Prints a help message.
 
@@ -454,6 +469,7 @@ class Shake(object):
             if ips:
                 print ' * Running on http://%s:%s' % (ips[0], port)
         print '-- Quit the server with Ctrl+C --'
+
     
     def run(self, host=None, port=None, debug=None, reloader=None, 
             reloader_interval=2, threaded=True, processes=1,
@@ -484,6 +500,9 @@ class Shake(object):
         :   an SSL context for the connection.  Either an OpenSSL context, the
             string 'adhoc' if the server should automatically create one, or
             `None` to disable SSL (which is the default).
+
+        If no static_dir was defined (using `add_static`) a default`'/static'`
+        URL mounted at ``<root_path>/static'` is added automatically.
         
         """
         host = host or self.settings.SERVER_NAME
@@ -492,7 +511,12 @@ class Shake(object):
             self.settings.DEBUG)
         reloader = bool(reloader if (reloader is not None) else
             self.settings.RELOADER)
-        
+        static_dirs = self.static_dirs
+
+        if not static_dirs:
+            static_path = join(self.root_path, STATIC_DIR)
+            static_dirs['/static'] = static_path
+
         self.print_welcome_msg()
         self.print_help_msg(host, port)
 
@@ -503,7 +527,7 @@ class Shake(object):
             threaded=threaded,
             processes=processes,
             ssl_context=ssl_context,
-            static_files=self.static_dirs,
+            static_files=static_dirs,
             **kwargs)
     
     def test_client(self):
@@ -516,6 +540,7 @@ class Shake(object):
         if self.settings.SERVER_NAME == '127.0.0.1':
             self.settings.SERVER_NAME = 'localhost'
         return Client(self, self.response_class, use_cookies=True)
+
     
     def __call__(self, environ, start_response):
         """Shortcut for `wsgi_app`.

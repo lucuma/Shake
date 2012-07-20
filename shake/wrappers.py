@@ -9,13 +9,13 @@ from werkzeug.wrappers import Request as BaseRequest
 from werkzeug.wrappers import Response as BaseResponse
 from werkzeug.datastructures import ImmutableMultiDict
 
-from .helpers import local, StorageDict
+from .helpers import local, StorageDict, to_unicode
 from .session import SecureCookie, _NullSession
-from .serializers import from_json
+from .serializers import from_json, to_json
 
 
 __all__ = (
-    'Request', 'Response', 'Settings',
+    'Request', 'Response', 'Settings', 'make_response',
 )
 
 
@@ -23,7 +23,7 @@ class Request(BaseRequest):
     """The request object used by default in shake.
     Remembers the route rule, the matched endpoint and the view arguments.
     
-    It is what ends up passed to the controllers as the `request` argument.
+    It is what ends up passed to the view as the `request` argument.
     If you want to replace this class set `shake.Shake.request_class`
     to your own subclass.
 
@@ -104,12 +104,23 @@ class Request(BaseRequest):
             return SecureCookie(secret_key=secret_key)
         return SecureCookie.unserialize(data, secret_key)
     
-    def get_language(self, default='en'):
-        """Try to guess the 
+    def get_locale(self, default='en'):
+        """Returns the locale that should be used for this request as a
+        string.
+
+        Tries the following in order:
+        - an attribute called `'locale'`
+        - a GET argument called `'locale'`
+        - the best guess from the ACCEPT_LANGUAGES header
+        - the language of the user agent
+        - the provided default language
 
         """
-        lang = self.args.get('lang') if self.args else \
-            self.accept_languages.best or self.user_agent.language or default
+        lang = getattr(self, 'locale') or \
+            (self.args and self.args.get('locale')) or \
+            self.accept_languages.best or \
+            self.user_agent.language or \
+            default
         return lang.replace('_', '-')
 
 
@@ -188,3 +199,68 @@ class Settings(object):
         for key, value in dict_.items():
             setattr(dcustom, key, value)
 
+
+def make_response(resp='', status=None, headers=None,
+        response_class=Response, **kwargs):
+    """Converts the return value from a view function to a real
+    response object that is an instance of `response_class`.
+    
+    The following types are allowed for `resp_value`:
+        
+    `None`
+    :   an empty response object is created.
+    `response`
+    :   the object is returned unchanged.
+    `str`
+    :   a response object is created with the string as body.
+    `unicode`
+    :   a response object is created with the string encoded to utf-8
+        as body.
+    `dict`
+    :   creates a response object with the JSON representation of the
+        dictionary and the mimetype of `application/json`.
+    WSGI function
+    :   the function is called as WSGI application and buffered as
+        response object.
+    
+    Parameters:
+
+    resp_value
+    :   the return value from the view function.
+    status
+    :   An optional status code.
+    headers
+    :   A dictionary with custom headers.
+    
+    return: an instance of `response_class`
+    
+    """
+    if resp is None:
+        resp = ''
+
+    if isinstance(resp, dict):
+        kwargs['mimetype'] = 'application/json'
+        resp = to_json(resp, indent=None)
+
+    if not isinstance(resp, BaseResponse):
+        if isinstance(resp, basestring):
+            resp = response_class(resp, status=status, headers=headers,
+                **kwargs)
+            headers = status = None
+        elif not callable(resp):
+            resp = to_unicode(resp)
+            resp = response_class(resp, status=status, headers=headers,
+                **kwargs)
+            headers = status = None
+        else:
+            resp = response_class.force_type(resp, local.request.environ)
+
+    if status is not None:
+        if isinstance(status, basestring):
+            resp.status = status
+        else:
+            resp.status_code = status
+    if headers:
+        resp.headers.extend(headers)
+
+    return resp

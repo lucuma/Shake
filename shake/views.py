@@ -3,160 +3,90 @@
     Shake.views
     --------------------------
 
-    Implements the bridge to Jinja2.
+    Generic views
 
 """
-from collections import defaultdict
-from datetime import datetime
-import io
-import os
+from random import choice
 
-import jinja2
-from werkzeug.local import LocalProxy
-
-from .babel import (get_translations,
-    format_datetime, format_date, format_time, format_timedelta,
-    format_number, format_decimal, format_currency, format_percent,
-    format_scientific)
-from .helpers import local, url_for
-from .session import get_csrf, get_messages
-from .templates import plural, link_to
+from .helpers import local, NotFound, safe_join, send_file
+from .render import default_render
 
 
 __all__ = (
-    'Render',
+    'not_found_page', 'error_page', 'not_allowed_page', 'render_template',
 )
 
 
-VIEWS_DIR = 'views'
-
-
-class Render(object):
-    """A thin wrapper arround Jinja2.
+def not_found_page(request, error):
+    """Default "Not Found" page.
 
     """
+    rules = local.urls.map._rules
+    return default_render('error_notfound.html', locals())
 
-    default_globals = {
-        'request': local('request'),
-        'settings': local('app.settings'),
-        'now': LocalProxy(datetime.utcnow),
-        'csrf': LocalProxy(get_csrf),
-        'url_for': url_for,
-        'get_messages': get_messages,
-        'plural': plural,
-        'link_to': link_to,
-    }
 
-    default_filters = {
-        'datetimeformat': format_datetime,
-        'dateformat': format_date,
-        'timeformat': format_time,
-        'timedeltaformat': format_timedelta,
-        'numberformat': format_number,
-        'decimalformat': format_decimal,
-        'currencyformat': format_currency,
-        'percentformat': format_percent,
-        'scientificformat': format_scientific,
-    }
+def error_page(request, error):
+    """A generic error page.
+
+    """
+    return default_render('error.html')
+
+
+def not_allowed_page(request, error):
+    """A default "access denied" page.
+
+    """
+    return default_render('error_notallowed.html')
+
+
+def render_template(request, template, render=None, context=None, **kwargs):
+    """A really simple view who render directly a template.
     
-    default_tests = {
-        'ellipsis': (lambda obj: obj == Ellipsis),
-    }
+    request
+    :   a `Request` instance.  Automatically provided by the application.
+    template
+    :   the template to render.
+    render
+    :   the renderer to use.  If none is provided `local.app.render` is used.
+    context
+    :   values to add to the template context.
 
-    default_extensions = [
-        'jinja2.ext.i18n',
-    ]
+    """
+    render = render or local.app.render
+    return render(template, context, **kwargs)
+
+
+def send_from_directory(request, directory, filename, **options):
+    """Send a file from a given directory with `send_file`.  This
+    is a secure way to quickly expose static files from an upload folder
+    or something similar.
+
+    Example usage:
+
+        @app.route('/uploads/<path:filename>')
+        def download_file(filename):
+            return send_from_directory(UPLOAD_FOLDER, filename,
+                as_attachment=True)
+
+    It is strongly recommended to activate either `X-Sendfile` support in
+    your webserver or (if no authentication happens) to tell the webserver
+    to serve files for the given path on its own without calling into the
+    web application for improved performance.
     
-    def __init__(self, views_path=None, loader=None,
-            default_mimetype='text/html', **kwargs):
-        """
-
-        views_path
-        :   Optional path to the folder from where the templates will be loaded.
-            Internally a `jinja2.FileSystemLoader` will be constructed.
-            You can ignore this parameter and provide a `loader` instead.
-        loader
-        :   Optional replacement loader for the templates.  If provided,
-            `views_path` will be ignored.
-        default_mimetype
-        ;   Used when making a response, if a `mimetype` parameter is not used
-            when rendering.
-        kwargs
-        :   Extra parameters passed directly to the `jinja2.Environment`
-            constructor.
-
-        """
-        
-        self.default_mimetype = default_mimetype
-
-        if not loader:
-            views_path = views_path or '.'
-            views_path = os.path.normpath(os.path.realpath(views_path))
-            # Instead of a path, we've probably recieved the value of __file__
-            if not os.path.isdir(views_path):
-                views_path = os.path.join(os.path.dirname(views_path), 
-                    VIEWS_DIR)
-            loader = jinja2.FileSystemLoader(views_path)
-        
-        tglobals = kwargs.pop('globals', {})
-        tfilters = kwargs.pop('filters', {})
-        ttests = kwargs.pop('tests', {})
-        
-        kwargs.setdefault('extensions', self.default_extensions)
-        kwargs.setdefault('autoescape', True)
-
-        self.env = env = jinja2.Environment(loader=loader, **kwargs)
-        
-        env.globals.update(self.default_globals)
-        env.globals.update(tglobals)
-        env.globals.update(self.default_filters)
-        env.filters.update(tfilters)
-        env.tests.update(self.default_tests)
-        env.tests.update(ttests)
-        
-        env.install_gettext_callables(
-            lambda x: get_translations().ugettext(x),
-            lambda s, p, n: get_translations().ungettext(s, p, n),
-            newstyle=True
-        )
-
-    def render(self, tmpl, context=None, to_string=False, **kwargs):
-        """Render a template `tmpl` using the given `context`.
-        If `to_string` is True, the result is returned as is.
-        If not, is used to build a response along with the other parameters.
-
-        """
-        context = context or {}
-        result = tmpl.render(context)
-        if to_string:
-            return result
-        kwargs.setdefault('mimetype', self.default_mimetype)
-        return local.app.make_response(result, **kwargs)
-
-    def __call__(self, filename, context=None, to_string=False, **kwargs):
-        """Load a template from `<views_path>/<filename>` and passes it to
-        `render` along with the other parameters.
-
-        Depending of the value of `to_string`, returns the rendered template as
-        a string or as a response_class instance.
-
-        """
-        tmpl = self.env.get_template(filename)
-        return self.render(tmpl, context=context, to_string=to_string, **kwargs)
-
-    def from_string(self, source, context=None, to_string=False, **kwargs):
-        """Parses the `source` given and build a Template from it.
-        The template and the other parameters are passed to `Render.render`
-        along with the other parameters.
-
-        Depending of the value of `to_string`, returns the rendered template as
-        a string or as a response_class instance.
-
-        """
-        tmpl = self.env.from_string(source)
-        return self.render(tmpl, context=context, to_string=to_string, **kwargs)
-
-
-default_loader = jinja2.PackageLoader('shake', 'default_views')
-default_render = Render(loader=default_loader)
+    directory
+    :   the directory where all the files are stored.
+    filename
+    :   the filepath relative to that directory to download.
+    options
+    :   optional keyword arguments that are directly forwarded to `send_file`.
+    
+    --------------------------------
+    Copied almost unchanged from Flask <http://flask.pocoo.org/>
+    Copyright © 2010 by Armin Ronacher.
+    Used under the modified BSD license.
+    """
+    filepath = safe_join(directory, filename)
+    if not os.path.isfile(filepath):
+        raise NotFound
+    return send_file(request, filepath, conditional=True, **options)
 

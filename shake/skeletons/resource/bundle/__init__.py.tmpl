@@ -9,11 +9,11 @@
 """
 from shake import Rule, EndpointPrefix, Submount
 
-from . import controllers, models
+from . import views, models
 
 
 urls = [
-    EndpointPrefix('bundles.[[ plural ]].controllers', [
+    EndpointPrefix('bundles.[[ plural ]].views', [
 
         Rule('/', 'index', methods=['GET'],
             name='[[ plural ]].index'

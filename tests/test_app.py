@@ -18,7 +18,7 @@ HTTP_FORBIDDEN = 403
 HTTP_NOT_FOUND = 404
 HTTP_ERROR = 500
 
-#### Controllers #####
+#### Views #####
 
 def index(request):
     return 'hello'
@@ -29,17 +29,17 @@ def no_pass(request):
 
 
 def not_found(request, error):
-    """Custom "not found" controller."""
+    """Custom "not found" view."""
     return 'not found'
 
 
 def error(request, error):
-    """Custom error controller."""
+    """Custom error view."""
     return 'error'
 
 
 def not_allowed(request, error):
-    """Custom access "not allowed" controller."""
+    """Custom access "not allowed" view."""
     return 'access denied'
 
 
@@ -50,7 +50,7 @@ def fail(request):
 ##### Tests #####
 
 def test_callable_endpoint():
-    app = Shake()
+    app = Shake(__file__)
     app.add_url('/', index)
     
     c = app.test_client()
@@ -60,7 +60,7 @@ def test_callable_endpoint():
 
 
 def test_string_endpoint():
-    app = Shake()
+    app = Shake(__file__)
     app.add_url('/', 'tests.test_app.index')
 
     c = app.test_client()
@@ -70,7 +70,7 @@ def test_string_endpoint():
 
 
 def test_default_response():
-    app = Shake()
+    app = Shake(__file__)
     
     @app.route('/')
     def index(request):
@@ -83,7 +83,7 @@ def test_default_response():
 
 
 def test_default_not_found():
-    app = Shake()
+    app = Shake(__file__)
     app.add_url('/', index)
     
     c = app.test_client()
@@ -93,7 +93,7 @@ def test_default_not_found():
 
 
 def test_default_error():
-    app = Shake()
+    app = Shake(__file__)
     app.add_url('/', fail)
     
     c = app.test_client()
@@ -102,7 +102,7 @@ def test_default_error():
 
 
 def test_default_not_allowed():
-    app = Shake()
+    app = Shake(__file__)
     app.add_url('/', no_pass)
     
     c = app.test_client()
@@ -112,7 +112,7 @@ def test_default_not_allowed():
 
 
 def test_redirect():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def redir(request):
@@ -125,7 +125,7 @@ def test_redirect():
 
 def test_custom_not_found():
     settings = {'PAGE_NOT_FOUND': not_found, 'DEBUG': True}
-    app = Shake(settings)
+    app = Shake(__file__, settings)
     app.add_url('/', index)
     
     c = app.test_client()
@@ -136,7 +136,7 @@ def test_custom_not_found():
 
 def test_custom_error():
     settings = {'PAGE_ERROR': error, 'DEBUG': False}
-    app = Shake(settings)
+    app = Shake(__file__, settings)
     app.add_url('/', fail)
     
     c = app.test_client()
@@ -147,7 +147,7 @@ def test_custom_error():
 
 def test_custom_not_allowed():
     settings = {'PAGE_NOT_ALLOWED': not_allowed}
-    app = Shake(settings)
+    app = Shake(__file__, settings)
     app.add_url('/', no_pass)
     
     c = app.test_client()
@@ -158,7 +158,7 @@ def test_custom_not_allowed():
 
 def test_data_not_found():
     settings = {'DEBUG': True}
-    app = Shake(settings)
+    app = Shake(__file__, settings)
 
     @app.route('/')
     def data_not_found(request):
@@ -191,7 +191,7 @@ def test_error_codes():
         503: ServiceUnavailable,
         }
     settings = {'DEBUG': False}
-    app = Shake(settings)
+    app = Shake(__file__, settings)
     
     @app.route('/<int:code>/')
     def index(request, code):
@@ -229,7 +229,7 @@ def test_fallback_error_code():
         503: ServiceUnavailable,
     }
     settings = {'PAGE_ERROR': error, 'DEBUG': False}
-    app = Shake(settings)
+    app = Shake(__file__, settings)
 
     @app.route('/<int:code>/')
     def index(request, code):
@@ -246,7 +246,7 @@ def test_fallback_error_code():
 
 
 def test_is_get():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -264,7 +264,7 @@ def test_is_get():
 
 
 def test_is_post():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -282,7 +282,7 @@ def test_is_post():
 
 
 def test_is_put():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -300,7 +300,7 @@ def test_is_put():
 
 
 def test_is_delete():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -318,7 +318,7 @@ def test_is_delete():
 
 
 def test_is_json():
-    app = Shake()
+    app = Shake(__file__)
     data = {'foo': 'bar', 'num': 3}
 
     @app.route('/')
@@ -335,7 +335,7 @@ def test_is_json():
 
 
 def test_response_response():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -349,7 +349,7 @@ def test_response_response():
 
 
 def test_response_string():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -363,7 +363,7 @@ def test_response_string():
 
 
 def test_response_none():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -377,7 +377,7 @@ def test_response_none():
 
 
 def test_response_json():
-    app = Shake()
+    app = Shake(__file__)
     data = {'foo': 'bar', 'num': 3}
 
     @app.route('/')
@@ -403,7 +403,7 @@ def test_bad_responses():
     ]
     
     for r in bad_responses:
-        app = Shake()
+        app = Shake(__file__)
         app.add_url('/', lambda request: r)
         c = app.test_client()
         print '\nr is:', r
@@ -411,7 +411,7 @@ def test_bad_responses():
 
 
 def test_response_mimetype():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -425,12 +425,12 @@ def test_response_mimetype():
 
 
 def test_processors_order():
-    app = Shake()
+    app = Shake(__file__)
     r = []
     
     @app.route('/')
     def index(request):
-        r.append('controller')
+        r.append('view')
     
     @app.before_request
     def br1(request):
@@ -456,21 +456,21 @@ def test_processors_order():
     
     c = app.test_client()
     c.get('/')
-    assert r == 'br1 br2 controller ar1 ar2'.split()
+    assert r == 'br1 br2 view ar1 ar2'.split()
 
 
 def test_processors_order_exception():
     
-    def econtroller(request, error):
-        r.append('econtroller')
+    def eview(request, error):
+        r.append('eview')
 
-    settings = {'PAGE_ERROR': econtroller, 'DEBUG': False}
-    app = Shake(settings)
+    settings = {'PAGE_ERROR': eview, 'DEBUG': False}
+    app = Shake(__file__, settings)
     r = []
     
     @app.route('/')
     def index(request):
-        r.append('controller')
+        r.append('view')
         assert False
     
     @app.before_request
@@ -497,11 +497,11 @@ def test_processors_order_exception():
     
     c = app.test_client()
     c.get('/')
-    assert r == 'br1 br2 controller error econtroller ar1 ar2'.split()
+    assert r == 'br1 br2 view error eview ar1 ar2'.split()
 
 
 def test_after_request_return():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def index(request):
@@ -518,7 +518,7 @@ def test_after_request_return():
 
 def test_session():
     settings = {'SECRET_KEY': 'q'*22}
-    app = Shake(settings)
+    app = Shake(__file__, settings)
 
     @app.route('/p1/')
     def p1(request):
@@ -535,7 +535,7 @@ def test_session():
 
 
 def test_session_nosecret():
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def p1(request):
@@ -548,10 +548,10 @@ def test_session_nosecret():
 
 def test_postdata_keyerror():
     """Bugfix v0.5.14 Test than the main application handles correctly a
-    `KeyError` raised in a controller when doing `request.form['foo']` and
+    `KeyError` raised in a view when doing `request.form['foo']` and
     `foo` isn't in request.form.
     """
-    app = Shake()
+    app = Shake(__file__)
 
     @app.route('/')
     def p1(request):

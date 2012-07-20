@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Administration scripts
+    Manage scripts.
     --------------------------
 
 """

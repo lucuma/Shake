@@ -1,6 +1,6 @@
 # Authors
 
-Shake is written and maintained by the Lúcuma labs team:
+Shake is written and maintained by the Lúcuma team:
 
 Project Leader / Developer:
 

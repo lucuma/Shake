@@ -8,7 +8,6 @@ from os.path import dirname, join, realpath
 
 
 BASE_DIR = realpath(join(dirname(__file__) , '..'))
-VIEWS_DIR = realpath(join(BASE_DIR, 'views'))
 STATIC_DIR = realpath(join(BASE_DIR, 'static'))
 
 # The default subdomain for URLs without a subdomain defined.
@@ -36,6 +35,10 @@ MAX_CONTENT_LENGTH = 1024 * 1024 * 16  # 16 MB
 
 # The maximum size for regular form data (not files)
 MAX_FORM_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB
+
+# Internationalization settings
+DEFAULT_LOCALE = 'en'
+DEFAULT_TIMEZONE = 'UTC'
 
 # This secret was generated automatically, so it should be unique.
 # Don't share it with anybody.

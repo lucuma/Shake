@@ -20,7 +20,7 @@ def endpoint(request, name=None):
 
 
 def test_url_for():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
 
     def index(request):
@@ -28,7 +28,7 @@ def test_url_for():
         url = url_for(endpoint, name='world')
         assert url == expected
 
-        expected = 'http://0.0.0.0/hello/world/'
+        expected = 'http://0.0.0.0:5000/hello/world/'
         url = url_for(endpoint, name='world', external=True)
         assert url == expected
 
@@ -36,7 +36,7 @@ def test_url_for():
         url = url_for(endpoint, name='world', anchor='awesome')
         assert url == expected
 
-        expected = 'http://0.0.0.0/hello/world/#awesome'
+        expected = 'http://0.0.0.0:5000/hello/world/#awesome'
         url = url_for(endpoint, name='world', anchor='awesome', external=True)
         assert url == expected
     
@@ -49,10 +49,11 @@ def test_url_for():
 
 
 def test_url_for_server_name():
-    app = Shake({
+    settings = {
         'SERVER_NAME': 'example.com',
         'DEFAULT_SUBDOMAIN': 'www',
-    })
+    }
+    app = Shake(__file__, settings)
     c = app.test_client()
 
     @app.route('/hello/<name>/')
@@ -65,7 +66,7 @@ def test_url_for_server_name():
 
 
 def test_url_for_method():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
     
     def index(request):
@@ -91,7 +92,7 @@ def test_url_for_method():
 
 
 def test_named_url_for():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
 
     def test(request):
@@ -290,7 +291,7 @@ def test_storagedict_update():
 
 
 def test_send_file_regular():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
 
     @app.route('/')
@@ -311,7 +312,7 @@ def test_send_file_regular():
 
 
 def test_send_file_xsendfile():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
 
     @app.route('/')
@@ -327,7 +328,7 @@ def test_send_file_xsendfile():
 
 
 def test_send_file_object():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
 
     @app.route('/')
@@ -367,7 +368,7 @@ def test_send_file_object():
 
 
 def test_send_file_object_xsendfile():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
 
     @app.route('/')
@@ -390,7 +391,7 @@ def test_send_file_object_xsendfile():
 
 
 def test_send_file_attachment():
-    app = Shake()
+    app = Shake(__file__)
     c = app.test_client()
 
     @app.route('/')

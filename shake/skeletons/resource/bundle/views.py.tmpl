@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    [[ plural|title ]] controllers
+    [[ plural|title ]] views
     -------------------------------
 
 """
@@ -8,7 +8,7 @@ import shake
 from shake import url_for, redirect
 from shake_auth import protected
 
-from main import app, render, db
+from main import app, db
 from . import models as m
 from .forms import [[ class_name ]]Form
 
@@ -17,14 +17,14 @@ def index(request):
     """/[[ plural ]]/  [GET]
     """
     [[ plural ]] = m.get_[[ plural ]]()
-    return render('[[ plural ]]/index.html', locals())
+    return app.render('[[ plural ]]/index.html', locals())
 
 
 def show(request, [[ singular ]]_id):
     """/[[ plural ]]/1/  [GET]
     """
     [[ singular ]] = m.get_[[ singular ]]([[ singular ]]_id)
-    return render('[[ plural ]]/show.html', locals())
+    return app.render('[[ plural ]]/show.html', locals())
 
 
 @protected()
@@ -39,7 +39,7 @@ def new(request):
         request.flash('CREATED', 'success', extra=[[ singular ]].show_url)
         return redirect(url_for('[[ plural ]].index'))
 
-    return render('[[ plural ]]/edit.html', locals())
+    return app.render('[[ plural ]]/edit.html', locals())
 
 
 @protected()
@@ -55,7 +55,7 @@ def edit(request, [[ singular ]]_id):
         request.flash('UPDATED', 'success', extra=[[ singular ]].show_url)
         return redirect(url_for('[[ plural ]].index'))
 
-    return render('[[ plural ]]/edit.html', locals())
+    return app.render('[[ plural ]]/edit.html', locals())
 
 
 @protected(csrf=True)

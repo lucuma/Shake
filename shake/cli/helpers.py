@@ -10,13 +10,12 @@ import os
 from subprocess import Popen
 import re
 
+import inflector
 import voodoo
 
-from .globals import SINGULAR_RULES, PLURAL_RULES
 
+inf = inflector.English()
 
-_FIRST_CAP_RE = re.compile('(.)([A-Z][a-z]+)')
-_ALL_CAP_RE = re.compile('([a-z0-9])([A-Z])')
 _IMPORTS_RE = re.compile(r'"(\n*\s*(#[^\n]*|(from [a-zA-Z0-9_\.]+\s+)?import\s+.*))+')
 
 
@@ -35,51 +34,19 @@ def install_requirements(app_path, quiet=False):
     proc.communicate()
 
 
-def underscores_to_camelcase(name):
-    return ''.join([word.title() for word in name.split('_')])
-
-
-def camelcase_to_underscores(name):
-    s1 = _FIRST_CAP_RE.sub(r'\1_\2', name)
-    name = _ALL_CAP_RE.sub(r'\1_\2', s1).lower()
-    return name
- 
-
-def regex_rules(rules):
-    for line in rules:
-        pattern, search, replace = line
-        yield lambda word: re.search(pattern, word) and \
-            re.sub(search, replace, word)
-
-
-def singularize(noun):
-    for rule in regex_rules(SINGULAR_RULES):
-        result = rule(noun)
-        if result: 
-            return result
-    return noun
-
-
-def pluralize(noun):
-    for rule in regex_rules(PLURAL_RULES):
-        result = rule(noun)
-        if result: 
-            return result
-    return noun
-
-
 def sanitize_name(name):
-    singular = singularize(name)
+    singular = inf.singularize(name)
     plural = name
     if singular == name:
-        plural = pluralize(name)
+        plural = inf.pluralize(name)
 
     num = 2
     while os.path.exists(plural + '.py'):
         plural = plural + str(num)
         num = num + 1
-    
-    return singular, plural
+
+    class_name = inf.tableize(singular)
+    return singular, plural, class_name
 
 
 def get_model_fields(args):

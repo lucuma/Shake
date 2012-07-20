@@ -2,7 +2,7 @@
 """
 
 """
-import os
+from os.path import join, dirname
 import sys
 
 import shake
@@ -14,18 +14,17 @@ from settings import settings
 
 # Add the content of `libs` to the PATH, so you can do
 # `import something` to everything inside libs, without install it first.
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'libs'))
+sys.path.insert(0, join(dirname(__file__), 'libs'))
 
 
-app = shake.Shake(settings)
+app = shake.Shake(__file__, settings)
 
 # Used for the local development server.
 # In production, you'll have to define the static paths in your server config.
 app.add_static(app.settings.STATIC_URL, app.settings.STATIC_DIR)
 app.add_static(app.settings.MEDIA_URL, app.settings.MEDIA_DIR)
 
-render = shake.Render(app.settings.VIEWS_DIR)
-render.env.globals.update({
+app.render.env.globals.update({
     'STATIC': app.settings.STATIC_URL,
     'STYLES': app.settings.STATIC_URL_STYLES,
     'SCRIPTS': app.settings.STATIC_URL_SCRIPTS,

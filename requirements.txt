@@ -4,9 +4,10 @@
 #
 #     pip install -r requirements.txt
 
-Babel
-Jinja2>=2.4
-pyCEO>=1.0.3
+babel
+inflector
+jinja2>=2.4
+pyceo>=1.0.3
 pytz
-Voodoo>=0.7
-Werkzeug>=0.7
+voodoo>=0.7
+werkzeug>=0.7

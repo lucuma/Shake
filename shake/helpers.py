@@ -52,7 +52,7 @@ def url_for(endpoint, anchor=None, method=None, external=False, **values):
         urls = local.urls
     except AttributeError:
         raise RuntimeError("You must call this function only from"
-            " inside a controller or a view")
+            " inside a view or a template")
     try:
         url = urls.build(endpoint, values, method=method,
             force_external=external)

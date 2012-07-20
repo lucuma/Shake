@@ -95,7 +95,7 @@ def new_csrf(request=None):
 def flash(msg, cat='info', **kwargs):
     """Flashes a message to the next session.  In order to remove the
     flashed message from the session and to display it to the user,
-    the controller has to call `shake.get_flashed_messages`.
+    the view has to call `shake.get_messages`.
     
     msg
     :   the message to be flashed.

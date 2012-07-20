@@ -14,12 +14,13 @@ from .helpers import local, to_unicode
 
 
 __all__ = (
-    'plural', 'link_to',
+    'link_to', 'dumb_plural', 
 )
 
 
-def plural(num, plural='s', singular=''):
-    """A dumb simple pluralize function.
+def dumb_plural(num, plural='s', singular=''):
+    """A dumb simple pluralize function.  Don't use this is your application
+    is internationalizated.  Use {{ t('key_name', count) }} instead.
     """
     return plural if num != 1 else singular
 
