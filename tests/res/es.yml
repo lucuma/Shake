@@ -1,0 +1,7 @@
+mytest:
+  greeting: Hola
+  apple:
+    0: No apples
+    1: One apple
+    3: Few apples
+    n: "%(count)s apples"
