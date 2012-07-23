@@ -4,6 +4,8 @@
     --------------------------
 
 """
+from babel import Locale
+from pytz import UTC
 from werkzeug.utils import cached_property
 from werkzeug.wrappers import Request as BaseRequest
 from werkzeug.wrappers import Response as BaseResponse
@@ -61,6 +63,9 @@ class Request(BaseRequest):
     # The maximum size for regular form data (not files).
     # Set by the application
     max_form_memory_size = 0
+
+    # The default timezone
+    tzinfo = UTC
     
     @property
     def is_get(self):
@@ -116,12 +121,16 @@ class Request(BaseRequest):
         - the provided default language
 
         """
-        lang = getattr(self, 'locale') or \
+        locale = getattr(self, 'locale') or \
             (self.args and self.args.get('locale')) or \
             self.accept_languages.best or \
             self.user_agent.language or \
             default
-        return lang.replace('_', '-')
+        if isinstance(locale, basestring):
+            locale = locale.replace('-', '_')
+            locale = Locale.parse(locale, sep='_')
+        self.locale = locale
+        return self.locale
 
 
 class Response(BaseResponse):

@@ -115,6 +115,7 @@ class Render(object):
     def init_i18n(self, i18n):
         self.env.globals['t'] = i18n.translate
         self.env.filters.update({
+            'format': i18n.format,
             'datetimeformat': i18n.format_datetime,
             'dateformat': i18n.format_date,
             'timeformat': i18n.format_time,

@@ -1,6 +1,15 @@
 # Changes
 
 
+## Version 1.2.1
+
+- Adds the `i18n.format` method, that formats the value according to the detected data type.
+
+- Added tests for the i18n module.
+
+- Important bugfixes to the i18n module.
+
+
 ## Version 1.2.0
 
 - New Rails-like internationalization framework.  Available at `app.i18n` or as {{ t('key_name', **kwargs) }} in the templates.
