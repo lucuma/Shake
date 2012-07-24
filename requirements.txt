@@ -9,5 +9,6 @@ inflector
 jinja2>=2.4
 pyceo>=1.0.3
 pytz
+pyyaml
 voodoo>=0.7
 werkzeug>=0.7

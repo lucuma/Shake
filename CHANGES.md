@@ -1,4 +1,9 @@
-# Changes
+# Shake Changelog
+
+
+## Version 1.2.2
+
+- Added PyYaml to the requirements (removed by mistake).
 
 
 ## Version 1.2.1
