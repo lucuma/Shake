@@ -38,7 +38,7 @@ class Render(object):
         'enumerate': enumerate,
 
         'request': local('request'),
-        'settings': local('app.settings'),
+        'settings': LocalProxy(lambda: local.app.settings),
         'csrf': LocalProxy(get_csrf),
         'url_for': url_for,
         'get_messages': get_messages,

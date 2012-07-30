@@ -17,15 +17,14 @@ from bundles import users
 
 
 app.add_urls([
-    
+    # Import your bundle and mount its urls like this:
+    # Submount('/where_to_mount/', bundle.urls),
+    # Example:  Submount('/blog/', posts.urls),
+
     # Index and other common pages like not-found
     Submount('/', common.urls),
 
     # Login, logout, password reset and related pages
     Submount('/', users.urls),
-
-    # Import your bundle and mount its urls like this:
-    # Submount('/where_to_mount/', bundle.urls),
-    # Example:  Submount('/blog/', posts.urls),
 
 ])

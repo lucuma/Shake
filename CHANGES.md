@@ -5,6 +5,8 @@
 
 - Added PyYaml to the requirements (removed by mistake).
 
+- Fix the class name generation (when adding a bundle).
+
 
 ## Version 1.2.1
 

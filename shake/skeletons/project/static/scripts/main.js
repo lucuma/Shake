@@ -1,5 +1,6 @@
-
 (function($){
+	"use strict";
+
 	/* To use the CSRF protection with AJAX calls.
 	This will cause all AJAX requests to send back the CSRF token in 
 	the custom X-CSRFTOKEN header. */
@@ -17,6 +18,5 @@
 			}
 		}
 	});
-}(jQuery));
 
-
+}(window.jQuery));

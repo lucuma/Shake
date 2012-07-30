@@ -86,7 +86,7 @@ def link_to(text='', url='', classes='', **kwargs):
 
     """
     request = local.request
-    if request.path.startswith(url):
+    if request.path.rstrip('/') == url.rstrip('/'):
         classes += ' active'
     data = {
         'url': url,

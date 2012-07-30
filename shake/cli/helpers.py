@@ -45,7 +45,7 @@ def sanitize_name(name):
         plural = plural + str(num)
         num = num + 1
 
-    class_name = inf.tableize(singular)
+    class_name = inf.camelize(singular)
     return singular, plural, class_name
 
 
