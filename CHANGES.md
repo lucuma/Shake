@@ -5,6 +5,8 @@
 
 - Respect the default timezone if a custom one is not defined.
 
+- Several minor bugfixes to the default project template.
+
 
 ## Version 1.2.3
 
