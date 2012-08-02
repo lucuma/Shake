@@ -153,7 +153,7 @@ def test_link_to():
     expected = u'<a href="/foo/bar/" class="active">Bar</a>'
     assert expected == html
 
-    html = link_to('Bar', '/foo/')
+    html = link_to('Bar', '/foo/', partial=True)
     expected = u'<a href="/foo/" class="active">Bar</a>'
     assert expected == html
 

@@ -7,6 +7,8 @@
 
 - Several minor bugfixes to the default project template.
 
+- Adds a `partial` argument to `link_to` to matching partial URLs.
+
 
 ## Version 1.2.3
 

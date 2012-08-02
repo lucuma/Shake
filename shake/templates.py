@@ -64,7 +64,7 @@ def html_attrs(classes=None, **kwargs):
     return u' '.join(attrs)
 
 
-def link_to(text='', url='', classes='', **kwargs):
+def link_to(text='', url='', classes='', partial=False, **kwargs):
     """Build an HTML anchor element for the provided URL.
     If the url match the beginning of that in the current request, an `active`
     class is added.  This is intended to be use to build navigation links.
@@ -86,8 +86,11 @@ def link_to(text='', url='', classes='', **kwargs):
 
     """
     request = local.request
-    if request.path.rstrip('/') == url.rstrip('/'):
+    path_ = request.path.rstrip('/')
+    url_ = url.rstrip('/')
+    if path_ == url_ or (partial and path_.startswith(url_)):
         classes += ' active'
+
     data = {
         'url': url,
         'text': text,
