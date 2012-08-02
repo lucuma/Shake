@@ -4,8 +4,9 @@
     --------------------------
 
 """
+import shake
 from shake import manager
-from main import app
+from main import app, db
 import urls
 
 
@@ -14,14 +15,12 @@ def server(host='0.0.0.0', port=None, **kwargs):
     """[-host HOST] [-port PORT]
     Runs the application on the local development server.
     """
-    from main import app
     app.run(host, port, **kwargs)
 
 
 @manager.command
 def syncdb():
     """Create the database tables (if they don't exist)"""
-    from main import db
     from bundles.users.models import create_admin
 
     print 'Founded this tables:'
@@ -35,14 +34,14 @@ def syncdb():
 @manager.command
 def load_data():
     """Load the inital data"""
-    db.load_data(FIXTURES)
-    db.load_media(FIXTURES)
+    db.load_data(app.settings.FIXTURES_DIR)
+    db.load_media(app.settings.FIXTURES_DIR)
 
 
 @manager.command
 def dump_data():
     """Serialize the current data to fixtures/xxx.json"""
-    db.dump_data(FIXTURES)
+    db.dump_data(app.settings.FIXTURES_DIR)
 
 
 @manager.command

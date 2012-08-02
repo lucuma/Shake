@@ -27,4 +27,4 @@ MAILER_SETTINGS = {
 }
 
 # You might need to uncomment this line for deploying with FastCGI
-# force_script_name = ''
+# FORCE_SCRIPT_NAME = ''

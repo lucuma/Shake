@@ -64,8 +64,8 @@ class Request(BaseRequest):
     # Set by the application
     max_form_memory_size = 0
 
-    # The default timezone
-    tzinfo = UTC
+    # The request timezone (UTC if not defined)
+    tzinfo = None
     
     @property
     def is_get(self):
@@ -121,7 +121,7 @@ class Request(BaseRequest):
         - the provided default language
 
         """
-        locale = getattr(self, 'locale') or \
+        locale = (hasattr(self, 'locale') and self.locale) or \
             (self.args and self.args.get('locale')) or \
             self.accept_languages.best or \
             self.user_agent.language or \

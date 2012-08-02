@@ -6,3 +6,4 @@
 #
 #     pip install -r req-prod.txt
 
+psycopg2

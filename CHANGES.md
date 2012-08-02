@@ -1,6 +1,18 @@
 # Shake Changelog
 
 
+## Version 1.2.4
+
+- Respect the default timezone if a custom one is not defined.
+
+
+## Version 1.2.3
+
+- Several bugfixes to `Request` class.
+
+- Added `Moar` thumbnailer to the default project requirements.
+
+
 ## Version 1.2.2
 
 - Added PyYaml to the requirements (removed by mistake).

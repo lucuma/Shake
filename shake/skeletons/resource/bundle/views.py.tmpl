@@ -5,7 +5,7 @@
 
 """
 import shake
-from shake import url_for, redirect
+from shake import url_for, redirect, flash
 from shake_auth import protected
 
 from main import app, db
@@ -36,7 +36,7 @@ def new(request):
     if request.is_post and form.is_valid():
         [[ singular ]] = form.save()
         db.commit()
-        request.flash('CREATED', 'success', extra=[[ singular ]].show_url)
+        flash('CREATED', 'success', extra=[[ singular ]].show_url)
         return redirect(url_for('[[ plural ]].index'))
 
     return app.render('[[ plural ]]/edit.html', locals())
@@ -52,7 +52,7 @@ def edit(request, [[ singular ]]_id):
     if request.is_post and form.is_valid():
         form.save()
         db.commit()
-        request.flash('UPDATED', 'success', extra=[[ singular ]].show_url)
+        flash('UPDATED', 'success', extra=[[ singular ]].show_url)
         return redirect(url_for('[[ plural ]].index'))
 
     return app.render('[[ plural ]]/edit.html', locals())
@@ -72,7 +72,7 @@ def delete(request, [[ singular ]]_id):
         data['restore_url'] = restore_url
         return data
 
-    request.flash('DELETED', 'danger', extra=restore_url)
+    flash('DELETED', 'danger', extra=restore_url)
     return redirect(url_for('[[ plural ]].index'))
 
 
@@ -87,6 +87,6 @@ def restore(request, [[ singular ]]_id):
     if request.is_xhr:
         return [[ singular ]].to_dict()
     
-    request.flash('RESTORED', 'success', extra=[[ singular ]].show_url)
+    flash('RESTORED', 'success', extra=[[ singular ]].show_url)
     return redirect(url_for('[[ plural ]].index'))
 
