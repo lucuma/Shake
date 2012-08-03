@@ -20,6 +20,13 @@ if __name__ == "__main__":
 
 Or a full featured (yet configurable if needed) framework.
 
+To get started:
+
+```
+mkdir myawesomeproject
+cd myawesomeproject
+shake new
+```
 
 ---------------------------------------
 © 2010 by [Lúcuma] (http://lucumalabs.com).  
