@@ -120,8 +120,9 @@ class I18n(object):
         This returns the default locale if used outside of a request.
 
         """
-        locale = hasattr(local, 'request') and local.request.get_locale()
-        return locale or self.default_locale
+        return (hasattr(local, 'request') and \
+            local.request.get_locale(self.default_locale)) or \
+            self.default_locale
 
 
     def get_timezone(self):
@@ -130,12 +131,9 @@ class I18n(object):
         outside of a request or if no timezone was defined.
 
         """
-        tzinfo = hasattr(local, 'request') and local.request.tzinfo
-        if not tzinfo:
-            tzinfo = self.default_timezone
-        elif isinstance(tzinfo, basestring):
-            tzinfo = timezone(tzinfo)
-        return tzinfo
+        return (hasattr(local, 'request') and \
+            local.request.get_timezone(self.default_timezone)) or \
+            self.default_timezone
 
 
     def load_language(self, path, locale):

@@ -5,7 +5,7 @@
 
 """
 from babel import Locale
-from pytz import UTC
+from pytz import timezone, UTC
 from werkzeug.utils import cached_property
 from werkzeug.wrappers import Request as BaseRequest
 from werkzeug.wrappers import Response as BaseResponse
@@ -64,6 +64,9 @@ class Request(BaseRequest):
     # Set by the application
     max_form_memory_size = 0
 
+    # The request locale
+    locale = None
+
     # The request timezone (UTC if not defined)
     tzinfo = None
     
@@ -108,10 +111,30 @@ class Request(BaseRequest):
         if not data:
             return SecureCookie(secret_key=secret_key)
         return SecureCookie.unserialize(data, secret_key)
+
     
+    def get_timezone(self, default=UTC):
+        """Returns the timezone that should be used for this request as a
+        `DstTzInfo` instance.
+
+        Tries the following in order:
+        - an attribute called `'tzinfo'`
+        - a GET argument called `'tzinfo'`
+        - the provided default timezone
+
+        """
+        tzinfo = self.tzinfo or \
+            (self.args and self.args.get('tzinfo')) or \
+            default
+        if isinstance(tzinfo, basestring):
+            tzinfo = timezone(tzinfo)
+        self.tzinfo = tzinfo
+        return self.tzinfo
+
+
     def get_locale(self, default='en'):
         """Returns the locale that should be used for this request as a
-        string.
+        `babel.Locale` instance.
 
         Tries the following in order:
         - an attribute called `'locale'`
@@ -121,7 +144,7 @@ class Request(BaseRequest):
         - the provided default language
 
         """
-        locale = (hasattr(self, 'locale') and self.locale) or \
+        locale = self.locale or \
             (self.args and self.args.get('locale')) or \
             self.accept_languages.best or \
             self.user_agent.language or \
