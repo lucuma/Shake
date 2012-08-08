@@ -18,13 +18,12 @@ import os
 if os.environ.get('LC_CTYPE', '').lower() == 'utf-8':
     os.environ['LC_CTYPE'] = 'en_US.utf-8'
 
-from collections import defaultdict
 import datetime as d
 from decimal import Decimal
 import io
 from os.path import join, dirname, realpath, abspath, normpath, isdir, isfile
 
-from babel import dates, numbers, support, Locale
+from babel import dates, numbers, Locale
 from jinja2 import Markup
 from pytz import timezone, UTC
 from werkzeug import ImmutableDict
@@ -120,7 +119,7 @@ class I18n(object):
         This returns the default locale if used outside of a request.
 
         """
-        return (hasattr(local, 'request') and \
+        return (hasattr(local, 'request') and 
             local.request.get_locale(self.default_locale)) or \
             self.default_locale
 
@@ -131,7 +130,7 @@ class I18n(object):
         outside of a request or if no timezone was defined.
 
         """
-        return (hasattr(local, 'request') and \
+        return (hasattr(local, 'request') and 
             local.request.get_timezone(self.default_timezone)) or \
             self.default_timezone
 
@@ -208,7 +207,7 @@ class I18n(object):
                 if value is None:
                     return None
             return value
-        except (IndexError, ValueError), e:
+        except (IndexError, ValueError):
             return None
 
 
@@ -290,10 +289,11 @@ class I18n(object):
     
 
     def to_user_timezone(self, datetime, tzinfo=None):
-        """Convert a datetime object to the user's timezone.  This automatically
-        happens on all date formatting unless rebasing is disabled.  If you need
-        to convert a `datetime.datetime` object at any time to the user's
-        timezone (as returned by `get_timezone` this function can be used).
+        """Convert a datetime object to the user's timezone.  This
+        automatically happens on all date formatting unless rebasing is
+        disabled.  If you need to convert a `datetime.datetime` object at any
+        time to the user's timezone (as returned by `get_timezone` this
+        function can be used).
 
         """
         if datetime.tzinfo is None:
@@ -350,8 +350,8 @@ class I18n(object):
 
         if isinstance(value, d.date):
             if isinstance(value, d.datetime):
-                return self.format_datetime(value, locale=locale, tzinfo=tzinfo,
-                    *args, **kwargs)
+                return self.format_datetime(value, locale=locale,
+                    tzinfo=tzinfo, *args, **kwargs)
             else:
                 return self.format_date(value, locale=locale, tzinfo=tzinfo, 
                     *args, **kwargs)

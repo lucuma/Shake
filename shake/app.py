@@ -222,9 +222,9 @@ class Shake(object):
         return function
 
     
-    def preprocess_request(self, request):
+    def preprocess_request(self, request, kwargs):
         for handler in self.before_request_funcs:
-            resp_value = handler(request)
+            resp_value = handler(request, **kwargs)
             if resp_value is not None:
                 return resp_value
 
@@ -315,7 +315,8 @@ class Shake(object):
         """
         try:
             endpoint, kwargs = self.match_url(request)
-            resp_value = self.preprocess_request(request)
+            request.view_kwargs = kwargs
+            resp_value = self.preprocess_request(request, kwargs)
             if resp_value is None:
                 resp_value = endpoint(request, **kwargs)
             response = self.make_response(resp_value)

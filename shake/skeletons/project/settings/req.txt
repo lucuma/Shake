@@ -8,7 +8,7 @@
 
 Shake
 Solution>=1.1.16
-Shake-Auth>=1.1.4
+Shake-Auth>=1.1.7
 Shake-Files
 MailShake
 Moar
