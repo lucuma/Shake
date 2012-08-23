@@ -1,6 +1,20 @@
 # Shake Changelog
 
 
+## Version 1.2.6
+
+- Perfect requiremnts and settings structure.
+
+- `get_env` and `set_env` search from/set the environment variable `SHAKE_ENV` if no `.SHAKE_ENV` file is present. This is useful for deploying with services like Heroku.
+
+- i18n module extracted to a separated library (now named `AllSpeak`).
+
+
+## Version 1.2.5
+
+- Added `get_timezone` method to `shake.Request`.
+
+
 ## Version 1.2.4
 
 - Respect the default timezone if a custom one is not defined.
@@ -13,8 +27,6 @@
 ## Version 1.2.3
 
 - Several bugfixes to `Request` class.
-
-- Added `Moar` thumbnailer to the default project requirements.
 
 
 ## Version 1.2.2

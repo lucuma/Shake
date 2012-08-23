@@ -8,11 +8,11 @@ import shake
 
 
 if shake.env_is('production'):
-    import settings.production as settings
+    import settings.prod as settings
 elif shake.env_is('testing'):
-    import settings.testing as settings
+    import settings.test as settings
 else:
-    import settings.development as settings
+    import settings.dev as settings
 
 
 # # Import local settings

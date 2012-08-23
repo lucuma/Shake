@@ -1,0 +1,12 @@
+# Common requirements
+# -------------------------------
+# This file collects all required third-party applications that are needed
+# to run this project.
+
+shake
+solution>=1.1.16
+shake-auth>=1.1.7
+shake-files
+mailshake
+# moar
+# pil

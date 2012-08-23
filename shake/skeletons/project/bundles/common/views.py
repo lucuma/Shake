@@ -18,7 +18,7 @@ def not_found(request, error):
     return app.render('common/error_notfound.html', locals())
 
 
-def critical_error(request, error=None):
+def server_error(request, error=None):
     return app.render('common/error.html', locals())
 
 

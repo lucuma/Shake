@@ -6,7 +6,6 @@ clean: clean-pyc
 	rm -rf build
 	rm -rf dist
 	rm -rf *.egg-info
-	rm -rf tests/res/t
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name '*~' -exec rm -f {} \;
 
@@ -15,8 +14,8 @@ clean-pyc:
 	find . -name '*.pyo' -exec rm -f {} \;
 
 test:
-	rm -rf tests/res/t
-	python runtests.py tests
+	rm -rf tests/__pycache__
+	py.test tests
 	rm -rf tests/__pycache__
 
 upload: clean

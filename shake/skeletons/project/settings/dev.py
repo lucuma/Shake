@@ -6,14 +6,11 @@
 """
 from mailshake import ToConsoleMailer
 
-from .base import *
+from .common import *
 
 
 DEBUG = True
 RELOAD = True
-
-# Optional server name hint
-SERVER_NAME = '127.0.0.1'
 
 SQLALCHEMY_URI = 'sqlite:///db.sqlite'
 

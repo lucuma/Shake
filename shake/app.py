@@ -12,6 +12,7 @@ import os
 from os.path import isdir, dirname, join, abspath, normpath, realpath
 import socket
 
+from allspeak import I18n, LOCALES_DIR
 from pyceo import Manager
 from werkzeug.exceptions import HTTPException, NotFound, BadRequest
 from werkzeug.local import LocalManager
@@ -20,7 +21,6 @@ from werkzeug.utils import import_string
 
 from .config import get_settings_object
 from .helpers import local, to_unicode
-from .i18n import I18n, LOCALES_DIR
 from .render import Render, TEMPLATES_DIR
 from .routes import Map, Rule
 from .wrappers import Request, Response, make_response
@@ -35,7 +35,9 @@ local_manager = LocalManager([local])
 SECRET_KEY_MINLEN = 20
 STATIC_DIR = 'static'
 WELCOME_MESSAGE = "Welcome aboard. You're now using Shake!"
+
 ENV_FILE = '.SHAKE_ENV'
+ENV_NAME = 'SHAKE_ENV'
 DEFAULT_ENV = 'development'
 
 
@@ -123,16 +125,40 @@ class Shake(object):
         `root_path` as the base path for the `'templates'` and `'locales'` dirs.
 
         """
+        templates_dir = join(self.root_path, TEMPLATES_DIR)
+        render = Render(templates_dir,
+            default_mimetype=self.settings.get('DEFAULT_MIMETYPE'),
+            response_class=self.response_class)
+
         locales_dir = (self.settings.get('LOCALES_DIR') or
             join(self.root_path, LOCALES_DIR))
         if isinstance(locales_dir, basestring):
             locales_dir = [locales_dir]
-        self.i18n = I18n(locales_dir, app=self)
+        get_request = lambda: local.request
 
-        templates_dir = join(self.root_path, TEMPLATES_DIR)
-        self.render = Render(templates_dir, i18n=self.i18n,
-            default_mimetype=self.settings.get('DEFAULT_MIMETYPE'),
-            response_class=self.response_class)
+        i18n = I18n(
+            locales_dirs=locales_dir,
+            get_request=get_request,
+            default_locale=self.settings.DEFAULT_LOCALE,
+            default_timezone=self.settings.DEFAULT_TIMEZONE
+        )
+
+        render.env.globals['t'] = i18n.translate
+        render.env.filters.update({
+            'format': i18n.format,
+            'datetimeformat': i18n.format_datetime,
+            'dateformat': i18n.format_date,
+            'timeformat': i18n.format_time,
+            'timedeltaformat': i18n.format_timedelta,
+            'numberformat': i18n.format_number,
+            'decimalformat': i18n.format_decimal,
+            'currencyformat': i18n.format_currency,
+            'percentformat': i18n.format_percent,
+            'scientificformat': i18n.format_scientific,
+        })
+
+        self.render = render
+        self.i18n = i18n
 
     
     def route(self, url, *args, **kwargs):
@@ -508,6 +534,11 @@ class Shake(object):
         """
         host = host or self.settings.SERVER_NAME
         port = port or self.settings.SERVER_PORT
+        try:
+            port = int(port)
+        except (ValueError, TypeError):
+            port = None
+
         debug = bool(debug if debug is not None else
             self.settings.DEBUG)
         reloader = bool(reloader if (reloader is not None) else
@@ -551,8 +582,9 @@ class Shake(object):
 
 
 def set_env(env):
-    """Set the working environment to `env` saving it in `ENV_FILE`.
-    `env` is the name of the new environment eg: 'development' or 'production'.
+    """Set the working environment to `env` saving it in `.SHAKE_ENV`.
+    `env` is the name of the new environment eg: 'development', 'production',
+    'testing', etc.
 
     You use environments to load different settings for development,
     production, testing, etc.
@@ -560,11 +592,13 @@ def set_env(env):
     """
     with io.open(ENV_FILE, 'wt') as f:
         f.write(to_unicode(env))
+    os.environ[ENV_NAME] = env
     return env
 
 
 def get_env(default=DEFAULT_ENV):
-    """Read the current working environment from `ENV_FILE`.
+    """Read the current working environment from `.SHAKE_ENV` or from the
+    environment variable `SHAKE_ENV` .
 
     You use environments to load different settings for development,
     production, testing, etc.
@@ -574,8 +608,8 @@ def get_env(default=DEFAULT_ENV):
         with io.open(ENV_FILE, 'rt') as f:
             env = f.read()
     except IOError:
-        return default
-    return env or default
+        pass
+    return os.environ.get(ENV_NAME) or default
 
 
 def env_is(env):

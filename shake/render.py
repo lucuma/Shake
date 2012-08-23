@@ -59,7 +59,7 @@ class Render(object):
     }
     
 
-    def __init__(self, templates_path=None, loader=None, i18n=None,
+    def __init__(self, templates_path=None, loader=None,
             default_mimetype='text/html', response_class=Response, **kwargs):
         """
 
@@ -70,8 +70,6 @@ class Render(object):
         loader
         :   optional replacement loader for the templates.  If provided,
             `templates_path` is ignored.
-        i18n
-        :   optional `I18n` instance for adding internationalization filters.
         default_mimetype
         :   the default MIMETYPE of the response.
         response_class
@@ -107,26 +105,7 @@ class Render(object):
         self.env = env
         self.default_mimetype = default_mimetype
         self.response_class = response_class
-
-        if i18n:
-            self.init_i18n(i18n)
     
-
-    def init_i18n(self, i18n):
-        self.env.globals['t'] = i18n.translate
-        self.env.filters.update({
-            'format': i18n.format,
-            'datetimeformat': i18n.format_datetime,
-            'dateformat': i18n.format_date,
-            'timeformat': i18n.format_time,
-            'timedeltaformat': i18n.format_timedelta,
-            'numberformat': i18n.format_number,
-            'decimalformat': i18n.format_decimal,
-            'currencyformat': i18n.format_currency,
-            'percentformat': i18n.format_percent,
-            'scientificformat': i18n.format_scientific,
-        })
-
 
     def render(self, tmpl, context=None, to_string=False, **kwargs):
         """Render a template `tmpl` using the given `context`.

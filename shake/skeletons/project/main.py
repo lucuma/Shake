@@ -5,7 +5,7 @@
 from os.path import join, dirname
 import sys
 
-from moar import Thumbnailer
+# from moar import Thumbnailer
 import shake
 from shake_files import FileStorage, IMAGES
 from solution import SQLAlchemy
@@ -16,7 +16,6 @@ from settings import settings
 # Add the content of `libs` to the PATH, so you can do
 # `import something` to everything inside libs, without install it first.
 sys.path.insert(0, join(dirname(__file__), 'libs'))
-
 
 app = shake.Shake(__file__, settings)
 
@@ -32,7 +31,7 @@ mailer = app.settings.MAILER_CLASS(**app.settings.MAILER_SETTINGS)
 uploader = FileStorage(app.settings.MEDIA_DIR, app.settings.MEDIA_URL,
     allowed=IMAGES)
 
-thumbnail = Thumbnailer()
+# thumbnail = Thumbnailer()
 
 app.render.env.globals.update({
     'STATIC': app.settings.STATIC_URL,
@@ -40,5 +39,5 @@ app.render.env.globals.update({
     'SCRIPTS': app.settings.STATIC_URL_SCRIPTS,
     'IMAGES': app.settings.STATIC_URL_IMAGES,
     'MEDIA': app.settings.MEDIA_URL,
-    'thumbnail': thumbnail,
+    # 'thumbnail': thumbnail,
 })

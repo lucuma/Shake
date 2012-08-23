@@ -6,16 +6,20 @@
 """
 from mailshake import SMTPMailer
 
-from .base import *
+from .common import *
 
 
 DEBUG = False
 RELOAD = False
 
+# Optional server name hint
+SERVER_NAME = 'example.com'
+DEFAULT_SUBDOMAIN = 'www'
+
 SQLALCHEMY_URI = 'postgresql://username:password@127.0.0.1/database'
 
 PAGE_NOT_FOUND = 'bundles.common.views.not_found'
-PAGE_ERROR = 'bundles.common.views.critical_error'
+PAGE_ERROR = 'bundles.common.views.server_error'
 PAGE_NOT_ALLOWED = 'bundles.common.views.not_allowed'
 
 MAILER_CLASS = SMTPMailer
