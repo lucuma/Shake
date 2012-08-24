@@ -49,7 +49,7 @@
 
 ## Version 1.2.0
 
-- New Rails-like internationalization framework.  Available at `app.i18n` or as {{ t('key_name', **kwargs) }} in the templates.
+- New Rails-like internationalization solution.  Available at `app.i18n` or as {{ t('key_name', **kwargs) }} in the templates.
 
 - Auto-created `Render` instance at `app.render`.  Uses the `'<app-path>/templates/'` folder by default.
 
