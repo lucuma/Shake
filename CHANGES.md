@@ -3,11 +3,13 @@
 
 ## Version 1.2.6
 
-- Perfect requiremnts and settings structure.
+- Perfect requirements and settings structure.
 
 - `get_env` and `set_env` search from/set the environment variable `SHAKE_ENV` if no `.SHAKE_ENV` file is present. This is useful for deploying with services like Heroku.
 
 - i18n module extracted to a separated library (now named `AllSpeak`).
+
+- jQuery (bundled with the default skeleton) updated to version 1.8.
 
 
 ## Version 1.2.5

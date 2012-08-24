@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Shake.cli.utils
+    Shake.cli.helpers
     --------------------------
 
 """
@@ -25,7 +25,7 @@ def make_secret():
 
 def install_requirements(app_path, quiet=False):
     args = {'app': app_path, 'sep': os.path.sep}
-    msg = 'pip install -r %(app)s%(sep)ssettings%(sep)sreq.txt' % args
+    msg = 'pip install -r %(app)s%(sep)srequirements%(sep)sdev.txt' % args
     if not quiet:
         print voodoo.formatm('run', msg, color='green'), '\n'
 
