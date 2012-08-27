@@ -604,12 +604,13 @@ def get_env(default=DEFAULT_ENV):
     production, testing, etc.
 
     """
+    env = None
     try:
         with io.open(ENV_FILE, 'rt') as f:
             env = f.read()
     except IOError:
         pass
-    return os.environ.get(ENV_NAME) or default
+    return env or os.environ.get(ENV_NAME) or default
 
 
 def env_is(env):
