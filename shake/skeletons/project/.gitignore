@@ -29,4 +29,5 @@ pip-log.txt
 db.sqlite
 
 ### Project specific
+.SHAKE_ENV
 static/media/*
