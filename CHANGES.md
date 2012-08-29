@@ -1,16 +1,8 @@
 # Shake Changelog
 
 
-## Version 1.2.8
+## Version 1.3
 
-
-
-## Version 1.2.7
-
-- bugfix with `get_env`
-
-
-## Version 1.2.6
 
 - Perfect requirements and settings structure.
 
