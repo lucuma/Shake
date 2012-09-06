@@ -488,6 +488,7 @@ class Shake(object):
 
         """
         if host == '0.0.0.0':
+            print ' * Running on http://0.0.0.0:%s' % (port,)
             # local IP address for easy debugging.
             ips = [ip 
                 for ip in socket.gethostbyname_ex(socket.gethostname())[2]
