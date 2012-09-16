@@ -10,7 +10,6 @@ from werkzeug.wrappers import Response as BaseResponse
 from werkzeug.datastructures import ImmutableMultiDict
 
 from .helpers import local, StorageDict, to_unicode
-from .session import SecureCookie, _NullSession
 from .serializers import from_json, to_json
 
 
@@ -61,7 +60,6 @@ class Request(BaseRequest):
     # The maximum size for regular form data (not files).
     # Set by the application
     max_form_memory_size = 0
-
     
     @property
     def is_get(self):
@@ -87,23 +85,6 @@ class Request(BaseRequest):
         """
         if self.mimetype == 'application/json':
             return from_json(self.data)
-    
-    @cached_property
-    def session(self):
-        """Creates or open a new session.
-        Default implementation stores all session data in a signed cookie.
-        This requires that the `secret_key` setting is set.
-
-        """
-        settings = local.app.settings
-        secret_key = settings.SECRET_KEY
-        if not secret_key:
-            return _NullSession(secret_key='')
-        
-        data = self.cookies.get(settings.SESSION_COOKIE_NAME)
-        if not data:
-            return SecureCookie(secret_key=secret_key)
-        return SecureCookie.unserialize(data, secret_key)
 
 
 class Response(BaseResponse):

@@ -10,13 +10,14 @@ import shake
 from shake import cached_property
 
 from main import app, db
+from bundles.common.models import AuditableMixin
 
 
 ACTIVE_USER = 'A'
 SUSPENDED_USER = 'S'
 
 
-class User(db.Model):
+class User(db.Model, AuditableMixin):
 
     __tablename__ = 'users'
     
@@ -31,12 +32,6 @@ class User(db.Model):
 
     fullname = db.Column(db.Unicode(255),
         default=u'')
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow,
-        nullable=False)
-
-    modified_at = db.Column(db.DateTime, default=datetime.utcnow,
-        nullable=False)
 
     last_sign_in = db.Column(db.DateTime)
 

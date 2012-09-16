@@ -6,6 +6,7 @@
 
 allspeak
 inflector
+itsdangerous>=0.17
 jinja2>=2.4
 pyceo>=1.0.3
 voodoo>=0.7

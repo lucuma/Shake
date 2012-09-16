@@ -91,8 +91,9 @@ def test_tests():
 
 def test_csrf_token():
     settings = {'SECRET_KEY': 'abc'*20}
-    local.app = Shake(__file__, settings)
-    request = get_test_request()
+    app = Shake(__file__, settings)
+    environ = get_test_env()
+    request = app.make_request(environ)
 
     csrf1 = get_csrf(request).value
     csrf2 = new_csrf(request).value
@@ -103,26 +104,26 @@ def test_csrf_token():
 
 def test_csrf_token_global():
     settings = {'SECRET_KEY': 'abc'*20}
-    local.app = Shake(__file__, settings)
-    render = Render()
-    local.request = get_test_request()
+    app = Shake(__file__, settings)
+    environ = get_test_env()
+    request = app.make_request(environ)
     
-    csrf = get_csrf()
+    csrf = get_csrf(request)
     tmpl = '{{ csrf.name }} {{ csrf.value }}'
-    resp = render.from_string(tmpl, to_string=True)
+    resp = app.render.from_string(tmpl, to_string=True)
     expected = '%s %s' % (csrf.name, csrf.value)
     assert resp == expected
 
 
 def test_csrf_token_input():
     settings = {'SECRET_KEY': 'abc'*20}
-    local.app =  Shake(__file__, settings)
-    render = Render()
-    local.request = get_test_request()
+    app =  Shake(__file__, settings)
+    environ = get_test_env()
+    request = app.make_request(environ)
     
-    csrf = get_csrf()
+    csrf = get_csrf(request)
     tmpl = '{{ csrf.input }}'
-    resp = render.from_string(tmpl, to_string=True)
+    resp = app.render.from_string(tmpl, to_string=True)
     expected = '<input type="hidden" name="%s" value="%s">' \
             % (csrf.name, csrf.value)
     assert resp == expected
@@ -130,13 +131,13 @@ def test_csrf_token_input():
 
 def test_csrf_token_query():
     settings = {'SECRET_KEY': 'abc'*20}
-    local.app = Shake(__file__, settings)
-    render = Render()
-    local.request = get_test_request()
+    app =  Shake(__file__, settings)
+    environ = get_test_env()
+    request = app.make_request(environ)
     
     csrf = get_csrf()
     tmpl = '{{ csrf.query }}'
-    resp = render.from_string(tmpl, to_string=True)
+    resp = app.render.from_string(tmpl, to_string=True)
     expected = '%s=%s' % (csrf.name, csrf.value)
     assert resp == expected
 
@@ -159,7 +160,7 @@ def test_link_to():
 
 # -----------------------------------------------------------------------------
 
-def get_test_env(path, **kwargs):
+def get_test_env(path='/', **kwargs):
     builder = EnvironBuilder(path=path, **kwargs)
     return builder.get_environ()
 
@@ -168,7 +169,5 @@ def get_test_request(path='/', **kwargs):
     env = get_test_env(path, **kwargs)
     return Request(env)
 
-
-# def pytest_funcarg__render(request):
 
 

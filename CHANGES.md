@@ -1,8 +1,19 @@
 # Shake Changelog
 
 
-## Version 1.3
+## Version 1.4
 
+- New pluggable session interface system.
+
+- Dropped the Werkzeug provided 'secure cookie' as session system. Using the `itsdangerous` library instead.  Motivations:
+    1. the implementation comes from the django signing module and was heavily reviewed in terms of the crypto used.
+    2. it uses JSON instead of pickle, so it is inmune to pickle's vulnerabilities if in some way the SECRET_KEY is exposed.
+    3. it does not rely on Python specifics so your proxy server could be able to read it.
+
+- New `AuditableMixin` in the common bundle of the default skeleton. Use it to get automatic `created_at` and `modified_at` columns.
+
+
+## Version 1.3
 
 - Perfect requirements and settings structure.
 

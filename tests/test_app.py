@@ -516,24 +516,6 @@ def test_after_request_return():
         print c.get('/')
 
 
-def test_session():
-    settings = {'SECRET_KEY': 'q'*22}
-    app = Shake(__file__, settings)
-
-    @app.route('/p1/')
-    def p1(request):
-        request.session['foo'] = 'bar'
-    
-    @app.route('/p2/')
-    def p2(request):
-        assert 'bar' == request.session['foo']
-    
-    c = app.test_client()
-    resp = c.get('/p1/')
-    resp = c.get('/p2/')
-    assert resp.status_code == HTTP_OK
-
-
 def test_session_nosecret():
     app = Shake(__file__)
 
