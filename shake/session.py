@@ -209,7 +209,6 @@ class ItsdangerousSessionInterface(SessionInterface):
             return
         cookie_name = self.app.settings['SESSION_COOKIE_NAME']
         val = request.cookies.get(cookie_name)
-        print 'val', val
         if not val:
             request.session = self.session_class()
             return
@@ -234,12 +233,10 @@ class ItsdangerousSessionInterface(SessionInterface):
         if s is None:
             return response
         session_data = s.dumps(dict(session))
-        print 'session_data', session_data
         httponly = self.get_cookie_httponly()
         response.set_cookie(cookie_name, session_data, expires=expires,
             httponly=httponly, domain=domain)
         return response
-        # print response.headers.getlist('Set-Cookie')
 
     def invalidate(self, request):
         s = self.get_serializer()
