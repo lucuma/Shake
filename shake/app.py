@@ -106,7 +106,7 @@ class Shake(object):
         self.request_class.max_content_length = settings.MAX_CONTENT_LENGTH
         self.request_class.max_form_memory_size = settings.MAX_FORM_MEMORY_SIZE
         self.session_lifetime = timedelta(hours=settings.SESSION_LIFETIME)
-        self.session_interface = ItsdangerousSessionInterface()
+        self.session_interface = ItsdangerousSessionInterface(self)
         self.create_default_services()
     
     def assert_secret_key(self):
@@ -228,7 +228,6 @@ class Shake(object):
             self.after_request_funcs.append(function)
         return function
 
-    # Backwards compatibilty.  Will go away in v1.3
     before_response = after_request
     
     def on_exception(self, function):
@@ -253,8 +252,7 @@ class Shake(object):
 
     def make_request(self, environ):
         request = self.request_class(environ)
-        session = self.session_interface.open_session(self, request)
-        request.session = session
+        self.session_interface.open_session(request)
         local.request = request
         return request
 
@@ -284,7 +282,9 @@ class Shake(object):
         request = self.make_request(environ)
         response = self.dispatch(request)
         response = self.process_response(response)
-        self.session_interface.save_session(self, request.session, response)
+        if isinstance(response, self.response_class):
+            response = self.session_interface.save_session(request.session, response)
+            print 'cookieheader', response.headers.getlist('Set-Cookie')
         local_manager.cleanup()
         return response(environ, start_response)
 
@@ -444,8 +444,9 @@ class Shake(object):
         without declaring URLs first.
 
         """
-        if os.environ.get('WERKZEUG_RUN_MAIN') != 'true' \
-                and len(self.url_map._rules) == 0:
+        is_dev_server = os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
+        no_urls = len(self.url_map._rules) == 0
+        if is_dev_server and no_urls:
             wml = len(WELCOME_MESSAGE) + 2
             print '\n '.join(['',
                 '-' * wml,
@@ -532,16 +533,17 @@ class Shake(object):
             static_files=static_dirs,
             **kwargs)
     
-    def test_client(self):
+    def test_client(self, **kwargs):
         """Creates a test client which you can use to send virtual requests
         to the application.
         For general information refer to `werkzeug.test.Client`.
 
         """
         from werkzeug.test import Client
-        if self.settings.SERVER_NAME == '127.0.0.1':
+        if self.settings.SERVER_NAME in '127.0.0.1':
             self.settings.SERVER_NAME = 'localhost'
-        return Client(self, self.response_class, use_cookies=True)
+        kwargs.setdefault('use_cookies', True)
+        return Client(self, self.response_class, **kwargs)
     
     def __call__(self, environ, start_response):
         """Shortcut for `wsgi_app`.

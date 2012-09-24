@@ -4,6 +4,9 @@
 """
 from os.path import join, dirname
 import sys
+# Add the content of `libs` to the PATH, so you can do
+# `import something` to everything inside libs, without install it first.
+sys.path.insert(0, join(dirname(__file__), 'libs'))
 
 # from moar import Thumbnailer
 import shake
@@ -12,10 +15,6 @@ from solution import SQLAlchemy
 
 from settings import settings
 
-
-# Add the content of `libs` to the PATH, so you can do
-# `import something` to everything inside libs, without install it first.
-sys.path.insert(0, join(dirname(__file__), 'libs'))
 
 app = shake.Shake(__file__, settings)
 

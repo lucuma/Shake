@@ -1,0 +1,85 @@
+# -*- coding: utf-8 -*-
+"""
+    [[ plural|title ]] protected views
+    -------------------------------
+
+"""
+import shake
+from shake import url_for, redirect, flash
+from shake_auth import protected
+
+from main import app, db
+from . import models as m
+from .forms import [[ class_name ]]Form
+
+
+@protected()
+def admin(request):
+    """/[[ plural ]]/admin/  [GET]
+    """
+    return app.render('[[ plural ]]/admin_index.html', locals())
+
+
+@protected()
+def new(request):
+    """/[[ plural ]]/new/
+    """
+    form = [[ class_name ]]Form(request.form, files=request.files)
+
+    if request.is_post and form.is_valid():
+        [[ singular ]] = form.save()
+        db.commit()
+        flash('CREATED', 'success', extra=[[ singular ]].show_url)
+        return redirect(url_for('[[ plural ]].index'))
+
+    return app.render('[[ plural ]]/edit.html', locals())
+
+
+@protected()
+def edit(request, [[ singular ]]_id):
+    """/[[ plural ]]/1/edit/
+    """
+    [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id)
+    form = [[ class_name ]]Form(request.form, obj=[[ singular ]], files=request.files)
+
+    if request.is_post and form.is_valid():
+        form.save()
+        db.commit()
+        flash('UPDATED', 'success', extra=[[ singular ]].show_url)
+        return redirect(url_for('[[ plural ]].index'))
+
+    return app.render('[[ plural ]]/edit.html', locals())
+
+
+@protected(csrf=True)
+def delete(request, [[ singular ]]_id):
+    """/[[ plural ]]/1/delete/
+    """
+    [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id, deleted=True)
+    [[ singular ]].deleted = True
+    db.commit()
+
+    restore_url = [[ singular ]].restore_url
+    if request.is_xhr:
+        data = [[ singular ]].to_dict()
+        data['restore_url'] = restore_url
+        return data
+
+    flash('DELETED', 'danger', extra=restore_url)
+    return redirect(url_for('[[ plural ]].index'))
+
+
+@protected(csrf=True)
+def restore(request, [[ singular ]]_id):
+    """/[[ plural ]]/1/restore/
+    """
+    [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id, deleted=True)
+    [[ singular ]].deleted = False
+    db.commit()
+    
+    if request.is_xhr:
+        return [[ singular ]].to_dict()
+    
+    flash('RESTORED', 'success', extra=[[ singular ]].show_url)
+    return redirect(url_for('[[ plural ]].index'))
+

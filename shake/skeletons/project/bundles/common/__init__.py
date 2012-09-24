@@ -14,8 +14,7 @@ from . import views
 
 urls = [
     EndpointPrefix('bundles.common.views', [
-
-        Rule('/', 'index', name='index'), 
-        
+        Rule('/', 'index',
+            name='index'), 
     ]),
 ]

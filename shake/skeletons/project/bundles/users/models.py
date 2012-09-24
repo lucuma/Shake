@@ -7,7 +7,7 @@
 from datetime import datetime
 
 import shake
-from shake import cached_property
+from shake import cached_property, to_unicode
 
 from main import app, db
 from bundles.common.models import AuditableMixin
@@ -15,6 +15,27 @@ from bundles.common.models import AuditableMixin
 
 ACTIVE_USER = 'A'
 SUSPENDED_USER = 'S'
+
+
+class Role(db.Model):
+    
+    __tablename__ = 'roles'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.Unicode(64), unique=True)
+
+    def __init__(self, name, **kwargs):
+        self.name = to_unicode(name)
+        db.Model.__init__(self, **kwargs)
+
+    @classmethod
+    def by_name(cls, name):
+        name = to_unicode(name)
+        return db.query(cls).filter(cls.name == name).first()
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, self.name.encode('utf8'))
 
 
 class User(db.Model, AuditableMixin):
@@ -28,7 +49,7 @@ class User(db.Model, AuditableMixin):
 
     password = db.Column(db.String(300))
 
-    email = db.Column(db.String(300))
+    email = db.Column(db.Unicode(300))
 
     fullname = db.Column(db.Unicode(255),
         default=u'')
@@ -38,48 +59,66 @@ class User(db.Model, AuditableMixin):
     status = db.Column(db.String(1), default=ACTIVE_USER,
         nullable=False)
 
-    perms = db.Column(db.Text, default='')
+    roles = db.relationship(Role, secondary='users_roles', lazy='joined',
+        backref=db.backref('users', lazy='dynamic'))
 
     def __init__(self, login, password=None, **kwargs):
-        self.login = login
+        self.login = to_unicode(login)
         self.password = password
+        kwargs.setdefault('fullname', u'')
         db.Model.__init__(self, **kwargs)
+
+    @classmethod
+    def by_login(cls, login):
+        login = to_unicode(login)
+        return db.query(cls).filter(cls.login == login).first()
 
     @property
     def is_active(self):
+        """Returns `True` if the user is active."""
         return self.status == ACTIVE_USER
 
-    @property
-    def is_suspended(self):
-        return self.status == SUSPENDED_USER
+    def add_role(self, name):
+        """Adds a role (by name) to the user."""
+        role = Role.by_name(name)
+        if not role:
+            role = Role(name)
+            db.add(role)
+        if not role in self.roles:
+            self.roles.append(role)
 
-    @cached_property
-    def perms_list(self):
-        return self.perms.strip().split(' ')
-
-    def has_perm(self, perm):
-        return perm in self.perms_list
-
-    def add_perms(self, perms):
-        curr_perms = self.perms_list
-        curr_perms.extend(perms)
-        # Filter duplicates
-        curr_perms = list(set(curr_perms))
-        self.perms = ' '.join(curr_perms)
+    def remove_role(self, name):
+        """Remove a role (by name) from the user."""
+        role = Role.by_name(name)
+        if not role:
+            return
+        if role in self.roles:
+            self.roles.remove(role)
 
     def __repr__(self):
-        return '<%s %s (%s)>' % (self.__class__.__name__, self.fullname,
-            self.login)
+        return '<%s %s (%s)>' % (self.__class__.__name__,
+            self.fullname.encode('utf8') or '?', self.login.encode('utf8'))
+
+
+UsersRolesTable = db.Table('users_roles', db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey(User.id)),
+    db.Column('role_id', db.Integer, db.ForeignKey(Role.id))
+)
 
 
 def create_admin():
-    """Create the admin user (if it don't already exist)"""
+    """Create the admin user (if it doesn't already exist)"""
     from pyceo import prompt
     from .manage import create_user
     
-    u = db.query(User).filter(User.login=='admin').first()
+    u = User.by_login(u'admin')
     if not u:
-        print 'Creating `admin` user…'
-        email = prompt('>>> Admin email?\n')
+        print 'Creating the `admin` user…'
+        email = prompt('>>> `admin` email?\n')
         create_user(u'admin', 'admin', fullname=u'Admin', email=email)
+        u = User.by_login(u'admin')
+
+    u.add_role(u'admin')
+    db.commit()
+    return u
 

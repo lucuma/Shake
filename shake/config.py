@@ -26,7 +26,7 @@ class DefaultSettings(object):
     SESSION_COOKIE_PATH = None
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = None
-    SESSION_LIFETIME = 24 * 120
+    SESSION_LIFETIME = 24 * 120 # 120 days
     
     # The maximum size for uploade files
     MAX_CONTENT_LENGTH = 1024 * 1024 * 16  # 16 MB

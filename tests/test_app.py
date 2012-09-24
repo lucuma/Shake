@@ -516,6 +516,24 @@ def test_after_request_return():
         print c.get('/')
 
 
+def test_session():
+    settings = {'SECRET_KEY': 'abc'*20}
+    app = Shake(__file__, settings)
+
+    @app.route('/write/')
+    def write(request):
+        request.session['foo'] = 'bar'
+
+    @app.route('/read/')
+    def read(request):
+        assert request.session['foo'] == 'bar'
+    
+    c = app.test_client()
+    c.get('/write/')
+    print c.cookie_jar
+    c.get('/read/')
+
+
 def test_session_nosecret():
     app = Shake(__file__)
 

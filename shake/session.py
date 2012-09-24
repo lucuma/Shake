@@ -40,6 +40,7 @@ class NullSession(CallbackDict):
     """Class used to generate nicer error messages if sessions are not
     available.  Will still allow read-only access to the empty session
     but fail on setting.
+
     """
 
     def _fail(self, *args, **kwargs):
@@ -71,7 +72,7 @@ class SessionInterface(object):
     is to assign :attr:`shake.Shake.session_interface`::
 
         app = Shake(__name__)
-        app.session_interface = MySessionInterface()
+        app.session_interface = MySessionInterface(app)
 
     """
     # :meth:`make_null_session` will look here for the class that should
@@ -80,7 +81,10 @@ class SessionInterface(object):
     # this type.
     null_session_class = NullSession
 
-    def make_null_session(self, app):
+    def __init__(self, app):
+        self.app = app
+
+    def make_null_session(self):
         """Creates a null session which acts as a replacement object if the
         real session support could not be loaded due to a configuration
         error.  This mainly aids the user experience because the job of the
@@ -89,6 +93,7 @@ class SessionInterface(object):
         failed.
 
         This creates an instance of :attr:`null_session_class` by default.
+
         """
         return self.null_session_class()
 
@@ -98,106 +103,149 @@ class SessionInterface(object):
 
         This checks if the object is an instance of :attr:`null_session_class`
         by default.
+
         """
         return isinstance(obj, self.null_session_class)
 
-    def get_cookie_domain(self, app):
+    def get_cookie_domain(self):
         """Helpful helper method that returns the cookie domain that should
         be used for the session cookie if session cookies are used.
+
         """
-        cookie_domain = app.settings.get('SESSION_COOKIE_DOMAIN')
+        cookie_domain = self.app.settings.get('SESSION_COOKIE_DOMAIN')
         if cookie_domain is not None:
             return cookie_domain
-        server_name = app.settings.get('SERVER_NAME')
-        if server_name is not None:
-            # a port number *could* be included, so try to remove it, because
-            # it's usually not supported by browsers
-            return '.' + server_name.rsplit(':', 1)[0]
+        cookie_domain = self.app.settings.get('SERVER_NAME')
+        if cookie_domain is None:
+            return None
+        # a port number *could* be included, so try to remove it, because
+        # it's usually not supported by browsers
+        cookie_domain = cookie_domain.rsplit(':', 1)[0]
+        if cookie_domain in ('localhost', '127.0.0.1', '0.0.0.0',):
+            return None
+        return '.' + cookie_domain
 
-    def get_cookie_path(self, app):
+    def get_cookie_path(self):
         """Returns the path for which the cookie should be valid.  The
         default implementation uses the value from the SESSION_COOKIE_PATH``
         config var if it's set, and falls back to ``/`` if it's `None`.
-        """
-        return app.settings.get('SESSION_COOKIE_PATH', '/')
 
-    def get_cookie_httponly(self, app):
+        """
+        return self.app.settings.get('SESSION_COOKIE_PATH', '/')
+
+    def get_cookie_httponly(self):
         """Returns True if the session cookie should be httponly.  This
         currently just returns the value of the ``SESSION_COOKIE_HTTPONLY``
         config var.
-        """
-        return app.settings.get('SESSION_COOKIE_HTTPONLY', True)
 
-    def get_cookie_secure(self, app):
+        """
+        return self.app.settings.get('SESSION_COOKIE_HTTPONLY', True)
+
+    def get_cookie_secure(self):
         """Returns True if the cookie should be secure.  This currently
         just returns the value of the ``SESSION_COOKIE_SECURE`` setting.
-        """
-        return app.settings.get('SESSION_COOKIE_SECURE', False)
 
-    def get_expiration_time(self, app, session):
+        """
+        return self.app.settings.get('SESSION_COOKIE_SECURE', False)
+
+    def get_expiration_time(self, session):
         """A helper method that returns an expiration date for the session
         or `None` if the session is linked to the browser session.  The
         default implementation returns now + the permanent session
         lifetime configured on the application.
-        """
-        return datetime.utcnow() + app.session_lifetime
 
-    def open_session(self, app, request):
+        """
+        return datetime.utcnow() + self.app.session_lifetime
+
+    def open_session(self, request):
         """This method has to be implemented and must either return `None`
         in case the loading failed because of a configuration error or an
         instance of a session object which implements a dictionary like
         interface.
+
         """
         raise NotImplementedError()
 
-    def save_session(self, app, session, response):
+    def save_session(self, session, response):
         """This is called for actual sessions returned by :meth:`open_session`
         at the end of the request.  This is still called during a request
         context so if you absolutely need access to the request you can do
         that.
+
         """
         raise NotImplementedError()
+
+    def invalidate(self, request):
+        """Reset the current session.
+
+        """
+        secret_key = self.app.settings.get('SECRET_KEY')
+        if not secret_key:
+            request.session = self.make_null_session()
+        request.session = self.session_class()
 
 
 class ItsdangerousSessionInterface(SessionInterface):
 
     session_class = Session
+    digest_method = staticmethod(hashlib.sha256)
 
-    def __init__(self, salt='shake-session'):
+    def __init__(self, app, salt='shake-session'):
+        super(ItsdangerousSessionInterface, self).__init__(app)
         self.salt = salt
 
-    def get_serializer(self, app):
-        secret_key = app.settings.get('SECRET_KEY')
+    def get_serializer(self):
+        secret_key = self.app.settings.get('SECRET_KEY')
         if not secret_key:
             return None
-        return URLSafeTimedSerializer(secret_key, salt=self.salt)
+        s = URLSafeTimedSerializer(secret_key, salt=self.salt)
+        s.digest_method = self.digest_method
+        return s
 
-    def open_session(self, app, request):
-        s = self.get_serializer(app)
+    def open_session(self, request):
+        s = self.get_serializer()
         if s is None:
-            return self.make_null_session(app)
-        cookie_name = app.settings['SESSION_COOKIE_NAME']
+            request.session = self.make_null_session()
+            return
+        cookie_name = self.app.settings['SESSION_COOKIE_NAME']
         val = request.cookies.get(cookie_name)
+        print 'val', val
         if not val:
-            return self.session_class()
-        max_age = app.session_lifetime.total_seconds()
+            request.session = self.session_class()
+            return
+        max_age = self.app.session_lifetime.total_seconds()
         try:
             data = s.loads(val, max_age=max_age)
-            return self.session_class(data)
-        except BadSignature:
-            return self.session_class()
-
-    def save_session(self, app, session, response):
-        domain = self.get_cookie_domain(app)
-        cookie_name = app.settings['SESSION_COOKIE_NAME']
-        if not session:
-            response.delete_cookie(cookie_name, domain=domain)
+            request.session = self.session_class(data)
             return
-        expires = self.get_expiration_time(app, session)
-        session_data = self.get_serializer(app).dumps(dict(session))
-        httponly = self.get_cookie_httponly(app)
+        except BadSignature:
+            assert False
+            request.session = self.session_class()
+            return
+
+    def save_session(self, session, response):
+        if not session:
+            # response.delete_cookie(cookie_name, domain=domain)
+            return response
+        domain = self.get_cookie_domain()
+        cookie_name = self.app.settings['SESSION_COOKIE_NAME']
+        expires = self.get_expiration_time(session)
+        s = self.get_serializer()
+        if s is None:
+            return response
+        session_data = s.dumps(dict(session))
+        print 'session_data', session_data
+        httponly = self.get_cookie_httponly()
         response.set_cookie(cookie_name, session_data, expires=expires,
             httponly=httponly, domain=domain)
+        return response
+        # print response.headers.getlist('Set-Cookie')
+
+    def invalidate(self, request):
+        s = self.get_serializer()
+        if s is None:
+            request.session = self.make_null_session()
+        request.session = self.session_class()
 
 
 def generate_key(salt=None):

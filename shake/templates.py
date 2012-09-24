@@ -64,7 +64,7 @@ def html_attrs(classes=None, **kwargs):
     return u' '.join(attrs)
 
 
-def link_to(text='', url='', classes='', partial=False, **kwargs):
+def link_to(text='', url='', classes='', partial=False, wrapper=None, **kwargs):
     """Build an HTML anchor element for the provided URL.
     If the url match the beginning of that in the current request, an `active`
     class is added.  This is intended to be use to build navigation links.
@@ -97,6 +97,10 @@ def link_to(text='', url='', classes='', partial=False, **kwargs):
         'attrs': html_attrs(classes, **kwargs),
     }
     data['attrs'] = ' ' + data['attrs'] if data['attrs'] else ''
-    html = u'<a href="%(url)s"%(attrs)s>%(text)s</a>' % data
-    return Markup(html)
+    if wrapper:
+        data['wr'] = str(wrapper).lower()
+        tmpl = u'<%(wr)s %(attrs)s><a href="%(url)s">%(text)s</a></%(wr)s>'
+    else:
+        tmpl = u'<a href="%(url)s"%(attrs)s>%(text)s</a>'
+    return Markup(tmpl % data)
 

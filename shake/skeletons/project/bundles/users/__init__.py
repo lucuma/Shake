@@ -17,7 +17,6 @@ from .models import User
 auth = Auth(User, app, mailer=mailer, **app.settings.AUTH_SETTINGS)
 
 urls = [
-
     Rule('/sign-in/', auth.sign_in_view,
         name='auth.sign_in'),
 
@@ -32,6 +31,5 @@ urls = [
 
     Rule('/change-password/', auth.change_password_view,
         name='auth.change_password'),
-
 ]
 

@@ -14,25 +14,25 @@ from . import views, models
 
 urls = [
     EndpointPrefix('bundles.[[ plural ]].views', [
-
         Rule('/', 'index', methods=['GET'],
-            name='[[ plural ]].index'
-        ),
-        Rule('/new/', 'new',
-            name='[[ plural ]].new'
-        ),
-        Rule('/<int:[[ singular ]]_id>/', 'show',
-            name='[[ plural ]].show'
-        ),
-        Rule('/<int:[[ singular ]]_id>/edit/', 'edit',
-            name='[[ plural ]].edit'
-        ),
-        Rule('/<int:[[ singular ]]_id>/delete/', 'delete',
-            name='[[ plural ]].delete'
-        ),
-        Rule('/<int:[[ singular ]]_id>/restore/', 'restore',
-            name='[[ plural ]].restore'
-        ),
+            name='[[ plural ]].index'),
 
+        Rule('/<int:[[ singular ]]_id>/', 'show', methods=['GET'],
+            name='[[ plural ]].show'),
+    ]),
+
+    EndpointPrefix('bundles.[[ plural ]].views_admin', [
+        Rule('/new/', 'new',
+            name='[[ plural ]].new'),
+
+        Rule('/<int:[[ singular ]]_id>/edit/', 'edit',
+            name='[[ plural ]].edit'),
+
+        Rule('/<int:[[ singular ]]_id>/delete/', 'delete',
+            name='[[ plural ]].delete'),
+
+        Rule('/<int:[[ singular ]]_id>/restore/', 'restore',
+            name='[[ plural ]].restore'),
     ]),
 ]
+

@@ -43,7 +43,7 @@ def change_password(login, passw=None):
         passw = prompt_pass('>>> Password? ')
 
     auth.change_password(login, passw)
-    print 'Changed the password of user `%s`.' % login
+    print 'Changed the password of user `%s`.' % login.encode('utf8')
 
 
 @manager.command
@@ -53,33 +53,53 @@ def update_user(login, **data):
     from main import db
     from bundles.users.models import User
 
-    user = db.query(User).filter(User.login==login).first()
+    user = User.by_login(login)
     if not user:
-        print 'User `%s` not found.' % login
+        print 'User `%s` not found.' % login.encode('utf8')
         return
     
     for key, val in data.items():
         setattr(user, key, val)
     db.commit()
-    print 'User `%s` updated.' % login
+    print 'User `%s` updated.' % login.encode('utf8')
 
 
 @manager.command
-def add_perms(login, *perms):
-    """[-login] LOGIN [-perms] *PERMISSIONS
-    Add permissions to the user
+def add_role(login, role):
+    """[-login] LOGIN [-role] ROLE_NAME
+    Adds a role to the user
     """
     from main import db
     from bundles.users.models import User
     
-    user = db.query(User).filter(User.login==login).first()
+    user = User.by_login(login)
     if not user:
-        print 'User `%s` not found.' % login
+        print 'User `%s` not found.' % login.encode('utf8')
         return
-    user.add_perms(perms)
+    user.add_role(role)
     db.commit()
-    print 'Changed the permissions of user `%s`.' % login
+    print 'User `%s` has now the `%s` role.' % (
+        login.encode('utf8'), role.encode('utf8'))
+
+
+@manager.command
+def remove_role(login, role):
+    """[-login] LOGIN [-role] ROLE_NAME
+    Remove a role from the user
+    """
+    from main import db
+    from bundles.users.models import User
+    
+    user = User.by_login(login)
+    if not user:
+        print 'User `%s` not found.' % login.encode('utf8')
+        return
+    user.remove_role(role)
+    db.commit()
+    print 'User `%s` no longer has the `%s` role.' % (
+        login.encode('utf8'), role.encode('utf8'))
 
 
 if __name__ == "__main__":
     manager.run()
+

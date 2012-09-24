@@ -26,6 +26,15 @@ class [[ class_name ]](db.Model, BaseMixin, AuditableMixin):
     def __init__(self, **kwargs):
         db.Model.__init__(self, **kwargs)
 
+    @classmethod
+    def by_id(cls, [[ singular ]]_id, deleted=False):
+        [[ singular ]] = db.query(cls) \
+            .filter(cls.id == [[ singular ]]_id) \
+            .first()
+        if not [[ singular ]] or ([[ singular ]].deleted and not deleted):
+            raise shake.NotFound
+        return [[ singular ]]
+
     @cached_property
     def show_url(self):
         return url_for('[[ plural ]].show', [[ singular ]]_id=self.id)
@@ -60,13 +69,4 @@ def get_[[ plural ]](deleted=False, limit=None):
     if limit:
         query = query.limit(limit)
     return query
-
-
-def get_[[ singular ]]([[ singular ]]_id, deleted=False):
-    [[ singular ]] = db.query([[ class_name ]]) \
-        .filter([[ class_name ]].id == [[ singular ]]_id) \
-        .first()
-    if not [[ singular ]] or ([[ singular ]].deleted and not deleted):
-        raise shake.NotFound
-    return [[ singular ]]
 
