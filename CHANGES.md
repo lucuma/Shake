@@ -2,6 +2,8 @@
 
 ## Version 1.5
 
+- Fix bug that was preventing to set the session cookie while using the development server.
+
 - Added a `wrapper` parameter to `shake.templates.link_to` for making navigations bootstrap-style.
 
 - User roles in the default project skeleton, and other changes.

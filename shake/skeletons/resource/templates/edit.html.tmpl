@@ -9,7 +9,7 @@
 <fieldset class="form-actions">
   {{ csrf.input }}
   <a href="{{ url_for('[[ plural ]].index') }}" class="btn btn-small cancel">Cancel</a>
-  <button class="btn btn-large btn-primary">Save</button>
+  <button type="submit" class="btn btn-large btn-primary">Save</button>
 </fieldset>
 </form>
 {% endblock %}

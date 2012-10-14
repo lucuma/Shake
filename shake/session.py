@@ -218,7 +218,6 @@ class ItsdangerousSessionInterface(SessionInterface):
             request.session = self.session_class(data)
             return
         except BadSignature:
-            assert False
             request.session = self.session_class()
             return
 
@@ -254,8 +253,8 @@ class CSRFToken(object):
     
     name = CSRF_FORM_NAME
     
-    def __init__(self):
-        self.value = generate_key('csrf-token')
+    def __init__(self, value=None):
+        self.value = value or generate_key('csrf-token')
 
     def get_input(self):
         return Markup(u'<input type="hidden" name="%s" value="%s">' %
@@ -279,8 +278,10 @@ class CSRFToken(object):
 def get_csrf(request=None):
     """Use it to prevent Cross Site Request Forgery (CSRF) attacks."""
     request = request or local.request
-    csrf = request.session.get(CSRF_SESSION_NAME)
-    if not csrf:
+    csrf_value = request.session.get(CSRF_SESSION_NAME)
+    if csrf_value:
+        csrf = CSRFToken(csrf_value)
+    else:
         csrf = new_csrf(request)
     return csrf
 
@@ -288,7 +289,7 @@ def get_csrf(request=None):
 def new_csrf(request=None):
     request = request or local.request
     csrf = CSRFToken()
-    request.session[CSRF_SESSION_NAME] = csrf
+    request.session[CSRF_SESSION_NAME] = csrf.value
     return csrf
 
 

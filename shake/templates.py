@@ -75,6 +75,8 @@ def link_to(text='', url='', classes='', partial=False, wrapper=None, **kwargs):
 
         >>> link_to('Hello', '/hello/', title='click me')
         u'<a href="/hello/" title="click me">Hello</a>'
+        >>> link_to('Hello', '/hello/', wrapper='li', classes='last', title='Hi')
+        u'<li class="last" title="Hi"><a href="/hello/">Hello</a></li>'
 
         >>> from werkzeug.test import EnvironBuilder
         >>> builder = EnvironBuilder(method='GET', path='/foo/')
