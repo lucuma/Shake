@@ -212,7 +212,10 @@ class ItsdangerousSessionInterface(SessionInterface):
         if not val:
             request.session = self.session_class()
             return
-        max_age = self.app.session_lifetime.total_seconds()
+        # Python 2.6 compatibility hack :(
+        td = self.app.session_lifetime
+        max_age = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 1e6) / 1e6
+        # max_age = self.app.session_lifetime.total_seconds()
         try:
             data = s.loads(val, max_age=max_age)
             request.session = self.session_class(data)
