@@ -62,11 +62,9 @@ class [[ class_name ]](db.Model, BaseMixin, AuditableMixin):
         return url_for('[[ plural ]].restore', **data)
 
 
-def get_[[ plural ]](deleted=False, limit=None):
+def get_[[ plural ]](deleted=False):
     query = db.query([[ class_name ]])
     if not deleted:
         query = query.filter([[ class_name ]].deleted == False)
-    if limit:
-        query = query.limit(limit)
     return query
 
