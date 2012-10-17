@@ -158,6 +158,14 @@ def test_link_to():
     expected = u'<a href="/foo/" class="active">Bar</a>'
     assert expected == html
 
+    html = link_to('Bar', ['/hello/', path])
+    expected = u'<a href="/hello/" class="active">Bar</a>'
+    assert expected == html
+
+    html = link_to('Hello', ['/hello/', '/world/'], title='click me')
+    expected = u'<a href="/hello/" title="click me">Hello</a>'
+    assert expected == html
+
 # -----------------------------------------------------------------------------
 
 def get_test_env(path='/', **kwargs):

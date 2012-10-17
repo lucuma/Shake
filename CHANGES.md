@@ -1,5 +1,10 @@
 # Shake Changelog
 
+## Version 1.6
+
+- `shake.templates.link_to` now can match the current URL to a list of URLs and/or endpoint names.
+- Impoved project skeleton
+
 ## Version 1.5
 
 - Fix bug that was preventing to set the session cookie while using the development server.
