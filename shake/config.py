@@ -29,9 +29,9 @@ class DefaultSettings(object):
     SESSION_LIFETIME = 24 * 120 # 120 days
     
     # The maximum size for uploade files
-    MAX_CONTENT_LENGTH = 1024 * 1024 * 16  # 16 MB
+    MAX_CONTENT_LENGTH = 1024 * 1024 * 50  # 50 MB
     # The maximum size for regular form data (not files)
-    MAX_FORM_MEMORY_SIZE = 1024 * 1024 * 2  # 2 MB
+    MAX_FORM_MEMORY_SIZE = 1024 * 1024 * 5  # 5 MB
     
     DEFAULT_MIMETYPE = 'text/html'
 

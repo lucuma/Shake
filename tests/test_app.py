@@ -565,4 +565,3 @@ def test_postdata_keyerror():
     with pytest.raises(KeyError):
         print c.post('/', data={'a':123})
 
-

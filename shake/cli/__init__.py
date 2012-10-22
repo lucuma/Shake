@@ -85,8 +85,8 @@ def add(name=None, *args, **options):
 
     Examples:
         shake add post
-        shake add post title:string body:text published:boolean
-        shake add post purchase order_id:integer amount:numeric
+        shake add post title:Unicode(255) body:UnicodeText published:Boolean
+        shake add post purchase order_id:Integer amount:Numeric
 
     """
     if not name:

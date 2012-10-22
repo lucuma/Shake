@@ -31,9 +31,10 @@ class Session(CallbackDict):
 
     def __init__(self, initial=None):
         def on_update(self):
-            self._modified = True
+            self.modified = True
+
         CallbackDict.__init__(self, initial, on_update)
-        self._modified = False
+        self.modified = False
 
 
 class NullSession(CallbackDict):
@@ -225,11 +226,12 @@ class ItsdangerousSessionInterface(SessionInterface):
             return
 
     def save_session(self, session, response):
-        if not session:
-            # response.delete_cookie(cookie_name, domain=domain)
-            return response
         domain = self.get_cookie_domain()
         cookie_name = self.app.settings['SESSION_COOKIE_NAME']
+        # if not session:
+        #     if session.modified:
+        #         response.delete_cookie(cookie_name, domain=domain)
+        #     return response
         expires = self.get_expiration_time(session)
         s = self.get_serializer()
         if s is None:
@@ -244,7 +246,9 @@ class ItsdangerousSessionInterface(SessionInterface):
         s = self.get_serializer()
         if s is None:
             request.session = self.make_null_session()
-        request.session = self.session_class()
+        session = self.session_class()
+        session.modified = True
+        request.session = session
 
 
 def generate_key(salt=None):
