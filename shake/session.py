@@ -206,24 +206,24 @@ class ItsdangerousSessionInterface(SessionInterface):
     def open_session(self, request):
         s = self.get_serializer()
         if s is None:
-            request.session = self.make_null_session()
-            return
+            return self.make_null_session()
+        
         cookie_name = self.app.settings['SESSION_COOKIE_NAME']
         val = request.cookies.get(cookie_name)
         if not val:
-            request.session = self.session_class()
-            return
+            return self.session_class()
+
         # Python 2.6 compatibility hack :(
         td = self.app.session_lifetime
         max_age = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 1e6) / 1e6
         # max_age = self.app.session_lifetime.total_seconds()
         try:
             data = s.loads(val, max_age=max_age)
-            request.session = self.session_class(data)
-            return
+            session = self.session_class(data)
+            return session
+
         except BadSignature:
-            request.session = self.session_class()
-            return
+            return self.session_class()
 
     def save_session(self, session, response):
         domain = self.get_cookie_domain()
@@ -236,6 +236,7 @@ class ItsdangerousSessionInterface(SessionInterface):
         s = self.get_serializer()
         if s is None:
             return response
+        
         session_data = s.dumps(dict(session))
         httponly = self.get_cookie_httponly()
         response.set_cookie(cookie_name, session_data, expires=expires,

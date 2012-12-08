@@ -7,7 +7,7 @@
 from datetime import datetime
 
 import shake
-from shake import cached_property, to_unicode
+from shake import to_unicode
 
 from main import app, db
 from bundles.common.models import AuditableMixin

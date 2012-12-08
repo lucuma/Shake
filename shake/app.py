@@ -252,7 +252,7 @@ class Shake(object):
 
     def make_request(self, environ):
         request = self.request_class(environ)
-        self.session_interface.open_session(request)
+        request.session = self.session_interface.open_session(request)
         local.request = request
         return request
 
@@ -284,7 +284,6 @@ class Shake(object):
         response = self.process_response(response)
         if isinstance(response, self.response_class):
             response = self.session_interface.save_session(request.session, response)
-            # print 'cookieheader', response.headers.getlist('Set-Cookie')
         local_manager.cleanup()
         return response(environ, start_response)
 
