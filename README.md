@@ -1,9 +1,8 @@
-
 # Shake
 
 A web framework mixed from the best ingredients (Werkzeug, Jinja2 and maybe SQLAlchemy, Babel, etc.)
 
-It can be minimal like this::
+It can be minimal like this:
 
 ```python
 from shake import Shake
