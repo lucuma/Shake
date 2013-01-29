@@ -458,7 +458,7 @@ class Shake(object):
             # local IP address for easy debugging.
             for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
                 if ip.startswith('192.'):
-                    print ' * Running on http://%s:%s' % (ips[0], port)
+                    print ' * Running on http://%s:%s' % (ip, port)
                     break
         print '-- Quit the server with Ctrl+C --'
 
