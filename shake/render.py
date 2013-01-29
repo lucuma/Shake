@@ -45,9 +45,6 @@ class Render(object):
 
         'link_to': link_to,
         'plural': dumb_plural,
-
-        # Deprecated. Will go away in v1.3
-        'csrf_secret': LocalProxy(get_csrf),
     }
 
     default_extensions = []

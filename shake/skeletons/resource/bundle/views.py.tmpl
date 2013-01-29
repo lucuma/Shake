@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    [[ plural|title ]] views
-    -------------------------------
-
-"""
 import shake
 from shake import url_for, redirect_to, flash
 
@@ -12,15 +7,11 @@ from . import models as m
 
 
 def index(request):
-    """/[[ plural ]]/  [GET]
-    """
     [[ plural ]] = m.get_[[ plural ]]()
     return app.render('[[ plural ]]/index.html', locals())
 
 
 def show(request, [[ singular ]]_id):
-    """/[[ plural ]]/1/  [GET]
-    """
     [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id)
     return app.render('[[ plural ]]/show.html', locals())
 

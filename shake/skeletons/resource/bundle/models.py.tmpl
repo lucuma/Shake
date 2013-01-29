@@ -1,19 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-    [[ plural|title ]] models
-    -------------------------------
-
-"""
-from datetime import datetime
-
-import shake
-from shake import cached_property, url_for, get_csrf
-
-from main import app, db
-from bundles.common.models import BaseMixin, AuditableMixin
+from main import db
+from bundles.common.models import BaseMixin
 
 
-class [[ class_name ]](db.Model, BaseMixin, AuditableMixin):
+class [[ class_name ]](BaseMixin, db.Model):
 
     __tablename__ = '[[ plural ]]'
     
@@ -25,46 +15,4 @@ class [[ class_name ]](db.Model, BaseMixin, AuditableMixin):
     [% endfor %]
     def __init__(self, **kwargs):
         db.Model.__init__(self, **kwargs)
-
-    @classmethod
-    def by_id(cls, [[ singular ]]_id, deleted=False):
-        [[ singular ]] = db.query(cls) \
-            .filter(cls.id == [[ singular ]]_id) \
-            .first()
-        if not [[ singular ]] or ([[ singular ]].deleted and not deleted):
-            raise shake.NotFound
-        return [[ singular ]]
-
-    @cached_property
-    def show_url(self):
-        return url_for('[[ plural ]].show', [[ singular ]]_id=self.id)
-
-    @cached_property
-    def edit_url(self):
-        return url_for('[[ plural ]].edit', [[ singular ]]_id=self.id)
-
-    @cached_property
-    def delete_url(self):
-        csfr = get_csrf()
-        data = {
-            '[[ singular ]]_id': self.id,
-            csfr.name: csfr.value,
-        }
-        return url_for('[[ plural ]].delete', **data)
-
-    @cached_property
-    def restore_url(self):
-        csfr = get_csrf()
-        data = {
-            '[[ singular ]]_id': self.id,
-            csfr.name: csfr.value,
-        }
-        return url_for('[[ plural ]].restore', **data)
-
-
-def get_[[ plural ]](deleted=False):
-    query = db.query([[ class_name ]])
-    if not deleted:
-        query = query.filter([[ class_name ]].deleted == False)
-    return query
 

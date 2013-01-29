@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    [[ plural|title ]] URLs
-    -------------------------------
-
     The priority is based upon order of creation:
     first created -> highest priority.
 
 """
 from shake import Rule, EndpointPrefix, Submount
 
-from . import views, models
+from . import models
 
 
 urls = [
@@ -21,17 +18,20 @@ urls = [
             name='[[ plural ]].show'),
     ]),
 
-    EndpointPrefix('bundles.[[ plural ]].views_admin', [
-        Rule('/new/', 'new',
+    EndpointPrefix('bundles.[[ plural ]].admin', [
+        Rule('/admin/', 'admin',
+            name='[[ plural ]].admin'),
+
+        Rule('/admin/new/', 'new',
             name='[[ plural ]].new'),
 
-        Rule('/<int:[[ singular ]]_id>/edit/', 'edit',
+        Rule('/admin/<int:[[ singular ]]_id>/edit/', 'edit',
             name='[[ plural ]].edit'),
 
-        Rule('/<int:[[ singular ]]_id>/delete/', 'delete',
+        Rule('/admin/<int:[[ singular ]]_id>/delete/', 'delete',
             name='[[ plural ]].delete'),
 
-        Rule('/<int:[[ singular ]]_id>/restore/', 'restore',
+        Rule('/admin/<int:[[ singular ]]_id>/restore/', 'restore',
             name='[[ plural ]].restore'),
     ]),
 ]

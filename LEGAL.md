@@ -1,6 +1,6 @@
 # Legal
 
-© 2010 by Lúcuma (http://lucumalabs.com).  
+© by Lúcuma (http://lucumalabs.com).  
 MIT License. (http://www.opensource.org/licenses/mit-license.php)
 
 

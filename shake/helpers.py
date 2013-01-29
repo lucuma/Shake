@@ -294,7 +294,7 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
         Set to overwrite the default Response class.
     
     --------------------------------
-    Copied almost unchanged from Flask <http://flask.pocoo.org/>
+    Copied almost verbatim from Flask <http://flask.pocoo.org/>
     Copyright © 2010 by Armin Ronacher.
     Used under the modified BSD license.
     """
@@ -391,7 +391,7 @@ def to_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     If strings_only is True, don't convert (some) non-string-like objects.
 
     --------------------------------
-    Copied almost unchanged from Django <https://www.djangoproject.com/>
+    Copied almost verbatim from Django <https://www.djangoproject.com/>
     Copyright © Django Software Foundation and individual contributors.
     Used under the modified BSD license.
     """
@@ -445,7 +445,7 @@ def to_bytestring(s, encoding='utf-8', strings_only=False, errors='strict'):
     If strings_only is True, don't convert (some) non-string-like objects.
 
     --------------------------------
-    Copied almost unchanged from Django <https://www.djangoproject.com/>
+    Copied almost verbatim from Django <https://www.djangoproject.com/>
     Copyright © Django Software Foundation and individual contributors.
     Used under the modified BSD license.
     """

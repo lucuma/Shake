@@ -38,7 +38,7 @@ class Role(db.Model):
         return '<%s %s>' % (self.__class__.__name__, self.name.encode('utf8'))
 
 
-class User(db.Model, AuditableMixin):
+class User(AuditableMixin, db.Model):
 
     __tablename__ = 'users'
     

@@ -81,7 +81,7 @@ def send_from_directory(request, directory, filename, **options):
     :   optional keyword arguments that are directly forwarded to `send_file`.
     
     --------------------------------
-    Copied almost unchanged from Flask <http://flask.pocoo.org/>
+    Copied almost verbatim from Flask <http://flask.pocoo.org/>
     Copyright © 2010 by Armin Ronacher.
     Used under the modified BSD license.
     """

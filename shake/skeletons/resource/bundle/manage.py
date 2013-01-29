@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-    Administration scripts
-    -------------------------------
-
     To activate, import this module from your main manage.py file
     
 """

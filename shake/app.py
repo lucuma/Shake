@@ -317,7 +317,6 @@ class Shake(object):
         """
         try:
             endpoint, kwargs = self.match_url(request)
-            request.view_kwargs = kwargs
             resp_value = self.preprocess_request(request, kwargs)
             if resp_value is None:
                 resp_value = endpoint(request, **kwargs)
@@ -454,18 +453,13 @@ class Shake(object):
                 ''])
 
     def print_help_msg(self, host, port):
-        """Prints a help message.
-
-        """
         if host == '0.0.0.0':
             print ' * Running on http://0.0.0.0:%s' % (port,)
             # local IP address for easy debugging.
-            ips = [ip 
-                for ip in socket.gethostbyname_ex(socket.gethostname())[2]
-                if not ip.startswith("127.")
-            ][:1]
-            if ips:
-                print ' * Running on http://%s:%s' % (ips[0], port)
+            for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
+                if ip.startswith('192.'):
+                    print ' * Running on http://%s:%s' % (ips[0], port)
+                    break
         print '-- Quit the server with Ctrl+C --'
 
     def run(self, host=None, port=None, debug=None, reloader=None, 
