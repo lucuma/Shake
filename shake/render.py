@@ -1,31 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-    Shake.render
-    --------------------------
-
-    Implements the bridge to Jinja2.
+A thin wrapper arround Jinja2.
 
 """
-from collections import defaultdict
 from datetime import datetime
-import io
 from os.path import isdir, dirname, join, abspath, normpath, realpath
 
 import jinja2
 from werkzeug.local import LocalProxy
 
 from .helpers import url_for, local
-from .session import get_csrf, get_messages
+from .session import get_flashed_messages
 from .templates import link_to, dumb_plural
 from .wrappers import Response, make_response
 
 
-__all__ = (
-    'Render',
-)
+__all__ = ('Render',)
 
 
-TEMPLATES_DIR = 'templates'
+TEMPLATES_FOLDER = 'templates'
 
 
 class Render(object):
@@ -34,14 +27,12 @@ class Render(object):
 
     default_globals = {
         'now': LocalProxy(datetime.utcnow),
-        'ellipsis': Ellipsis,
         'enumerate': enumerate,
 
         'request': local('request'),
         'settings': LocalProxy(lambda: local.app.settings),
-        'csrf': LocalProxy(get_csrf),
         'url_for': url_for,
-        'get_messages': get_messages,
+        'get_messages': get_flashed_messages,
 
         'link_to': link_to,
         'plural': dumb_plural,
@@ -50,14 +41,14 @@ class Render(object):
     default_extensions = []
 
     default_filters = {}
-    
+
     default_tests = {
         'ellipsis': (lambda obj: obj == Ellipsis),
     }
-    
 
     def __init__(self, templates_path=None, loader=None,
-            default_mimetype='text/html', response_class=Response, **kwargs):
+                 default_mimetype='text/html', response_class=Response,
+                 globals=None, filters=None, tests=None, **kwargs):
         """
 
         templates_path
@@ -77,13 +68,13 @@ class Render(object):
 
         """
         if not loader:
-            templates_path = templates_path or TEMPLATES_DIR
+            templates_path = templates_path or TEMPLATES_FOLDER
             templates_path = normpath(abspath(realpath(templates_path)))
             # Instead of a path, we've probably recieved the value of __file__
             if not isdir(templates_path):
-                templates_path = join(dirname(templates_path), TEMPLATES_DIR)
+                templates_path = join(dirname(templates_path), TEMPLATES_FOLDER)
             loader = jinja2.FileSystemLoader(templates_path)
-        
+
         tglobals = kwargs.pop('globals', {})
         tfilters = kwargs.pop('filters', {})
         ttests = kwargs.pop('tests', {})
@@ -102,7 +93,6 @@ class Render(object):
         self.env = env
         self.default_mimetype = default_mimetype
         self.response_class = response_class
-    
 
     def render(self, tmpl, context=None, to_string=False, **kwargs):
         """Render a template `tmpl` using the given `context`.
@@ -117,7 +107,6 @@ class Render(object):
         kwargs.setdefault('mimetype', self.default_mimetype)
         return make_response(result, response_class=self.response_class, **kwargs)
 
-
     def __call__(self, filename, context=None, to_string=False, **kwargs):
         """Load a template from `<templates_path>/<filename>` and passes it to
         `render` along with the other parameters.
@@ -129,7 +118,6 @@ class Render(object):
         tmpl = self.env.get_template(filename)
         return self.render(tmpl, context=context, to_string=to_string, **kwargs)
 
-    
     def from_string(self, source, context=None, to_string=False, **kwargs):
         """Parses the `source` given and build a Template from it.
         The template and the other parameters are passed to `Render.render`
@@ -145,4 +133,3 @@ class Render(object):
 
 default_loader = jinja2.PackageLoader('shake', 'default_templates')
 default_render = Render(loader=default_loader)
-

@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Shake.templates
-    --------------------------
-
-    Template globals, filters and tests
+Template globals, filters and tests
 
 """
 import re
@@ -14,9 +11,7 @@ from jinja2 import Markup
 from .helpers import local, to_unicode, url_for
 
 
-__all__ = (
-    'link_to', 'dumb_plural', 
-)
+__all__ = ('link_to', 'dumb_plural',)
 
 
 def dumb_plural(num, plural='s', singular=''):
@@ -125,8 +120,8 @@ def link_to(text='', endpoint='', classes='', wrapper=None, partial=False, **kwa
     path = request.path.rstrip('/')
 
     patterns = endpoint if isinstance(endpoint, (list, tuple)) else [endpoint]
-    patterns = [p
-        if p.startswith('/') or re.match(URL_RE, p) else url_for(p)
+    patterns = [
+        p if p.startswith('/') or re.match(URL_RE, p) else url_for(p)
         for p in patterns]
 
     for url in patterns:
@@ -147,4 +142,3 @@ def link_to(text='', endpoint='', classes='', wrapper=None, partial=False, **kwa
     else:
         tmpl = u'<a href="%(url)s"%(attrs)s>%(text)s</a>'
     return Markup(tmpl % data)
-

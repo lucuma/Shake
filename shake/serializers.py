@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-"""
-    Shake.serializers
-    --------------------------
-    
-"""
 import datetime
 # Get the fastest json available
 try:
     import simplejson as json
 except ImportError:
-    try:
-        import json
-    except ImportError:
-        raise ImportError('Unable to find a JSON implementation')
+    import json
+
+
+__all__ = ('to_json', 'from_json',)
+
+
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+DATE_FORMAT = '%Y-%m-%d'
 
 
 def to_json(value, **options):
@@ -22,15 +21,8 @@ def to_json(value, **options):
 
 
 def from_json(value, **options):
-    options.setdefault('object_hook', json_decoder)
+    options.setdefault('object_hook', _json_decoder)
     return json.loads(value, **options)
-
-
-#------------------------------------------------------------------------------
-
-
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
-DATE_FORMAT = '%Y-%m-%d'
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -42,9 +34,9 @@ class JSONEncoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
 
 
-def json_decoder(d):
+def _json_decoder(d):
     if isinstance(d, list):
-        return [json_decoder(item) for item in d]
+        return [_json_decoder(item) for item in d]
     for k, v in d.items():
         if not isinstance(v, basestring):
             continue
@@ -56,4 +48,3 @@ def json_decoder(d):
             except ValueError:
                 pass
     return d
-

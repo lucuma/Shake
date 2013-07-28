@@ -1,29 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-    Shake.session
-    --------------------------
-
-"""
 from datetime import datetime
 import hashlib
-import os
-from time import time
 
-from jinja2 import Markup
 from itsdangerous import URLSafeTimedSerializer, BadSignature
 from werkzeug.datastructures import CallbackDict
 
-from .helpers import local, to64
+from .helpers import local
 
 
 __all__ = (
     'Session', 'NullSession', 'SessionInterface', 'ItsdangerousSessionInterface',
-    'generate_key', 'CSRFToken', 'get_csrf', 'new_csrf', 'flash', 'get_messages',
+    'flash', 'get_flashed_messages',
 )
 
 
-CSRF_FORM_NAME = '_csrf'
-CSRF_SESSION_NAME = '_c'
 LOCAL_FLASHES = '_fm'
 
 
@@ -46,8 +36,8 @@ class NullSession(CallbackDict):
 
     def _fail(self, *args, **kwargs):
         raise RuntimeError('The session is unavailable because no secret '
-            'key was set.  Set the SECRET_KEY on the application to something '
-            'unique and secret.')
+                           'key was set.  Set the SECRET_KEY on the application'
+                           ' to something unique and secret.')
 
     __setitem__ = __delitem__ = clear = pop = popitem = update = setdefault = _fail
     del _fail
@@ -207,7 +197,7 @@ class ItsdangerousSessionInterface(SessionInterface):
         s = self.get_serializer()
         if s is None:
             return self.make_null_session()
-        
+
         cookie_name = self.app.settings['SESSION_COOKIE_NAME']
         val = request.cookies.get(cookie_name)
         if not val:
@@ -236,11 +226,11 @@ class ItsdangerousSessionInterface(SessionInterface):
         s = self.get_serializer()
         if s is None:
             return response
-        
+
         session_data = s.dumps(dict(session))
         httponly = self.get_cookie_httponly()
         response.set_cookie(cookie_name, session_data, expires=expires,
-            httponly=httponly, domain=domain)
+                            httponly=httponly, domain=domain)
         return response
 
     def invalidate(self, request):
@@ -252,60 +242,11 @@ class ItsdangerousSessionInterface(SessionInterface):
         request.session = session
 
 
-def generate_key(salt=None):
-    value = hashlib.sha1('%s%s%s' % (time(), os.urandom(32), salt)).hexdigest()[:32]
-    return to64(int(value, 16))
-
-
-class CSRFToken(object):
-    
-    name = CSRF_FORM_NAME
-    
-    def __init__(self, value=None):
-        self.value = value or generate_key('csrf-token')
-
-    def get_input(self):
-        return Markup(u'<input type="hidden" name="%s" value="%s">' %
-            (self.name, self.value))
-    
-    def get_query(self):
-        return Markup(u'%s=%s') % (self.name, self.value)
-
-    @property
-    def input(self):
-        return self.get_input()
-    
-    @property
-    def query(self):
-        return self.get_query()
-    
-    def __repr__(self):
-        return '<CSRFToken %s = "%s">' % (self.name, self.value)
-
-
-def get_csrf(request=None):
-    """Use it to prevent Cross Site Request Forgery (CSRF) attacks."""
-    request = request or local.request
-    csrf_value = request.session.get(CSRF_SESSION_NAME)
-    if csrf_value:
-        csrf = CSRFToken(csrf_value)
-    else:
-        csrf = new_csrf(request)
-    return csrf
-
-
-def new_csrf(request=None):
-    request = request or local.request
-    csrf = CSRFToken()
-    request.session[CSRF_SESSION_NAME] = csrf.value
-    return csrf
-
-
 def flash(msg, cat='info', **kwargs):
     """Flashes a message to the next session.  In order to remove the
     flashed message from the session and to display it to the user,
     the view has to call `shake.get_messages`.
-    
+
     msg
     :   the message to be flashed.
     cat
@@ -320,7 +261,7 @@ def flash(msg, cat='info', **kwargs):
     session.setdefault(LOCAL_FLASHES, []).append(kwargs)
 
 
-def get_messages():
+def get_flashed_messages():
     """Pulls all flashed messages from the session and returns them.
     Further calls in the same request to the function will return
     the same messages.
@@ -333,4 +274,3 @@ def get_messages():
         if flashes:
             del session[LOCAL_FLASHES]
     return flashes or []
-

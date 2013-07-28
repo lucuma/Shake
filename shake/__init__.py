@@ -1,57 +1,54 @@
 # -*- coding: utf-8 -*-
 """
-    --------------------------
-    Shake
-    --------------------------
+--------------------------
+Shake
+--------------------------
 
-    A web framework mixed from the best ingredients.
-    It can be minimal like this:
+Shake is a lightweight web framework based on Werkzeug and Jinja2.
+It can be considered a simpler alternative to Flask.
 
-        from shake import Shake
+:
+    from shake import Shake
 
-        app = Shake(__file__)
+    app = Shake(__file__)
 
-        app.route('/', hello)
-        def hello(request):
-            return 'Hello World!'        
+    app.route('/', hello)
+    def hello(request):
+        return 'Hello World!'
 
-        if __name__ == "__main__":
-            app.run()
+    if __name__ == "__main__":
+        app.run()
 
-    Or a full featured (yet configurable if you need it) framework.
+The most important differences from Flask are:
 
-    ---------------------------------------
-    © 2010 by [Lúcuma] (http://lucumalabs.com).
-    See `AUTHORS.md` for more details.
-    License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).
+* The `request` object is passed explicity
+* Any template can be rendered whitout an active request (unless you're trying to use the request object in the template.)
+* The URLs are declared separately from the views, instead of using decorators.
+* No blueprints. Instead:
+    - The URL submonting are done by using the Werkzeug routing functions directly (`Submount`, `EndpointPrefix`, etc.)
+    - Any static folder must be defined explicity.
+* No `abort(code)`. The Werkzeug exceptions are used instead.
 
-    Portions of code and/or inspiration taken from:
-    * Werkzeug <werkzeug.pocoo.org> Copyright 2010, the Werkzeug Team.
-    * Flask <flask.pocoo.org> Copyright 2010, Armin Ronacher.
-    Used under the modified BSD license. See LEGAL.md for more details
+---------------------------------------
+© 2010 by [Lúcuma] (http://lucumalabs.com).
+See `AUTHORS.md` for more details.
+License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).
+See LICENSE.md for more details
 
 """
 # Utilities we import from Werkzeug that are unused
 # in the module but are exported as public interface.
-from jinja2.exceptions import TemplateNotFound
 from werkzeug.exceptions import *
-from werkzeug.urls import url_quote, url_unquote
-from werkzeug.utils import cached_property, import_string, redirect
+from werkzeug.utils import redirect
 
 from .app import *
 from .helpers import *
 from .render import *
-from .routes import *
-from .serializers import json
+from .serializers import *
 from .session import *
 from .templates import *
 from .views import *
 from .wrappers import *
 
 
-## Aliases
-NotAllowed = Forbidden
-redirect_to = redirect
-
-__version__ = '1.6.2'
-
+__version__ = '2.0'

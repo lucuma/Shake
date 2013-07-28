@@ -1,4 +1,4 @@
-.PHONY: clean clean-pyc test upload docs
+.PHONY: clean clean-pyc test publish
 
 all: clean clean-pyc test
 
@@ -14,19 +14,7 @@ clean-pyc:
 	find . -name '*.pyo' -exec rm -f {} \;
 
 test:
-	rm -rf tests/__pycache__
 	py.test tests
-	rm -rf tests/__pycache__
 
-upload: clean
+publish: clean
 	python setup.py sdist upload
-
-docs:
-	cd docs; rm -rf build; clay build
-	rm _pages/*.html
-	rm -rf _pages/images
-	rm -rf _pages/scripts
-	rm -rf _pages/styles
-	cp -r docs/build/html/* _pages
-	cd _pages; git add .; git commit -m "Update pages"; git push origin gh-pages
-	git add _pages; git commit -m "Update pages"; git push origin master

@@ -1,33 +1,35 @@
+
 # Shake
 
-A web framework mixed from the best ingredients (Werkzeug, Jinja2 and maybe SQLAlchemy, Babel, etc.)
+Shake is a lightweight web framework based on Werkzeug and Jinja2.
+It can be considered a simpler alternative to Flask.
 
-It can be minimal like this:
-
-```python
+````python
 from shake import Shake
 
 app = Shake(__file__)
 
 app.route('/', hello)
 def hello(request):
-    return 'Hello World!'        
+    return 'Hello World!'
 
 if __name__ == "__main__":
     app.run()
-```
+````
 
-Or a full featured (yet configurable if needed) framework.
+The most important differences from Flask are:
 
-To get started:
+* The `request` object is passed explicity
+* Any template can be rendered whitout an active request (unless you're trying to use the request object in the template.)
+* The URLs are declared separately from the views, instead of using decorators.
+* No blueprints. Instead:
+    - The URL submonting are done by using the Werkzeug routing functions directly (`Submount`, `EndpointPrefix`, etc.)
+    - Any static folder must be defined explicity.
+* No `abort(code)`. The Werkzeug exceptions are used instead.
 
-```
-mkdir myawesomeproject
-cd myawesomeproject
-shake new
-```
 
 ---------------------------------------
-© 2010 by [Lúcuma] (http://lucumalabs.com).  
-See `AUTHORS.md` for more details.
-License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).
+© 2010 by [Lúcuma](http://lucumalabs.com). See `AUTHORS.md` for more details.
+
+License: [MIT License](http://www.opensource.org/licenses/mit-license.php).
+See LICENSE.md for more detail
