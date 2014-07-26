@@ -1,0 +1,114 @@
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #333;
+  background-color: #fdfdfd;
+}
+
+h1 {
+  margin: 0;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 32px;
+  font-weight: normal;
+  line-height: 36px;
+  color: inherit;
+  text-rendering: optimizelegibility;
+  padding: 0.4em 0;
+}
+p {
+  margin: 5px 0 10px;
+}
+ol {
+  padding: 0;
+  margin: 20px 0;
+  font-size: 12px;
+}
+ol li {
+  color: #aaa;
+  font-size: 12px;
+  margin-left: 10px;
+}
+dl {
+  margin-bottom: 18px;
+}
+dt, dd {
+  line-height: 18px;
+}
+dt {
+  font-weight: bold;
+  line-height: 17px;
+  float: left;
+  width: 120px;
+  clear: left;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+dd {
+  margin-left: 130px;
+}
+hr {
+  margin: 18px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #fff;
+}
+strong {
+  font-weight: bold;
+}
+em {
+  font-style: italic;
+}
+
+.item {
+  margin: 0;
+  padding: 3px;
+}
+.item:hover {
+  background: rgba(20,20,0, 0.05);
+}
+.method, .url {
+  font-size: 16px;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+.method {
+  color: #666;
+  display: inline-block;
+  font-size: 14px;
+  margin-left: 20px;
+}
+.url {
+  color: #111;
+}
+
+#header {
+  background-color: #a3312d;
+  color: white;
+  padding: 5px 50px;
+  margin: 20px 0 0;
+}
+#header.notfound {
+  background-color: #ffc;
+  color: black;
+  margin: 0;
+}
+#content {
+  padding: 30px 50px;
+  margin: 0;
+  font-size: 20px;
+}
+#content.notfound {
+  font-size: inherit;
+}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="csfrtoken" content="{{ csrf.value }}" />
+  <title>{% block title %}My site{% endblock %}</title>
+  <link rel="shortcut icon" type="image/x-icon" href="{{ IMAGES }}/favicon.ico" />
+  <link rel="stylesheet" href="{{ STYLES }}/main.css" />
+  <script src="{{ SCRIPTS }}/jquery-1.8.2.min.js"></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  {% block content %}{% endblock %}
+
+  <script src="{{ SCRIPTS }}/lodash.min.js"></script>
+  <script src="{{ SCRIPTS }}/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

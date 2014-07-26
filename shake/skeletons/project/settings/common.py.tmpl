@@ -1,0 +1,62 @@
+# -*- coding: utf-8 -*-
+"""
+    Common settings
+    -------------------------------
+    
+"""
+from os.path import dirname, join, realpath
+
+
+BASE_DIR = realpath(join(dirname(__file__) , '..'))
+STATIC_DIR = realpath(join(BASE_DIR, 'static'))
+FIXTURES_DIR = realpath(join(BASE_DIR, 'fixtures'))
+
+# The default subdomain for URLs without a subdomain defined.
+DEFAULT_SUBDOMAIN = ''
+
+# URL prefix for static files.
+# Example: "http://media.lucumalabs.com/static/", "http://example.com/static/"
+STATIC_URL = '/static'
+
+# URL shortcuts for static files -- styles, scripts and images.
+STATIC_URL_STYLES = STATIC_URL + '/styles'
+STATIC_URL_SCRIPTS = STATIC_URL + '/scripts'
+STATIC_URL_IMAGES = STATIC_URL + '/images'
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/home/example.com/media/"
+MEDIA_DIR = realpath(join(STATIC_DIR, 'media'))
+
+# URL prefix that handles the media served from MEDIA_ROOT.
+# Examples: "http://media.lucumalabs.com/media/", "http://example.com/media/"
+MEDIA_URL = '/static/media'
+
+# Internationalization settings
+DEFAULT_LOCALE = 'en'
+DEFAULT_TIMEZONE = 'UTC'
+
+# This secret was generated automatically, so it should be unique.
+# Don't share it with anybody.
+SECRET_KEY = '[[ SECRET1 ]]'
+
+# Shake-Auth settings
+AUTH_SETTINGS = {
+    # A hardcoded system-wide secret 'salt'. Don't share it with anybody.
+    # Do not change this value after creating users all of their passswords
+    # will become invalid.
+    'pepper': '[[ SECRET2 ]]',
+
+    # Redirect the user there after signing in.
+    'sign_in_redirect': '/',
+
+    # Redirect the user there after she sign out.
+    'sign_out_redirect': '/',
+
+    # The "reset your password" links will be valid for this number of hours
+    # after generation.
+    'reset_expire': 3,
+
+    # minimum number of chars the password must have.
+    'password_minlen': 5,
+}
+

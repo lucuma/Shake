@@ -1,0 +1,13 @@
+# This file collects all required third-party applications that are needed
+# to run this project. Later you can install all these apps in a row
+# using pip. Example:
+#
+#     pip install -r requirements.txt
+
+allspeak
+inflection
+itsdangerous>=0.17
+jinja2>=2.4
+pyceo>=1.0.3
+voodoo>=0.7
+werkzeug>=0.7

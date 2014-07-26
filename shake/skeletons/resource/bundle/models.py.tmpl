@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*-
+from main import db
+from bundles.common.models import BaseMixin
+
+
+class [[ class_name ]](BaseMixin, db.Model):
+
+    __tablename__ = '[[ plural ]]'
+    
+    [% for fname, ftype in fields -%]
+    [[ fname ]] = db.Column(
+        db.[[ ftype ]],
+        nullable=False
+    )
+    [% endfor %]
+    def __init__(self, **kwargs):
+        db.Model.__init__(self, **kwargs)
+

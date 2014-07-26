@@ -1,0 +1,25 @@
+# Common requirements
+# -------------------------------
+# This file collects all required third-party applications that are needed
+# to run this project.
+
+allspeak
+babel
+colorama
+inflector
+jinja2>=2.4
+mailshake
+pyceo>=1.0.3
+pytz
+shake
+shake-auth>=1.1.7
+shake-files
+simplejson
+solution>=1.1.16
+sqlalchemy
+voodoo>=0.7
+werkzeug>=0.7
+
+## Uncomment for thumbnails
+# moar
+# pil

@@ -1,0 +1,12 @@
+{% extends 'common/base.html' %}
+{% block title %}[[ plural|capitalize ]] | {{ super() }}{% endblock %}
+
+{% block content %}
+{% include '[[ plural ]]/flash.html' %}
+<h1>[[ plural|capitalize ]]</h1>
+
+{% for [[ singular ]] in [[ plural ]] %}
+  <article></article>
+{% endfor %}
+{% endblock %}
+

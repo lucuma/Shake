@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="robots" content="NONE,NOARCHIVE" />
+  <title>Access Denied</title>
+  <style>
+  {% include 'shake_default_view.css' %}
+  </style>
+</head>
+<body>
+  <div id="header" class="denied">
+    <h1>Access Denied</h1>
+  </div>
+  <div id="content" class="denied">
+    <p>You are not authorized to view this page.</p>
+  </div>
+  <!--
+  WARNING:
+  If a custom "HTTP 401: Acccess denied" page like this, is smaller than
+  512 bytes, then Internet Explorer and Chrome|Chromium will display their own
+  built-in 401 page and the robots will take over the world.
+  -->
+</body>
+</html>

@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+import shake
+from shake import url_for, redirect_to, flash
+
+from main import app, db
+from . import models as m
+
+
+def index(request):
+    [[ plural ]] = m.get_[[ plural ]]()
+    return app.render('[[ plural ]]/index.html', locals())
+
+
+def show(request, [[ singular ]]_id):
+    [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id)
+    return app.render('[[ plural ]]/show.html', locals())
+

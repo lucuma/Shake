@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<meta name="robots" content="NONE,NOARCHIVE" />
+<title>{% block title %}{% endblock %}</title>
+<style>
+html{font-size:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;margin:0;padding:0}
+body{margin:0;padding:0;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:16px;line-height:1.4;color:#333;background-color:#fdfdfd}
+h1{margin:0;font-family:inherit;font-weight:bold;font-size:32px;font-weight:normal;line-height:36px;color:inherit;text-rendering:optimizelegibility;padding:0.4em 0}
+p{margin:5px 0 10px}
+hr{margin:18px 0;border:0;border-top:1px solid #eee;border-bottom:1px solid #fff}
+strong{font-weight:bold}
+em{font-style:italic}
+#header{background-color:#a3312d;color:white;padding:5px 50px;margin:20px 0 0}
+#header.notfound{background-color:#ffc;color:black;margin:0}
+#content{padding:30px 50px;margin:0;font-size:20px}
+#content.notfound{font-size:inherit}
+</style>
+</head>
+<body>
+{% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,17 @@
+~*
+.DS_Store
+*.py[co]
+build
+dist
+*.egg*
+
+.coverage
+.tox
+htmlcov
+wheel
+__pycache__
+heroku
+_secret.py
+.secret
+PKG-INFO
+setup.cfg

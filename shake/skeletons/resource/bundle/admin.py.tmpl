@@ -1,0 +1,61 @@
+# -*- coding: utf-8 -*-
+import shake
+from shake import url_for, redirect_to, flash
+from shake_auth import protected
+
+from main import app, db
+from . import models as m
+from .forms import [[ class_name ]]Form
+
+
+@protected()
+def admin(request):
+    return app.render('[[ plural ]]/admin.html', locals())
+
+
+@protected()
+def new(request):
+    form = [[ class_name ]]Form(request.form, files=request.files)
+
+    if request.is_post and form.is_valid():
+        [[ singular ]] = form.save()
+        db.commit()
+        flash('CREATED', 'success')
+        return redirect_to(url_for('[[ plural ]].admin'))
+
+    return app.render('[[ plural ]]/edit.html', locals())
+
+
+@protected()
+def edit(request, [[ singular ]]_id):
+    [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id)
+    form = [[ class_name ]]Form(request.form, obj=[[ singular ]], files=request.files)
+
+    if request.is_post and form.is_valid():
+        form.save()
+        db.commit()
+        flash('UPDATED', 'success')
+        return redirect_to(url_for('[[ plural ]].admin'))
+
+    return app.render('[[ plural ]]/edit.html', locals())
+
+
+@protected(csrf=True)
+def delete(request, [[ singular ]]_id):
+    [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id, deleted=True)
+    [[ singular ]].delete()
+    db.commit()
+
+    restore_url = [[ singular ]].get_restore_url()
+    flash('DELETED', 'danger', extra=restore_url)
+    return redirect_to(url_for('[[ plural ]].admin'))
+
+
+@protected(csrf=True)
+def restore(request, [[ singular ]]_id):
+    [[ singular ]] = m.[[ class_name ]].by_id([[ singular ]]_id, deleted=True)
+    [[ singular ]].restore()
+    db.commit()
+    flash('RESTORED', 'success')
+    return redirect_to(url_for('[[ plural ]].admin'))
+

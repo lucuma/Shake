@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""
+    The priority is based upon order of creation:
+    first created -> highest priority.
+
+"""
+from shake import Rule, EndpointPrefix, Submount
+
+from . import models
+
+
+urls = [
+    EndpointPrefix('bundles.[[ plural ]].views', [
+        Rule('/', 'index', methods=['GET'],
+            name='[[ plural ]].index'),
+
+        Rule('/<int:[[ singular ]]_id>/', 'show', methods=['GET'],
+            name='[[ plural ]].show'),
+    ]),
+
+    EndpointPrefix('bundles.[[ plural ]].admin', [
+        Rule('/admin/', 'admin',
+            name='[[ plural ]].admin'),
+
+        Rule('/admin/new/', 'new',
+            name='[[ plural ]].new'),
+
+        Rule('/admin/<int:[[ singular ]]_id>/edit/', 'edit',
+            name='[[ plural ]].edit'),
+
+        Rule('/admin/<int:[[ singular ]]_id>/delete/', 'delete',
+            name='[[ plural ]].delete'),
+
+        Rule('/admin/<int:[[ singular ]]_id>/restore/', 'restore',
+            name='[[ plural ]].restore'),
+    ]),
+]
+

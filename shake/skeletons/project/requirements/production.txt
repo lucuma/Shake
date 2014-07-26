@@ -1,0 +1,10 @@
+# Production requirements
+# -------------------------------
+# This file collects all required third-party applications that are needed
+# to run this project in production, but not in other environments.
+# Later you can install all these apps in a row using pip. Example:
+#
+#     pip install -r requirements/production.txt
+
+-r common.txt
+psycopg2

@@ -1,0 +1,23 @@
+{% extends 'common/base.html' %}
+{% block title %}Edit [[ singular ]] | {{ super() }}{% endblock %}
+
+
+{% block content %}
+{% include '[[ plural ]]/flash.html' %}
+<form method="POST" action="" enctype="multipart/form-data">
+
+<fieldset class="form-actions">
+  {{ csrf.input }}
+  <a href="{{ url_for('[[ plural ]].index') }}" class="btn btn-small cancel">Cancel</a>
+  <button type="submit" class="btn btn-large btn-primary">Save</button>
+</fieldset>
+</form>
+{% endblock %}
+
+
+{% block head %}
+{% endblock %}
+
+
+{% block scripts %}
+{% endblock %}

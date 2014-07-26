@@ -1,0 +1,9 @@
+# Development requirements
+# -------------------------------
+# This file collects all required third-party applications that are needed
+# to run this project while developing, but not in other environments.
+# Later you can install all these apps in a row using pip. Example:
+#
+#     pip install -r requirements/development.txt
+
+-r common.txt
