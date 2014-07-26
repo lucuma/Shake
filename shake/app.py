@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 """
     Shake.app
     --------------------------
@@ -6,7 +7,7 @@
     This module implements the central WSGI application object.
 
 """
-from datetime import datetime, timedelta
+from datetime import timedelta
 import io
 import os
 from os.path import isdir, dirname, join, abspath, normpath, realpath
@@ -14,7 +15,7 @@ import socket
 
 from allspeak import I18n, LOCALES_DIR
 from pyceo import Manager
-from werkzeug.exceptions import HTTPException, NotFound, BadRequest
+from werkzeug.exceptions import HTTPException, NotFound
 from werkzeug.local import LocalManager
 from werkzeug.serving import run_simple
 from werkzeug.utils import import_string
@@ -322,13 +323,13 @@ class Shake(object):
                 resp_value = endpoint(request, **kwargs)
             response = self.make_response(resp_value)
 
-        except (HTTPException), exception:
+        except (HTTPException) as exception:
             if self.settings.DEBUG and isinstance(exception, DataNotFound):
-                response = self.handle_exception(request, error)
+                response = self.handle_exception(request, exception)
             else:
                 response = self.handle_http_exception(request, exception)
 
-        except (Exception), error:
+        except (Exception) as error:
             response = self.handle_exception(request, error)
 
         return response
@@ -446,21 +447,22 @@ class Shake(object):
         no_urls = len(self.url_map._rules) == 0
         if is_dev_server and no_urls:
             wml = len(WELCOME_MESSAGE) + 2
-            print '\n '.join(['',
+            print('\n '.join(['',
                 '-' * wml,
                 ' %s ' % WELCOME_MESSAGE,
                 '-' * wml,
                 ''])
+            )
 
     def print_help_msg(self, host, port):
         if host == '0.0.0.0':
-            print ' * Running on http://0.0.0.0:%s' % (port,)
+            print(' * Running on http://0.0.0.0:%s' % (port,))
             # local IP address for easy debugging.
             for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
                 if ip.startswith('192.'):
-                    print ' * Running on http://%s:%s' % (ip, port)
+                    print(' * Running on http://%s:%s' % (ip, port))
                     break
-        print '-- Quit the server with Ctrl+C --'
+        print('-- Quit the server with Ctrl+C --')
 
     def run(self, host=None, port=None, debug=None, reloader=None,
             reloader_interval=2, threaded=True, processes=1,
