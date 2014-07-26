@@ -11,7 +11,7 @@ app = Shake(__file__)
 
 app.route('/', hello)
 def hello(request):
-    return 'Hello World!'        
+    return 'Hello World!'
 
 if __name__ == "__main__":
     app.run()
@@ -28,6 +28,6 @@ shake new
 ```
 
 ---------------------------------------
-© 2010 by [Lúcuma] (http://lucumalabs.com).  
+© 2010 by [Lúcuma](http://lucumalabs.com).
 See `AUTHORS.md` for more details.
-License: [MIT License] (http://www.opensource.org/licenses/mit-license.php).
+License: [MIT License](http://www.opensource.org/licenses/mit-license.php).
