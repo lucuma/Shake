@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Shake.render
     --------------------------
@@ -50,11 +50,11 @@ class Render(object):
     default_extensions = []
 
     default_filters = {}
-    
+
     default_tests = {
         'ellipsis': (lambda obj: obj == Ellipsis),
     }
-    
+
 
     def __init__(self, templates_path=None, loader=None,
             default_mimetype='text/html', response_class=Response, **kwargs):
@@ -83,7 +83,7 @@ class Render(object):
             if not isdir(templates_path):
                 templates_path = join(dirname(templates_path), TEMPLATES_DIR)
             loader = jinja2.FileSystemLoader(templates_path)
-        
+
         tglobals = kwargs.pop('globals', {})
         tfilters = kwargs.pop('filters', {})
         ttests = kwargs.pop('tests', {})
@@ -102,7 +102,7 @@ class Render(object):
         self.env = env
         self.default_mimetype = default_mimetype
         self.response_class = response_class
-    
+
 
     def render(self, tmpl, context=None, to_string=False, **kwargs):
         """Render a template `tmpl` using the given `context`.
@@ -129,7 +129,7 @@ class Render(object):
         tmpl = self.env.get_template(filename)
         return self.render(tmpl, context=context, to_string=to_string, **kwargs)
 
-    
+
     def from_string(self, source, context=None, to_string=False, **kwargs):
         """Parses the `source` given and build a Template from it.
         The template and the other parameters are passed to `Render.render`

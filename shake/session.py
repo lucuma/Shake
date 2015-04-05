@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Shake.session
     --------------------------
@@ -207,7 +207,7 @@ class ItsdangerousSessionInterface(SessionInterface):
         s = self.get_serializer()
         if s is None:
             return self.make_null_session()
-        
+
         cookie_name = self.app.settings['SESSION_COOKIE_NAME']
         val = request.cookies.get(cookie_name)
         if not val:
@@ -236,7 +236,7 @@ class ItsdangerousSessionInterface(SessionInterface):
         s = self.get_serializer()
         if s is None:
             return response
-        
+
         session_data = s.dumps(dict(session))
         httponly = self.get_cookie_httponly()
         response.set_cookie(cookie_name, session_data, expires=expires,
@@ -258,27 +258,27 @@ def generate_key(salt=None):
 
 
 class CSRFToken(object):
-    
+
     name = CSRF_FORM_NAME
-    
+
     def __init__(self, value=None):
         self.value = value or generate_key('csrf-token')
 
     def get_input(self):
         return Markup(u'<input type="hidden" name="%s" value="%s">' %
             (self.name, self.value))
-    
+
     def get_query(self):
         return Markup(u'%s=%s') % (self.name, self.value)
 
     @property
     def input(self):
         return self.get_input()
-    
+
     @property
     def query(self):
         return self.get_query()
-    
+
     def __repr__(self):
         return '<CSRFToken %s = "%s">' % (self.name, self.value)
 
@@ -305,7 +305,7 @@ def flash(msg, cat='info', **kwargs):
     """Flashes a message to the next session.  In order to remove the
     flashed message from the session and to display it to the user,
     the view has to call `shake.get_messages`.
-    
+
     msg
     :   the message to be flashed.
     cat

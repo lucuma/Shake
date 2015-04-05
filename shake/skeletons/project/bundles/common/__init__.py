@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Common URLs
     -------------------------------
@@ -15,6 +15,6 @@ from . import views
 urls = [
     EndpointPrefix('bundles.common.views', [
         Rule('/', 'index',
-            name='index'), 
+            name='index'),
     ]),
 ]

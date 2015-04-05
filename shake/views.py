@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Shake.views
     --------------------------
@@ -41,7 +41,7 @@ def not_allowed_page(request, error):
 
 def render_template(request, template, render=None, context=None, **kwargs):
     """A really simple view who render directly a template.
-    
+
     request
     :   a `Request` instance.  Automatically provided by the application.
     template
@@ -72,14 +72,14 @@ def send_from_directory(request, directory, filename, **options):
     your webserver or (if no authentication happens) to tell the webserver
     to serve files for the given path on its own without calling into the
     web application for improved performance.
-    
+
     directory
     :   the directory where all the files are stored.
     filename
     :   the filepath relative to that directory to download.
     options
     :   optional keyword arguments that are directly forwarded to `send_file`.
-    
+
     --------------------------------
     Copied almost verbatim from Flask <http://flask.pocoo.org/>
     Copyright © 2010 by Armin Ronacher.

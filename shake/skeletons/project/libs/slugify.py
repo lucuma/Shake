@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     # Slugify
 
@@ -138,7 +138,7 @@ def normalize(s):
     def replace_char(m):
         char = m.group()
         return CHAR_MAP.get(char, char)
-    
+
     s = to_unicode(s)
     #translate non-roman text
     s = re.sub('[^a-zA-Z0-9\\s\\-]{1}', replace_char, s)

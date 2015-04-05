@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Administration scripts
     -------------------------------
 
     To activate, import this module from your main manage.py file
-    
+
 """
 from shake import manager
 from pyceo import prompt_pass
@@ -16,7 +16,7 @@ def create_user(login, passw, **data):
     Creates a new user.
     """
     from bundles.users import auth
-    
+
     password_minlen = auth.settings.password_minlen
     while len(passw) < password_minlen:
         print 'Password is too short (min %i chars).' % password_minlen
@@ -33,10 +33,10 @@ def change_password(login, passw=None):
     """[-login] LOGIN [-passw] NEW_PASSWORD
     Changes the password of an existing user."""
     from bundles.users import auth
-    
+
     if passw is None:
         passw = prompt_pass('>>> Password? ')
-    
+
     password_minlen = auth.settings.password_minlen
     while len(passw) < password_minlen:
         print 'Password is too short (min %i chars).' % password_minlen
@@ -57,7 +57,7 @@ def update_user(login, **data):
     if not user:
         print 'User `%s` not found.' % login.encode('utf8')
         return
-    
+
     for key, val in data.items():
         setattr(user, key, val)
     db.commit()
@@ -71,7 +71,7 @@ def add_role(login, role):
     """
     from main import db
     from bundles.users.models import User
-    
+
     user = User.by_login(login)
     if not user:
         print 'User `%s` not found.' % login.encode('utf8')
@@ -89,7 +89,7 @@ def remove_role(login, role):
     """
     from main import db
     from bundles.users.models import User
-    
+
     user = User.by_login(login)
     if not user:
         print 'User `%s` not found.' % login.encode('utf8')

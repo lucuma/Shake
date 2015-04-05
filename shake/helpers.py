@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Shake.helpers
     --------------------------
@@ -35,7 +35,7 @@ local = Local()
 
 def url_for(endpoint, anchor=None, method=None, external=False, **values):
     """Generates a URL to the given endpoint with the method provided.
-    
+
     endpoint
     :   The endpoint of the URL (name of the function).
     anchor
@@ -58,7 +58,7 @@ def url_for(endpoint, anchor=None, method=None, external=False, **values):
             force_external=external)
     except BuildError:
         url = ''
-    
+
     if anchor is not None:
         url += '#' + url_quote(anchor)
     return url
@@ -96,11 +96,11 @@ def to64(num, alphabet=None):
     """
     assert isinstance(num, (int, long)) and (num >= 0), \
         'Must supply a positive integer'
-    
+
     if alphabet:
         assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 64, \
             'The alphabet must be a 64 chars ASCII string'
-    
+
     alphabet = alphabet or ALPHABET64
     converted = []
     while num != 0:
@@ -115,7 +115,7 @@ def from64(snum, alphabet=None):
     if alphabet:
         assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 64, \
             'The alphabet must be a 64 chars ASCII string'
-        
+
         alphabet_reverse = dict((char, i) for (i, char) in enumerate(alphabet))
     else:
         alphabet_reverse = ALPHABET64_REVERSE
@@ -134,11 +134,11 @@ def to36(num, alphabet=None):
     """
     assert isinstance(num, (int, long)) and (num >= 0), \
         'Must supply a positive integer'
-    
+
     if alphabet:
         assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 36, \
             'The alphabet must be a 36 chars ASCII string'
-    
+
     alphabet = alphabet or ALPHABET36
     converted = []
     while num != 0:
@@ -152,10 +152,10 @@ def from36(snum, alphabet=None):
     """
     if not alphabet:
         return int(snum, 36)
-    
+
     assert isinstance(alphabet, (str, unicode)) and len(alphabet) == 36, \
         'The alphabet must be a 36 chars ASCII string'
-    
+
     alphabet_reverse = dict((char, i) for (i, char) in enumerate(alphabet))
     num = 0
     snum = str(snum)
@@ -170,9 +170,9 @@ def from36(snum, alphabet=None):
 class StorageDict(dict):
     """A StorageDict object is like a dictionary except than
        `obj.key` can be used in addition to `obj['key']`.
-    
+
     Basic Usage:
-    
+
         >>> o = StorageDict(a=1)
         >>> o.a
         1
@@ -184,24 +184,24 @@ class StorageDict(dict):
         >>> del o.a
         >>> print o.a
         None
-    
+
     """
-    
+
     def __getattr__(self, key):
         try:
             return self[key]
         except KeyError, error:
             raise AttributeError(error)
-    
+
     def __setattr__(self, key, value):
         self[key] = value
-    
+
     def __delattr__(self, key):
         try:
             del self[key]
         except KeyError, error:
             raise AttributeError(error)
-    
+
     def __repr__(self):
         return '<StorageDict ' + dict.__repr__(self) + '>'
 
@@ -219,10 +219,10 @@ def safe_join(directory, filename):
 
     param directory:
         the base directory.
-    
+
     param filename:
         the untrusted filename relative to that directory.
-    
+
     raises:
         `NotFound` if the resulting path would fall out of `directory`.
     """
@@ -254,45 +254,45 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
 
         if '..' in filename or filename.startswith('/'):
             raise NotFound()
-    
+
     param request:
         ...
-    
-    param filepath_or_fp: 
+
+    param filepath_or_fp:
         The absolute path of the file to send.
         Alternatively a file object might be provided in which case
         `X-Sendfile` might not work and fall back to the traditional method.
         Make sure that the file pointer is positioned at the start
         of data to send before calling `send_file`.
-    
+
     param mimetype:
         The mimetype of the file if provided, otherwise
         auto detection happens.
-    
+
     param as_attachment:
         Set to `True` if you want to send this file with
         a `Content-Disposition: attachment` header.
-    
+
     param attachment_filename:
         The filename for the attachment if it
         differs from the file's filename.
-    
+
     param add_etags:
         Set to `False` to disable attaching of etags.
-    
+
     param conditional:
         Set to `True` to enable conditional responses.
-    
+
     param cache_timeout:
         The timeout in seconds for the headers.
-    
+
     param use_x_sendfile:
         Set to `True` to directly emit an `X-Sendfile` header.
         This however requires support of the underlying webserver.
-    
+
     param response_class:
         Set to overwrite the default Response class.
-    
+
     --------------------------------
     Copied almost verbatim from Flask <http://flask.pocoo.org/>
     Copyright © 2010 by Armin Ronacher.
@@ -309,7 +309,7 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
         add_etags = False
         file = filepath_or_fp
         filepath = getattr(file, 'name', None)
-    
+
     if filepath is not None:
         filepath = os.path.abspath(filepath)
     if mimetype is None and (filepath or attachment_filename):
@@ -337,7 +337,7 @@ def send_file(request, filepath_or_fp, mimetype=None, as_attachment=False,
             file = io.open(filepath, 'rb')
             mtime = os.path.getmtime(filepath)
         data = wrap_file(request.environ, file)
-    
+
     response_class = response_class or Response
     resp = response_class(data, mimetype=mimetype, headers=headers,
         direct_passthrough=True)

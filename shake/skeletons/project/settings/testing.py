@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Testing settings
     -------------------------------
-    
+
 """
 from .production import *
 

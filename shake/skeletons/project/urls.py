@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Application's URLs.
     --------------------------
 
     The priority is based upon order of creation:
     first created -> highest priority.
-    
+
 """
 from shake import Rule, Submount
 

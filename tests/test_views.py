@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 import os
 
 import pytest
@@ -29,7 +29,7 @@ def fail(request):
 
 def no_pass(request):
     raise Forbidden
-    
+
 
 def test_default_not_found():
     settings = {
@@ -38,7 +38,7 @@ def test_default_not_found():
     app = Shake(__file__, settings)
     app.add_url('/', index)
     c = app.test_client()
-    
+
     resp = c.get('/bla')
     assert resp.status_code == HTTP_NOT_FOUND
     assert '<title>Page not found</title>' in resp.data
@@ -52,7 +52,7 @@ def test_default_error():
     app = Shake(__file__, settings)
     app.add_url('/', fail)
     c = app.test_client()
-    
+
     resp = c.get('/')
     assert resp.status_code == HTTP_ERROR
     assert '<title>Error</title>' in resp.data
@@ -74,9 +74,9 @@ def test_default_not_allowed():
 def test_render_template_view():
     app = Shake(__file__)
     c = app.test_client()
-    app.add_url('/', render_template, 
+    app.add_url('/', render_template,
         defaults={'template': 'tmpl.html', 'render': render})
-    
+
     resp = c.get('/')
     assert resp.data == '<h1>Hello World</h1>'
     assert resp.mimetype == 'text/html'

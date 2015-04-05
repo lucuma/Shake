@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     # Paginator
-    
+
 """
 from math import ceil
 
@@ -112,7 +112,7 @@ class Paginator(object):
         """0-based index of the last element in the current page."""
         end = self.start_index + self.per_page - 1
         return min(end, self.total - 1)
-    
+
     @property
     def items(self):
         offset = (self.page - 1) * self.per_page
@@ -127,7 +127,7 @@ class Paginator(object):
         """Iterates over the page numbers in the pagination.  The four
         parameters control the thresholds how many numbers should be produced
         from the sides:
-        
+
         1..left_edge
         ...
         (current - left_current), current, (current + right_current)

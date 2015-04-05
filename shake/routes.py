@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Shake.routes
     --------------------------
@@ -404,7 +404,7 @@ class EndpointPrefix(RuleFactory):
                 ]),
             ]),
         ])
-    
+
     """
 
     def __init__(self, prefix, rules):
@@ -696,11 +696,11 @@ class Rule(RuleFactory):
             convobj = _RawConverter(self.map)
             for variable in get_regex_variables(rule):
                 self._converters[variable] = convobj
-        
+
         def _build_regex(rule):
             if '(?P<' in rule:
                 return _build_raw_regex(rule)
-            
+
             for converter, arguments, variable in parse_rule(rule):
                 if converter is None:
                     regex_parts.append(re.escape(variable))
@@ -839,7 +839,7 @@ class Rule(RuleFactory):
                     return False
 
         return True
-    
+
     def __eq__(self, other):
         return self.__class__ is other.__class__ and \
                self._trace == other._trace
@@ -904,7 +904,7 @@ class UnicodeConverter(BaseConverter):
 
     minlength
     :   The minimum length of the string.  Must be greater or equal 1.
-    
+
     maxlength
     :   The maximum length of the string.
 
@@ -937,7 +937,7 @@ class AnyConverter(BaseConverter):
 
     map
     :   an instance of `Map`.
-    
+
     items
     :   This function accepts the possible items as positional arguments.
 
@@ -1002,7 +1002,7 @@ class IntegerConverter(NumberConverter):
     :   the number of fixed digits in the URL.  If you set this to `4`,
         for example, the application will only match if the url looks
         like `/0001/`.  The default is variable length.
-    
+
     min
     :   the minimum value.
 
@@ -1065,7 +1065,7 @@ class Map(object):
 
     rules
     :   sequence of url rules for this map.
-    
+
     default_subdomain
     :   The default subdomain for rules without a subdomain defined.
 
@@ -1078,16 +1078,16 @@ class Map(object):
     redirect_defaults
     :   This will redirect to the default rule if it wasn't visited that way.
         This helps creating unique URLs.
-    
+
     converters
     :   A dict of converters that adds additional converters
         to the list of converters. If you redefine one
         converter this will override the original one.
-    
+
     sort_parameters
     :   If set to `True` the url parameters are sorted.
         See `url_encode` for more details.
-    
+
     sort_key
     :   The sort key function for `url_encode`.
 
@@ -1098,7 +1098,7 @@ class Map(object):
     :   if set to `True` it enables the host matching feature and disables
         the subdomain one.  If enabled the `host` parameter to rules is used
         instead of the `subdomain` one.
-    
+
     """
     default_converters = ImmutableDict(DEFAULT_CONVERTERS)
 
@@ -1142,7 +1142,7 @@ class Map(object):
         arguments
         :   this function accepts one or more arguments as positional
             arguments.  Each one of them is checked.
-        
+
         """
         arguments = set(arguments)
         for rule in self._rules_by_endpoint[endpoint]:
@@ -1217,8 +1217,8 @@ class Map(object):
         and it will fetch the information from that dictionary.
         Note that because of limitations in the protocol there is no way to
         get the current subdomain and real `server_name` from the environment.
-        If you don't provide it, Shake will use `SERVER_NAME` and 
-        `SERVER_PORT` (or `HTTP_HOST` if provided) as used `server_name` 
+        If you don't provide it, Shake will use `SERVER_NAME` and
+        `SERVER_PORT` (or `HTTP_HOST` if provided) as used `server_name`
         with disabled subdomain feature.
 
         If `subdomain` is `None` but an environment and a server name is
@@ -1261,10 +1261,10 @@ class Map(object):
                 if (environ['wsgi.url_scheme'], environ['SERVER_PORT']) not \
                         in (('https', '443'), ('http', '80')):
                     wsgi_server_name += ':' + environ['SERVER_PORT']
-            
+
             wsgi_server_name = wsgi_server_name.lower()
 
-            ## `cur_server_name` can be != real_server_name 
+            ## `cur_server_name` can be != real_server_name
             ## even with valid configs if the server was
             ## accesssed directly by IP address under some situations.
             ## Why should we care?
@@ -1272,12 +1272,12 @@ class Map(object):
             real_server_name = server_name.split(':', 1)[0].split('.')
             offset = -len(real_server_name)
             subdomain = '.'.join(filter(None, cur_server_name[:offset]))
-        
+
         return Map.bind(self, server_name, environ.get('SCRIPT_NAME'),
             subdomain, environ['wsgi.url_scheme'], environ['REQUEST_METHOD'],
             environ.get('PATH_INFO'),
             query_args=environ.get('QUERY_STRING', ''))
-    
+
     def __repr__(self):
         rules = self.iter_rules()
         return '%s(%s)' % (self.__class__.__name__, pformat(list(rules)))
@@ -1339,15 +1339,15 @@ class MapAdapter(object):
             first argument and the value dict as second.  Has
             to dispatch to the actual view function with this
             information.  (see above)
-        
+
         path_info
         :   The path info to use for matching.  Overrides the
             path info specified on binding.
-        
+
         method
         :   The HTTP method used for matching.  Overrides the
             method specified on binding.
-        
+
         catch_http_exceptions
         :   Set to `True` to catch any of the `HTTPException`s.
 
@@ -1424,20 +1424,20 @@ class MapAdapter(object):
         path_info
         :   The path info to use for matching.  Overrides the path info
             specified on binding.
-        
+
         method
         :   The HTTP method used for matching.  Overrides the method
             specified on binding.
-        
+
         return_rule
         :   Return the rule that matched instead of just the endpoint
             (defaults to `False`).
-        
+
         query_args
         :   Optional query arguments that are used for automatic redirects as
             string or dictionary.  It's currently not possible to use the
             query arguments for URL matching.
-        
+
         """
         if path_info is None:
             path_info = self.path_info
@@ -1505,11 +1505,11 @@ class MapAdapter(object):
         path_info
         :   The path info to use for matching.  Overrides the
             path info specified on binding.
-        
+
         method
         :   The HTTP method used for matching.  Overrides the
             method specified on binding.
-        
+
         """
         try:
             self.match(path_info, method)
@@ -1615,7 +1615,7 @@ class MapAdapter(object):
                 rv = rule.build(values, append_unknown)
                 if rv is not None:
                     return rv
-        
+
         for rule in self.map._rules_by_endpoint.get(endpoint, ()):
             if rule.suitable_for(values, method):
                 rv = rule.build(values, append_unknown)
@@ -1666,23 +1666,23 @@ class MapAdapter(object):
 
         endpoint
         :   The endpoint or name of the URL to build.
-        
+
         values
         :   The values for the URL to build.  Unhandled values are
             appended to the URL as query parameters.
-        
+
         method
         :   The HTTP method for the rule if there are different
             URLs for different methods on the same endpoint.
-        
+
         force_external
         :   Enforce full canonical external URLs.
-        
+
         append_unknown
         :   Unknown parameters are appended to the generated
             URL as query string argument.  Disable this
             if you want the builder to ignore those.
-        
+
         """
         if values:
             if isinstance(values, MultiDict):
@@ -1705,7 +1705,7 @@ class MapAdapter(object):
             (self.map.host_matching and host == self.server_name) or
             (not self.map.host_matching and domain_part == self.subdomain)):
             return str(urljoin(self.script_name, './' + path.lstrip('/')))
-        
+
         return str('%s://%s%s/%s' % (
             self.url_scheme,
             host,

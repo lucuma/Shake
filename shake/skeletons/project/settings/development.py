@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Development settings
     -------------------------------
-    
+
 """
 from mailshake import ToConsoleMailer
 

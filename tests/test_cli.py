@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 import pytest
 from shake.cli.helpers import make_secret
 

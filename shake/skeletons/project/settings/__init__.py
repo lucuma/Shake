@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Project settings
     -------------------------------
-    
+
 """
 import shake
 

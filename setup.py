@@ -34,7 +34,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     url='http://github.com/lucuma/shake',
-    license='MIT license (http://www.opensource.org/licenses/mit-license.php)',
+    license='MIT license (see LICENSE)',
     description='A lightweight web framework based on Werkzeug and Jinja2 as an alternative to Flask',
     long_description=desc,
     install_requires=get_requirements(),

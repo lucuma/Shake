@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 import pytest
 from shake import routes as r
 from shake import Response
@@ -87,7 +87,7 @@ def test_named_routes():
         r.Rule('/<blob>/', 'ctest', name='test'),
     ])
     adapter = map.bind('example.com', '/')
-    
+
     assert adapter.build('foo', {}) == '/foo'
     assert adapter.build('bar', {}) == '/bar/'
     assert adapter.build('test', {'blob': 'blub'}) == '/blub/'
@@ -223,7 +223,7 @@ def test_dispatch():
         if raise_this is not None:
             raise raise_this
         return Response(repr((endpoint, values)))
-    
+
     def dispatch(p, q=False):
         return Response.force_type(adapter.dispatch(view_func, p,
             catch_http_exceptions=q), env)
@@ -319,7 +319,7 @@ def test_adapter_match_return_rule():
     rule = r.Rule('/foo/', endpoint='foo')
     map = r.Map([rule])
     adapter = map.bind('localhost', '/')
-    
+
     assert adapter.match('/foo/', return_rule=True) == (rule, {})
 
 
@@ -349,7 +349,7 @@ def test_rule_emptying():
     rule2 = rule.empty()
 
     assert rule.__dict__ == rule2.__dict__
-    
+
     rule.methods.add('GET')
     assert rule.__dict__ != rule2.__dict__
 
@@ -475,7 +475,7 @@ def test_default_converters():
     class MyMap(r.Map):
         default_converters = r.Map.default_converters.copy()
         default_converters['foo'] = r.UnicodeConverter
-    
+
     assert isinstance(r.Map.default_converters, ImmutableDict)
 
     m = MyMap([
@@ -746,6 +746,6 @@ def test_redirect_request_exception_code():
     exc = r.RequestRedirect('http://www.google.com/')
     exc.code = 307
     env = create_environ()
-    
+
     assert exc.get_response(env).status_code == exc.code
 

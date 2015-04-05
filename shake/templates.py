@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Shake.templates
     --------------------------
@@ -15,7 +15,7 @@ from .helpers import local, to_unicode, url_for
 
 
 __all__ = (
-    'link_to', 'dumb_plural', 
+    'link_to', 'dumb_plural',
 )
 
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 import os
 
 import pytest
@@ -52,7 +52,7 @@ def fail(request):
 def test_callable_endpoint():
     app = Shake(__file__)
     app.add_url('/', index)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -71,11 +71,11 @@ def test_string_endpoint():
 
 def test_default_response():
     app = Shake(__file__)
-    
+
     @app.route('/')
     def index(request):
         pass
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -85,7 +85,7 @@ def test_default_response():
 def test_default_not_found():
     app = Shake(__file__)
     app.add_url('/', index)
-    
+
     c = app.test_client()
     resp = c.get('/bla')
     assert resp.status_code == HTTP_NOT_FOUND
@@ -95,7 +95,7 @@ def test_default_not_found():
 def test_default_error():
     app = Shake(__file__)
     app.add_url('/', fail)
-    
+
     c = app.test_client()
     with pytest.raises(AssertionError):
         c.get('/')
@@ -104,7 +104,7 @@ def test_default_error():
 def test_default_not_allowed():
     app = Shake(__file__)
     app.add_url('/', no_pass)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_FORBIDDEN
@@ -117,7 +117,7 @@ def test_redirect():
     @app.route('/')
     def redir(request):
         return redirect('/bla')
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_FOUND
@@ -127,7 +127,7 @@ def test_custom_not_found():
     settings = {'PAGE_NOT_FOUND': not_found, 'DEBUG': True}
     app = Shake(__file__, settings)
     app.add_url('/', index)
-    
+
     c = app.test_client()
     resp = c.get('/bla')
     assert resp.status_code == HTTP_NOT_FOUND
@@ -138,7 +138,7 @@ def test_custom_error():
     settings = {'PAGE_ERROR': error, 'DEBUG': False}
     app = Shake(__file__, settings)
     app.add_url('/', fail)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_ERROR
@@ -149,7 +149,7 @@ def test_custom_not_allowed():
     settings = {'PAGE_NOT_ALLOWED': not_allowed}
     app = Shake(__file__, settings)
     app.add_url('/', no_pass)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_FORBIDDEN
@@ -163,7 +163,7 @@ def test_data_not_found():
     @app.route('/')
     def data_not_found(request):
         raise NotFound
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_NOT_FOUND
@@ -192,14 +192,14 @@ def test_error_codes():
         }
     settings = {'DEBUG': False}
     app = Shake(__file__, settings)
-    
+
     @app.route('/<int:code>/')
     def index(request, code):
         print code
         raise errors[code]
 
     c = app.test_client()
-    
+
     for code in errors:
         if code in app.error_handlers:
             continue
@@ -251,7 +251,7 @@ def test_is_get():
     @app.route('/')
     def index(request):
         return str(request.is_get)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.data == 'True'
@@ -269,7 +269,7 @@ def test_is_post():
     @app.route('/')
     def index(request):
         return str(request.is_post)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.data == 'False'
@@ -287,7 +287,7 @@ def test_is_put():
     @app.route('/')
     def index(request):
         return str(request.is_put)
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.data == 'False'
@@ -324,12 +324,12 @@ def test_is_json():
     @app.route('/')
     def index(request):
         return str(request.json)
-    
+
     c = app.test_client()
     resp = c.post('/', content_type='application/json',
         data=json.dumps(data))
     assert eval(resp.data) == data
-    
+
     resp = c.post('/', data=json.dumps(data))
     assert resp.data == 'None'
 
@@ -354,7 +354,7 @@ def test_response_string():
     @app.route('/')
     def index(request):
         return 'hello world'
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -368,7 +368,7 @@ def test_response_none():
     @app.route('/')
     def index(request):
         return None
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -383,7 +383,7 @@ def test_response_json():
     @app.route('/')
     def index(request):
         return data
-    
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -392,7 +392,7 @@ def test_response_json():
 
 
 def test_bad_responses():
-    
+
     bad_responses = [
         42,
         [], (),
@@ -401,7 +401,7 @@ def test_bad_responses():
         os.path,
         Ellipsis,
     ]
-    
+
     for r in bad_responses:
         app = Shake(__file__)
         app.add_url('/', lambda request: r)
@@ -416,7 +416,7 @@ def test_response_mimetype():
     @app.route('/')
     def index(request):
         return Response('hello world', mimetype='foo/bar')
-        
+
     c = app.test_client()
     resp = c.get('/')
     assert resp.status_code == HTTP_OK
@@ -427,74 +427,74 @@ def test_response_mimetype():
 def test_processors_order():
     app = Shake(__file__)
     r = []
-    
+
     @app.route('/')
     def index(request):
         r.append('view')
-    
+
     @app.before_request
     def br1(request):
         r.append('br1')
-    
+
     @app.before_request
     def br2(request):
         r.append('br2')
-    
+
     @app.after_request
     def ar1(response):
         r.append('ar1')
         return response
-    
+
     @app.after_request
     def ar2(response):
         r.append('ar2')
         return response
-    
+
     @app.on_exception
     def error(e):
         r.append('error')
-    
+
     c = app.test_client()
     c.get('/')
     assert r == 'br1 br2 view ar1 ar2'.split()
 
 
 def test_processors_order_exception():
-    
+
     def eview(request, error):
         r.append('eview')
 
     settings = {'PAGE_ERROR': eview, 'DEBUG': False}
     app = Shake(__file__, settings)
     r = []
-    
+
     @app.route('/')
     def index(request):
         r.append('view')
         assert False
-    
+
     @app.before_request
     def br1(request):
         r.append('br1')
-    
+
     @app.before_request
     def br2(request):
         r.append('br2')
-    
+
     @app.after_request
     def ar1(response):
         r.append('ar1')
         return response
-    
+
     @app.after_request
     def ar2(response):
         r.append('ar2')
         return response
-    
+
     @app.on_exception
     def on_error(e):
         r.append('error')
-    
+
     c = app.test_client()
     c.get('/')
     assert r == 'br1 br2 view error eview ar1 ar2'.split()
@@ -506,11 +506,11 @@ def test_after_request_return():
     @app.route('/')
     def index(request):
         return 'ok'
-    
+
     @app.after_request
     def brs(response):
         pass
-    
+
     c = app.test_client()
     with pytest.raises(Exception):
         print c.get('/')
@@ -527,7 +527,7 @@ def test_session():
     @app.route('/read/')
     def read(request):
         assert request.session['foo'] == 'bar'
-    
+
     c = app.test_client()
     c.get('/write/')
     print c.cookie_jar
@@ -540,7 +540,7 @@ def test_session_nosecret():
     @app.route('/')
     def p1(request):
         request.session['foo'] = 'bar'
-    
+
     c = app.test_client()
     with pytest.raises(RuntimeError):
         print c.get('/')

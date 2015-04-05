@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     Users models
     -------------------------------
@@ -18,7 +18,7 @@ SUSPENDED_USER = 'S'
 
 
 class Role(db.Model):
-    
+
     __tablename__ = 'roles'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +41,7 @@ class Role(db.Model):
 class User(AuditableMixin, db.Model):
 
     __tablename__ = 'users'
-    
+
     id = db.Column(db.Integer, primary_key=True)
 
     login = db.Column(db.String(255), unique=True,
@@ -110,7 +110,7 @@ def create_admin():
     """Create the admin user (if it doesn't already exist)"""
     from pyceo import prompt
     from .manage import create_user
-    
+
     u = User.by_login(u'admin')
     if not u:
         print 'Creating the `admin` user…'

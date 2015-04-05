@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding=utf-8
 """
     To activate, import this module from your main manage.py file
-    
+
 """
 from shake import manager
 
