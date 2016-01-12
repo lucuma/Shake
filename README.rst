@@ -23,5 +23,5 @@ Or a full featured (yet configurable if needed) framework.
 
 ______
 
-:copyright: `Juan-Pablo Scaletti <http://jpscaletti.com>`_.
+:copyright: `Lúcuma labs S.A.C. <http://lucumalabs.com>`_
 :license: MIT, see LICENSE for more details.

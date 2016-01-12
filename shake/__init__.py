@@ -22,7 +22,7 @@
 
     ---------------------------------------
 
-    :copyright: `Juan-Pablo Scaletti <http://jpscaletti.com>`_.
+    :copyright: `Lúcuma labs S.A.C. <http://lucumalabs.com>`_.
     :license: MIT, see LICENSE for more details.
 
 """
@@ -48,4 +48,4 @@ from .wrappers import *
 NotAllowed = Forbidden
 redirect_to = redirect
 
-__version__ = '1.6.4'
+__version__ = '1.6.5'

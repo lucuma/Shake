@@ -28,8 +28,8 @@ desc = str(re.search(b'"""(.+)"""', data, re.DOTALL).group(1)).strip()
 setup(
     name='Shake',
     version=version,
-    author='Juan-Pablo Scaletti',
-    author_email='juanpablo@lucumalabs.com',
+    author='Lucuma labs',
+    author_email='info@lucumalabs.com',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
